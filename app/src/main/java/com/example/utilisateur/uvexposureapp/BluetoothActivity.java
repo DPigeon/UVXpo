@@ -3,7 +3,10 @@ package com.example.utilisateur.uvexposureapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,18 +38,39 @@ public class BluetoothActivity extends AppCompatActivity {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // Initialize bluetooth
         bluetoothSetStatus();
+        bluetoothButtons();
     }
 
     protected void bluetoothSetStatus() { // Sets the status of the bluetooth connection
-        if (bluetoothAdapter == null)
-            Toast.makeText(getApplicationContext(), "Bluetooth is not available!", Toast.LENGTH_LONG);
-        else
-            Toast.makeText(getApplicationContext(), "Bluetooth is available!", Toast.LENGTH_LONG);
+        if (bluetoothAdapter == null) {
+            Log.i("BT", "Bluetooth not supported on Virtual Devices! Use a real device.");
+            displayToast("Bluetooth is not available!");
+            finish();
+        } else
+            displayToast("Bluetooth is available!");
 
-        if (bluetoothAdapter.isEnabled())
-            bluetoothStatusTextView.setText("Bluetooth is on!");
-        else
-            bluetoothStatusTextView.setText("Bluetooth is off!");
+            if (bluetoothAdapter.isEnabled())
+                displayToast("Bluetooth is on!");
+            else
+                displayToast("Bluetooth is off!");
+    }
+
+    protected void bluetoothButtons() {
+        buttonOn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!bluetoothAdapter.isEnabled()) {
+                    displayToast("Turning on Bluetooth...");
+                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(intent, REQUEST_ENABLE_BT);
+                } else
+                    displayToast("Bluetooth is already on!");
+            }
+        });
+    }
+
+    protected void displayToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
     }
 
 }
