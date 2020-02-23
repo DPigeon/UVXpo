@@ -7,10 +7,10 @@
     tools:context=".BluetoothActivity">
 
     <Button
-        android:id="@+id/buttonOn"
+        android:id="@+id/toggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="156dp"
         android:text="Turn On"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -18,17 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/buttonOff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="40dp"
-        android:text="Turn Off"
-        app:layout_constraintStart_toStartOf="@+id/buttonOn"
-        app:layout_constraintTop_toBottomOf="@+id/buttonOn" />
-
-    <Button
-        android:id="@+id/buttonDiscoverable"
+        android:id="@+id/discoverableButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Discoverable"
@@ -37,7 +27,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.443" />
+        app:layout_constraintVertical_bias="0.383" />
 
     <Button
         android:id="@+id/pairedDevicesButton"
@@ -48,7 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonDiscoverable" />
+        app:layout_constraintTop_toBottomOf="@+id/discoverableButton" />
 
     <TextView
         android:id="@+id/pairedDeviceTextView"
@@ -60,10 +50,11 @@
         app:layout_constraintTop_toBottomOf="@+id/pairedDevicesButton" />
 
     <TextView
-        android:id="@+id/bluetoothStatusTextView"
+        android:id="@+id/titleBluetoothTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:text="Bluetooth Settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
