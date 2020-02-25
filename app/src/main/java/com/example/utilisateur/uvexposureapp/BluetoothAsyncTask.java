@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -31,12 +30,6 @@ public class BluetoothAsyncTask extends AsyncTask<Void, Void, ArrayList> {
     private InputStream inputStream;
     private Handler handler;
     private byte buffer[];
-
-    private interface MessageConstants {
-        public static final int MESSAGE_READ = 0;
-        public static final int MESSAGE_WRITE = 1;
-        public static final int MESSAGE_TOAST = 2;
-    }
 
     @Override
     public void onPreExecute() {
@@ -75,6 +68,7 @@ public class BluetoothAsyncTask extends AsyncTask<Void, Void, ArrayList> {
                 socket.connect(); // Connect
                 tempIn = socket.getInputStream(); // We get the data
                 stringToReturn = "Success";
+                Log.d(TAG, "Connected to the Bluetooth device!");
             } else
                 stringToReturn = "Failed";
         } catch (IOException exception) {
@@ -96,46 +90,9 @@ public class BluetoothAsyncTask extends AsyncTask<Void, Void, ArrayList> {
     @Override
     public void onPostExecute(ArrayList result) {
         if (result.get(0) == "Success") {
-            Log.d(TAG, "Connected to the Bluetooth Device!");
-            connectedDevice((BluetoothSocket)result.get(1));
+            Log.d(TAG, "Asynchronous task completed!");
         }
         else if (result.get(0) == "Failed")
-            Log.d(TAG, "Failed connection...");
-    }
-
-    public void connectedDevice(BluetoothSocket socket) { ;
-            InputStream tempIn = null;
-            try {
-                if (foundDevice)
-                    tempIn = socket.getInputStream();
-            } catch (IOException e) {
-                Log.e(TAG, "Error occurred when creating input stream", e);
-            }
-
-            inputStream = tempIn;
-            getData(inputStream);
-    }
-
-    public void getData(InputStream inputStream) {
-        Log.d(TAG, "Listening to data...");
-        buffer = new byte[1024];
-        int numBytes; // bytes returned from read()
-
-        if (foundDevice) {
-            while (true) {
-                try {
-                    // Read from the InputStream
-                    numBytes = inputStream.read(buffer);
-                    String incomingMessage = new String(buffer, 0, numBytes);
-                    Log.d(TAG, "data: " + incomingMessage);
-                    // Send the obtained bytes to the UI activity.
-                    Message readMessage = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1, buffer);
-                    readMessage.sendToTarget();
-                } catch (IOException exception) {
-                    Log.d(TAG, "Input stream was disconnected!", exception);
-                    break;
-                }
-            }
-        }
+            Log.d(TAG, "Failed the asynchronous task! Check your connections...");
     }
 }
