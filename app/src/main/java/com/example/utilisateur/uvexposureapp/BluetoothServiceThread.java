@@ -1,12 +1,14 @@
 package com.example.utilisateur.uvexposureapp;
 
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /* https://developer.android.com/guide/topics/connectivity/bluetooth
  * A thread used to listen to the incoming stream input from bluetooth
@@ -17,6 +19,7 @@ public class BluetoothServiceThread extends Thread {
     private Handler handler; // handler that gets info from Bluetooth service
     private BluetoothSocket socket;
     private InputStream inStream;
+    private OutputStream outStream;
     private byte[] buffer; // To store the stream
 
     private interface MessageConstants {
@@ -28,6 +31,7 @@ public class BluetoothServiceThread extends Thread {
     public BluetoothServiceThread(BluetoothSocket socket) {
         socket = socket;
         InputStream tempIn = null;
+        OutputStream tempOut = null;
 
         // Get the incoming stream
         try {
@@ -36,7 +40,14 @@ public class BluetoothServiceThread extends Thread {
             Log.e(TAG, "Error occurred when creating input stream!", e);
         }
 
+        try {
+            tempOut = socket.getOutputStream();
+        } catch (IOException e) {
+            Log.e(TAG, "Error occurred when creating input stream!", e);
+        }
+
         inStream = tempIn;
+        outStream = tempOut;
     }
 
     public void run() {
@@ -50,12 +61,33 @@ public class BluetoothServiceThread extends Thread {
                 // Read from the InputStream.
                 bytes = inStream.read(buffer);
                 // Send the obtained bytes to the UI activity.
-                Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, bytes, -1, buffer);
-                readMsg.sendToTarget();
+                Message readMessage = handler.obtainMessage(MessageConstants.MESSAGE_READ, bytes, -1, buffer);
+                readMessage.sendToTarget();
             } catch (IOException e) {
                 Log.d(TAG, "Input stream was disconnected!", e);
                 break;
             }
+        }
+    }
+
+    // Used to send data from phone to microcontroller (may be needed for integration checks)
+    public void write(byte[] bytes) {
+        buffer = new byte[1024];
+        try {
+            outStream.write(bytes);
+
+            // Share the sent message with the UI activity
+            Message writtenMessage = handler.obtainMessage(MessageConstants.MESSAGE_WRITE, -1, -1);
+            writtenMessage.sendToTarget();
+        } catch (IOException e) {
+            Log.e(TAG, "Error occurred when sending data!", e);
+
+            // Send a failure message back to the activity
+            Message writeErrorMsg = handler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString("Toast", "Couldn't send data to the other device!");
+            writeErrorMsg.setData(bundle);
+            handler.sendMessage(writeErrorMsg);
         }
     }
 

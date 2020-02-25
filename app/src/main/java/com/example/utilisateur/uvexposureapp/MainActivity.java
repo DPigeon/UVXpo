@@ -13,10 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
+    Handler incomingHandler;
     static TextView testDataTextView;
     Button bluetoothActivityButton;
 
@@ -26,8 +26,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setupUI();
+
+        incomingHandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                testDataTextView.setText(String.valueOf(message));
+                return true;
+            }
+        });
         connectAndListen();
     }
+
 
     protected void setupUI() {
         bluetoothActivityButton = findViewById(R.id.bluetoothButton);
@@ -39,13 +48,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    /*static Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message message) {
-            testDataTextView.setText(String.valueOf(message.what));
-        }
-    };*/
 
     void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(MainActivity.this, page); // from the main activity to the profile class
