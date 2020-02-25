@@ -5,13 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    TextView testDataTextView;
+    static TextView testDataTextView;
     Button bluetoothActivityButton;
 
     @Override
@@ -34,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+            testDataTextView.setText(String.valueOf(message.what));
+        }
+    };
+
     void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(MainActivity.this, page); // from the main activity to the profile class
         startActivity(intent);
@@ -46,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             BluetoothAsyncTask bluetoothAsyncTask = new BluetoothAsyncTask();
             bluetoothAsyncTask.execute();
-
-            //testDataTextView.setText(bluetoothAsyncTask.getData());
         }
     }
 }

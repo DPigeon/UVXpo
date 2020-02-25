@@ -97,7 +97,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     if (devices.size() != 0) {
                         pairedTextView.setText("Paired Devices: \n");
                         for (BluetoothDevice device : devices)
-                            pairedTextView.append("\nDevice" + device.getName() + ", " + device + ", " + device.getUuids()[0]);
+                            pairedTextView.append("\nDevice" + device.getName() + ", " + device);
                     } else
                         pairedTextView.setText("Paired Devices: None");
                 } else {
