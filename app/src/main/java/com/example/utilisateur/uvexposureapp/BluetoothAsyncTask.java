@@ -93,6 +93,6 @@ public class BluetoothAsyncTask extends AsyncTask<Void, Void, ArrayList> {
             Log.d(TAG, "Asynchronous task completed!");
         }
         else if (result.get(0) == "Failed")
-            Log.d(TAG, "Failed the asynchronous task! Check your connections...");
+            Log.d(TAG, "Failed to connect! Check if you are connecting to the device address " + DEVICE_ADDRESS + ".");
     }
 }

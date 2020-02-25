@@ -13,6 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/*
+ * The MainActivity where the bluetooth connection is made and the data is fetched.
+ */
+
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,13 +66,17 @@ public class MainActivity extends AppCompatActivity {
             BluetoothAsyncTask bluetoothAsyncTask = new BluetoothAsyncTask();
             bluetoothAsyncTask.execute();
             try {
+                String status = (String)bluetoothAsyncTask.get().get(0); // Get the status from the async task
                 BluetoothSocket socket = (BluetoothSocket)bluetoothAsyncTask.get().get(1); // Get the socket from the async task
-                BluetoothServiceThread service = new BluetoothServiceThread(socket);
-                try {
-                    service.start(); // Start the service
-                } catch (Exception exception) {
-                    Log.e("BluetoothThread: ", "Error ", exception);
-                    service.cancel(); // Cancel the service if exception
+                BluetoothServiceThread service;
+                if (status == "Success") { // If connected to the device
+                    service = new BluetoothServiceThread(socket);
+                    try {
+                        service.start(); // Start the service
+                    } catch (Exception exception) {
+                        Log.e("BluetoothThread: ", "Error ", exception);
+                        service.cancel(); // Cancel the service if exception
+                    }
                 }
             } catch (InterruptedException | ExecutionException exception) {
                 Log.e("BluetoothThread: ", "Error ", exception);

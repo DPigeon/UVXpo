@@ -34,6 +34,7 @@ public class BluetoothServiceThread extends Thread {
         OutputStream tempOut = null;
 
         // Get the incoming stream
+
         try {
             tempIn = socket.getInputStream();
         } catch (IOException e) {
