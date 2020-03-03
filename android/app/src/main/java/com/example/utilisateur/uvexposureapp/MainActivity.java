@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
     Handler incomingHandler;
     static TextView testDataTextView;
-    Button bluetoothActivityButton;
+    Button bluetoothActivityButton, graphButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 goToActivity(BluetoothActivity.class);
+            }
+        });
+
+        graphButton = findViewById(R.id.graphButton);
+        graphButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToActivity(GraphActivity.class);
             }
         });
     }
