@@ -2,9 +2,11 @@ package com.example.utilisateur.uvexposureapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,13 +19,16 @@ import android.widget.TextView;
  * The MainActivity where the bluetooth connection is made and the data is fetched.
  */
 
+
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     Handler incomingHandler;
     static TextView testDataTextView;
     Button bluetoothActivityButton;
+    protected Button weatherButton;
 
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +50,17 @@ public class MainActivity extends AppCompatActivity {
     protected void setupUI() {
         bluetoothActivityButton = findViewById(R.id.bluetoothButton);
         testDataTextView = findViewById(R.id.testDataTextView);
+        weatherButton = findViewById(R.id.weather);
         bluetoothActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goToActivity(BluetoothActivity.class);
+            }
+        });
+        weatherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToActivity(WeatherAcitvity.class);
             }
         });
     }
