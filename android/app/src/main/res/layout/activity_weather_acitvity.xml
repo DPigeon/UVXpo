@@ -7,18 +7,6 @@
     tools:context=".WeatherAcitvity">
 
     <TextView
-        android:id="@+id/City"
-        android:layout_width="130dp"
-        android:layout_height="38dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginTop="33dp"
-        android:layout_marginEnd="215dp"
-        android:text="City"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weather" />
-
-    <TextView
         android:id="@+id/weather"
         android:layout_width="115dp"
         android:layout_height="43dp"
@@ -47,4 +35,15 @@
         android:text="Status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Weather" />
+
+    <EditText
+        android:id="@+id/City"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="66dp"
+        android:layout_marginTop="33dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weather" />
 </androidx.constraintlayout.widget.ConstraintLayout>
