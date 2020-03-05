@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WeatherAcitvity">
+
+    <TextView
+        android:id="@+id/Weather"
+        android:layout_width="206dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="66dp"
+        android:layout_marginTop="153dp"
+        android:text="Weather"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/Status"
+        android:layout_width="197dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="66dp"
+        android:layout_marginTop="24dp"
+        android:text="Status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Weather" />
+
+    <EditText
+        android:id="@+id/City"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="66dp"
+        android:layout_marginTop="130dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="195dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="13dp"
+        android:text="Montreal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Status" />
+</androidx.constraintlayout.widget.ConstraintLayout>
