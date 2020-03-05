@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
-public class WeatherAcitvity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity {
     protected TextView Weather;
     protected EditText City;
     protected TextView montreal;
@@ -62,8 +62,6 @@ public class WeatherAcitvity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     void setupUI(String main,String desc,String temps) {
@@ -74,16 +72,11 @@ public class WeatherAcitvity extends AppCompatActivity {
         cityName = City.getText().toString();
         Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
         Status.setText("Status: "+ main +"\n");
-
-
-
     }
 
     public String weatherInfo() {
         String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=b6907d289e10d714a6e88b30761fae22";
         return URL;
-
-
     }
 }
 
