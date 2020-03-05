@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     static TextView testDataTextView;
     Button bluetoothActivityButton;
     protected Button weatherButton;
+    Button bluetoothActivityButton, graphButton;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -62,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 goToActivity(WeatherAcitvity.class);
+
+        graphButton = findViewById(R.id.graphButton);
+        graphButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToActivity(GraphActivity.class);
             }
         });
     }
