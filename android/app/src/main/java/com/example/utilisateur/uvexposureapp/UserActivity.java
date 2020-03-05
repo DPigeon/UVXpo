@@ -1,6 +1,7 @@
 package com.example.utilisateur.uvexposureapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -135,7 +136,12 @@ public class UserActivity extends AppCompatActivity {
 
             }
         });
+        deleteBackHomeArrowTopLeft();
+    }
 
+    protected void deleteBackHomeArrowTopLeft() { // No backHone left arrow needed as we already have one included with actionBar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
     @Override
@@ -152,6 +158,7 @@ public class UserActivity extends AppCompatActivity {
         {
             case R.id.BackButtonItem: /**IF 'BACK' IS PRESSED, GO BACK TO HOME INTERFACE*/
                 sendToHome(); /**FUNCTION TO GO BACK HOME*/
+                return true;
             case R.id.EditUserProfileItem: /**IF 'EDIT MODE' IS PRESSED, LET USER EDIT INPUTS*/
                 Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
                 radioGroup.setEnabled(true); /**SET ALL BUTTONS AND INPUTS TO ENABLED SO USER CAN CHANGE*/

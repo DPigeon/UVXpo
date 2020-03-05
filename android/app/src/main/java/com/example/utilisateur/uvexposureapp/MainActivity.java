@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
     Handler incomingHandler;
     static TextView testDataTextView;
-    protected Button weatherButton, bluetoothActivityButton, graphButton;
+    protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        setupUI();
         connectAndListen();
     }
 
@@ -49,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
         bluetoothActivityButton = findViewById(R.id.bluetoothButton);
         testDataTextView = findViewById(R.id.testDataTextView);
         graphButton = findViewById(R.id.graphButton);
-        weatherButton = findViewById(R.id.weather);
+        weatherButton = findViewById(R.id.weatherButton);
+        settingsButton = findViewById(R.id.settingsButton);
         bluetoothActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 goToActivity(GraphActivity.class);
+            }
+        });
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToActivity(UserActivity.class);
             }
         });
     }
