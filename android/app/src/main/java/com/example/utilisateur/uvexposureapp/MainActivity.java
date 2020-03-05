@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 goToActivity(BluetoothActivity.class);
             }
         });
+        weatherButton.setText("Get Current Weather Data");
         weatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
