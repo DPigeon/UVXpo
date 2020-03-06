@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +26,8 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
     Handler incomingHandler;
     static TextView testDataTextView;
-    protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton;
+    protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
+    String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -77,6 +79,19 @@ public class MainActivity extends AppCompatActivity {
                 goToActivity(UserActivity.class);
             }
         });
+        faqButton = findViewById(R.id.faqButton);
+        faqButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFaqWebsite(view);
+            }
+        });
+    }
+
+    /* Linking website to FAQ button */
+    public void openFaqWebsite(View view){
+        Intent browserIntent=new Intent(Intent.ACTION_VIEW, Uri.parse(FaqURL));
+        startActivity(browserIntent);
     }
 
     void goToActivity(Class page) { // Function that goes from the main activity to another one
