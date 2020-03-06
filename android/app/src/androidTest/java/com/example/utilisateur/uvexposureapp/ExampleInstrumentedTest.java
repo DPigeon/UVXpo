@@ -1,4 +1,4 @@
-package com.example.faq;
+package com.example.utilisateur.uvexposureapp;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.example.faq", appContext.getPackageName());
+        assertEquals("com.example.utilisateur.uvexposureapp", appContext.getPackageName());
     }
 }
