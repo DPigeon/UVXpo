@@ -1,4 +1,4 @@
-package com.example.faq;
+package com.example.utilisateur.uvexposureapp;
 
 import org.junit.Test;
 

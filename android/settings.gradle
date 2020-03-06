@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='faq'
+rootProject.name='UV ExposureApp'
