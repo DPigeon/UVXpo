@@ -6,7 +6,7 @@ Sensor:           Analog UV sensor
 Connections:      Microntroller   |     Sensor
                   GND          <--|-->  GND
                   VCC          <--|-->  3V3
-                  AOUT         <--|-->  27
+                  AOUT         <--|-->  36
 Rev 1.1
 Xuebin Tian
 */
@@ -36,7 +36,7 @@ uint32_t value = 0;
 #define CHARACTERISTIC_UUID "aba24047-b36f-4646-92ce-3d5c0c75bd20"
 
 const int ledPin = 5;
-const int sensorPin = 27;
+const int sensorPin = 36;
 int sensorValue = 0;
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -71,11 +71,8 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(ledPin, OUTPUT);
-  pinMode(sensorPin, INPUT);
   analogReadResolution(10);
-  analogSetAttenuation(ADC_2_5db);
-  adcAttachPin(sensorPin);
-  adcStart(sensorPin);
+  //analogSetAttenuation(ADC_2_5db);
   digitalWrite(ledPin, HIGH);
 
   // Create the BLE Device
@@ -117,13 +114,14 @@ void loop() {
     
     digitalWrite(ledPin, HIGH);
     sensorValue = analogRead(sensorPin);
+    char txString[8];
+    dtostrf(sensorValue, 1, 2, txString); // float_val, min_width, digits_after_decimal, char_buffer
     
     // notify changed value
     if (deviceConnected) {
-        pCharacteristic->setValue((uint8_t*)&sensorValue, 4);
+        pCharacteristic->setValue(txString);
         pCharacteristic->notify();
-        value++;
-        delay(3); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
+        delay(10); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
     }
     // disconnecting
     if (!deviceConnected && oldDeviceConnected) {
@@ -140,7 +138,7 @@ void loop() {
 
     Serial.println(sensorValue);
     
-    delay(500);
+    delay(50);
     digitalWrite(ledPin, LOW);
-    delay(500);
+    delay(50);
 }
