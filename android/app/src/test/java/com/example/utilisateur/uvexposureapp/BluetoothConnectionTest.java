@@ -3,32 +3,32 @@ package com.example.utilisateur.uvexposureapp;
 import android.util.Log;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Bluetooth Connection Unit Test. Should return Success to pass.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(BluetoothAsyncTask.class)
 public class BluetoothConnectionTest {
+    private BluetoothAsyncTask bluetoothAsyncTaskMock;
+    private BluetoothConnection bluetoothConnection;
+
+    @Before
+    public void setup() {
+        bluetoothConnection = mock(BluetoothConnection.class); // Mocking the asynctask
+    }
+
     @Test
-    public void bluetooth_Connection_ReturnsSuccess() {
-        BluetoothAsyncTask bluetoothAsyncTask = PowerMockito.mock(BluetoothAsyncTask.class);
-        PowerMockito.when(bluetoothAsyncTask.execute()).thenReturn(bluetoothAsyncTask);
-        try {
-            String status = (String)bluetoothAsyncTask.get().get(0); // Get the status from the async task
-            Assert.assertEquals(status, "Success"); // Looks if it is the same as success
-        } catch (InterruptedException | ExecutionException exception) {
-            Log.e("BluetoothThread: ", "Error ", exception);
-            bluetoothAsyncTask.cancel(true); // Cancel the connection if exception
-        }
+    public void bluetooth_Connection_ReturnsSuccess() throws Exception {
+        when(bluetoothConnection.connectToBluetooth()).thenReturn("Success");
+
+        String status = (String)bluetoothConnection.connectToBluetooth(); // Get the status from the async task
+        Assert.assertEquals(status, "Success"); // Looks if it is the same as success
     }
 }
