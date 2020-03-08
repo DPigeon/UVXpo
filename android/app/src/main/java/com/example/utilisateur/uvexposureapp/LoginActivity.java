@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -44,6 +45,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+        setupAction();
+    }
+
+    protected void setupAction() { // No action bar for the main activity
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
 
