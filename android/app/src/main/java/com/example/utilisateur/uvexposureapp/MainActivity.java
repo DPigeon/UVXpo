@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
@@ -47,8 +48,13 @@ public class MainActivity extends AppCompatActivity {
         connectAndListen();
     }
 
+    protected void setupAction() { // No action bar for the main activity
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(false);
+    }
 
     protected void setupUI() {
+        setupAction();
         bluetoothActivityButton = findViewById(R.id.bluetoothButton);
         testDataTextView = findViewById(R.id.testDataTextView);
         graphButton = findViewById(R.id.graphButton);
