@@ -21,8 +21,9 @@ import java.util.UUID;
 
 public class BluetoothAsyncTask extends AsyncTask<Void, Void, ArrayList> {
     boolean foundDevice = false;
-    private final String DEVICE_ADDRESS = "F8:59:71:70:5D:5E"; // To be determined with Arduino
-    private final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private final String DEVICE_ADDRESS = "24:0A:C4:05:C6:8A";
+    private final UUID BT_UUID = UUID.fromString("b923eeab-9473-4b86-8607-5068911b18fe");
+    //    private final UUID BT_UUID = UUID.fromString("aba24047-b36f-4646-92ce-3d5c0c75bd20");
     private String TAG = "BluetoothService";
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice bluetoothDevice;
