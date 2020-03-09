@@ -166,7 +166,7 @@ public class UserActivity extends AppCompatActivity {
                 notifSwitch.setClickable(true);
                 editTextAge.setEnabled(true);
                 notifSwitch.setEnabled(true);
-                saveButton.setEnabled(true);
+                saveButton.setEnabled(false); // Not available for now (but later yes)
                 radioSkintype1.setClickable(true);
                 radioSkintype2.setClickable(true);
                 radioSkintype3.setClickable(true);
