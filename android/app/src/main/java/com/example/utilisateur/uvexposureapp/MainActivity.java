@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +29,6 @@ import java.util.UUID;
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 
 public class MainActivity extends AppCompatActivity {
-    Handler incomingHandler;
     TextView testDataTextView;
     protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
