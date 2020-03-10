@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (usernameEditText.getText().toString().equals("abc") && passwordEditText.getText().toString().equals("abc"))
+                if (usernameEditText.getText().toString().equals("") && passwordEditText.getText().toString().equals(""))
                 { /**currently set the password and username to 'abc' but it should be attached to database*/
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent); /**if correct, open mainactivity*/

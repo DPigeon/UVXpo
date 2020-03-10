@@ -5,30 +5,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Set;
+import java.util.UUID;
+
+import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
+
 /*
  * The MainActivity where the bluetooth connection is made and the data is fetched.
  */
 
-
-import java.util.concurrent.ExecutionException;
-
 public class MainActivity extends AppCompatActivity {
-    Handler incomingHandler;
-    static TextView testDataTextView;
+    TextView testDataTextView;
     protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
+    String TAG = "MainActivity";
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -36,14 +40,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        incomingHandler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message message) {
-                testDataTextView.setText(String.valueOf(message));
-                return true;
-            }
-        });
         setupUI();
         connectAndListen();
     }
@@ -105,30 +101,88 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    protected void connectAndListen() { // Connects to the Bluetooth device & starts the service to listen to inputs
+    // Connects to the Bluetooth device & starts the service to listen to inputs
+    protected void connectAndListen() {
+        final String DEVICE_ADDRESS = "24:0A:C4:05:C6:8A"; // We will have to allow more devices later
+        final UUID SERVICE_UUID = UUID.fromString("b923eeab-9473-4b86-8607-5068911b18fe"); // First layer
+        final UUID CHARACTERISTIC_UUID = UUID.fromString("aba24047-b36f-4646-92ce-3d5c0c75bd20"); // Second layer
+        final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902); // Used to send data from phone --> microcontroller
+        boolean foundDevice = false;
+
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Log.i("BT", "Bluetooth not supported on Virtual Devices! Use a real device.");
+            Log.i(TAG, "Bluetooth not supported on Virtual Devices! Use a real device.");
             finish(); // Allowing to skip the exception
         } else {
-            BluetoothAsyncTask bluetoothAsyncTask = new BluetoothAsyncTask();
-            bluetoothAsyncTask.execute();
-            try {
-                String status = (String)bluetoothAsyncTask.get().get(0); // Get the status from the async task
-                BluetoothSocket socket = (BluetoothSocket)bluetoothAsyncTask.get().get(1); // Get the socket from the async task
-                BluetoothServiceThread service;
-                if (status == "Success") { // If connected to the device
-                    service = new BluetoothServiceThread(socket);
-                    try {
-                        service.start(); // Start the service
-                    } catch (Exception exception) {
-                        Log.e("BluetoothThread: ", "Error ", exception);
-                        service.cancel(); // Cancel the service if exception
-                    }
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+            BluetoothDevice bluetoothDevice = null;
+            Set<BluetoothDevice> devices;
+            devices = bluetoothAdapter.getBondedDevices(); // We get the devices
+            for (BluetoothDevice device : devices) {
+                if (device.getAddress().equals(DEVICE_ADDRESS)) { // We find the Arduino device server
+                    bluetoothDevice = device;
+                    foundDevice = true;
+                    break;
                 }
-            } catch (InterruptedException | ExecutionException exception) {
-                Log.e("BluetoothThread: ", "Error ", exception);
-                bluetoothAsyncTask.cancel(true); // Cancel the connection if exception
+            }
+            if (foundDevice) { // If found connect, otherwise don't
+                BluetoothGatt gatt; // We're using a low energy bluetooth microcontroller. Must use Gatt.
+
+                /* This is the callback where all the receiving and sending happens. Once connected, this callback thread runs in background */
+                BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) { // If connection state changes
+                        if (newState == STATE_CONNECTED)
+                            gatt.discoverServices(); // Discover the services to update
+                    }
+
+                    @Override
+                    public void onServicesDiscovered(BluetoothGatt gatt, int status) { // As soon as we discover new services
+                        super.onServicesDiscovered(gatt, status);
+                        BluetoothGattCharacteristic characteristic = gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
+                        gatt.setCharacteristicNotification(characteristic, true); // Set notifications on
+
+                        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID); // Set descriptor on
+
+                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                        gatt.writeDescriptor(descriptor);
+                    }
+
+                    @Override
+                    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) { // Used to send data phone --> microcontroller
+                        BluetoothGattCharacteristic characteristic =
+                                gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
+                        String data = "Hello Microcontroller !";
+                        byte[] byteArray = data.getBytes();
+                        characteristic.setValue(byteArray); // Send data here example
+                        gatt.writeCharacteristic(characteristic);
+                    }
+
+                    @Override
+                    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
+                        String data = new String(characteristic.getValue()); // Converting from byte[] to string
+                        processDataOnScreen(data);
+                    }
+                };
+                gatt = bluetoothDevice.connectGatt(this, true, gattCallback); // Connect with a callback
             }
         }
+    }
+
+    public void processDataOnScreen(final String data) { // Processes the data from Bluetooth Thread --> UI thread
+        final String str = data;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                testDataTextView.setText(data);
+            }
+        });
+    }
+
+    public UUID convertFromInteger(int i) { // Used to get the right UUID for descriptor and characteristic of Gatt Bluetooth
+        final long MSB = 0x0000000000001000L;
+        final long LSB = 0x800000805f9b34fbL;
+        long value = i & 0xFFFFFFFF;
+        return new UUID(MSB | (value << 32), LSB);
     }
 }
