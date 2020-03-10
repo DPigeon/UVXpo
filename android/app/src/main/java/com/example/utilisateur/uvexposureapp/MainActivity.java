@@ -19,19 +19,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-/*
- * The MainActivity where the bluetooth connection is made and the data is fetched.
- */
-
 import java.util.Set;
 import java.util.UUID;
 
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 
+/*
+ * The MainActivity where the bluetooth connection is made and the data is fetched.
+ */
+
 public class MainActivity extends AppCompatActivity {
     TextView testDataTextView;
     protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
+    String TAG = "MainActivity";
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -102,13 +103,14 @@ public class MainActivity extends AppCompatActivity {
 
     // Connects to the Bluetooth device & starts the service to listen to inputs
     protected void connectAndListen() {
+        final String DEVICE_ADDRESS = "24:0A:C4:05:C6:8A"; // We will have to allow more devices later
         final UUID SERVICE_UUID = UUID.fromString("b923eeab-9473-4b86-8607-5068911b18fe"); // First layer
         final UUID CHARACTERISTIC_UUID = UUID.fromString("aba24047-b36f-4646-92ce-3d5c0c75bd20"); // Second layer
         final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902); // Used to send data from phone --> microcontroller
         boolean foundDevice = false;
 
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Log.i("BT", "Bluetooth not supported on Virtual Devices! Use a real device.");
+            Log.i(TAG, "Bluetooth not supported on Virtual Devices! Use a real device.");
             finish(); // Allowing to skip the exception
         } else {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -117,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             Set<BluetoothDevice> devices;
             devices = bluetoothAdapter.getBondedDevices(); // We get the devices
             for (BluetoothDevice device : devices) {
-                if (device.getAddress().equals("24:0A:C4:05:C6:8A")) { // We find the Arduino device server
+                if (device.getAddress().equals(DEVICE_ADDRESS)) { // We find the Arduino device server
                     bluetoothDevice = device;
                     foundDevice = true;
                     break;
@@ -183,5 +185,4 @@ public class MainActivity extends AppCompatActivity {
         long value = i & 0xFFFFFFFF;
         return new UUID(MSB | (value << 32), LSB);
     }
-
 }
