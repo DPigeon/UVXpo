@@ -124,45 +124,47 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            BluetoothGatt gatt; // We're using a low energy bluetooth microcontroller. Must use Gatt.
+            if (foundDevice) {
+                BluetoothGatt gatt; // We're using a low energy bluetooth microcontroller. Must use Gatt.
 
-            /* This is the callback where all the receiving and sending happens. Once connected, this callback thread runs in background */
-            BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-                @Override
-                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) { // If connection state changes
-                    if (newState == STATE_CONNECTED)
-                        gatt.discoverServices(); // Discover the services to update
-                }
+                /* This is the callback where all the receiving and sending happens. Once connected, this callback thread runs in background */
+                BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) { // If connection state changes
+                        if (newState == STATE_CONNECTED)
+                            gatt.discoverServices(); // Discover the services to update
+                    }
 
-                @Override
-                public void onServicesDiscovered(BluetoothGatt gatt, int status) { // As soon as we discover new services
-                    super.onServicesDiscovered(gatt, status);
-                    BluetoothGattCharacteristic characteristic = gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
-                    gatt.setCharacteristicNotification(characteristic, true); // Set notifications on
+                    @Override
+                    public void onServicesDiscovered(BluetoothGatt gatt, int status) { // As soon as we discover new services
+                        super.onServicesDiscovered(gatt, status);
+                        BluetoothGattCharacteristic characteristic = gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
+                        gatt.setCharacteristicNotification(characteristic, true); // Set notifications on
 
-                    BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID); // Set descriptor on
+                        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID); // Set descriptor on
 
-                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                    gatt.writeDescriptor(descriptor);
-                }
+                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                        gatt.writeDescriptor(descriptor);
+                    }
 
-                @Override
-                public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) { // Used to send data phone --> microcontroller
-                    BluetoothGattCharacteristic characteristic =
-                            gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
-                    String data = "Hello Microcontroller !";
-                    byte[] byteArray = data.getBytes();
-                    characteristic.setValue(byteArray); // Send data here example
-                    gatt.writeCharacteristic(characteristic);
-                }
+                    @Override
+                    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) { // Used to send data phone --> microcontroller
+                        BluetoothGattCharacteristic characteristic =
+                                gatt.getService(SERVICE_UUID).getCharacteristic(CHARACTERISTIC_UUID);
+                        String data = "Hello Microcontroller !";
+                        byte[] byteArray = data.getBytes();
+                        characteristic.setValue(byteArray); // Send data here example
+                        gatt.writeCharacteristic(characteristic);
+                    }
 
-                @Override
-                public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
-                    String data = new String(characteristic.getValue()); // Converting from byte[] to string
-                    processDataOnScreen(data);
-                }
-            };
-            gatt = bluetoothDevice.connectGatt(this, true, gattCallback);
+                    @Override
+                    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
+                        String data = new String(characteristic.getValue()); // Converting from byte[] to string
+                        processDataOnScreen(data);
+                    }
+                };
+                gatt = bluetoothDevice.connectGatt(this, true, gattCallback); // Connect with a callback
+            }
         }
     }
 
