@@ -25,6 +25,7 @@ public class GraphActivity extends AppCompatActivity {
     GraphView graph;
     DataPoint[] liveValues;
     int counter = 0;
+    int maxLivePoints = 1000;
     LineGraphSeries<DataPoint> series;
 
     @Override
@@ -33,7 +34,7 @@ public class GraphActivity extends AppCompatActivity {
         setContentView(R.layout.activity_graph);
 
         graph = findViewById(R.id.graph);
-        liveValues = new DataPoint[1000];
+        liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
     }
@@ -42,7 +43,7 @@ public class GraphActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mBroadcastReceiver = new BroadcastReceiver(){
+        mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -72,6 +73,7 @@ public class GraphActivity extends AppCompatActivity {
 
         // Legend
         series.setTitle("Live UV Exposure");
+        series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         // Axis
@@ -81,17 +83,17 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     protected void buildLiveExposureGraph(String data) {
-        double x = counter / 2;
+        double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation
         double y = Double.parseDouble(data);
         DataPoint point = new DataPoint(x, y);
         liveValues[counter] = point;
 
-        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, 1000);
-        counter = counter + 1;
+        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph
+        counter = counter + 1; // Increment by 1
     }
 
     protected void fetchData() {
-        // Will be used to fetch some UV exposure points <time, UV>
+        // Will be used to fetch some UV exposure points <time, UV> from the database
     }
 
 }
