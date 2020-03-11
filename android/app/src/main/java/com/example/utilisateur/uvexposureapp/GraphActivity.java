@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
@@ -50,8 +51,9 @@ public class GraphActivity extends AppCompatActivity {
                 switch (action) { // Several actions may be added here later for different activities
                     case "graph-activity":
                         String data = intent.getStringExtra("uv-live-data");
-                        if (Double.parseDouble(data) > 0) // Rejecting all 0's and negative values
-                            buildLiveExposureGraph(data);
+                        double preciseData = Double.parseDouble(data);
+                        if (preciseData > 0) // Rejecting all 0's and negative values
+                            buildLiveExposureGraph(convertVoltageToIntensity(preciseData));
                         break;
                 }
             }
@@ -64,7 +66,6 @@ public class GraphActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        liveValues = null;
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
@@ -79,7 +80,7 @@ public class GraphActivity extends AppCompatActivity {
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time");
-        gridLabel.setVerticalAxisTitle("UV Exposure");
+        gridLabel.setVerticalAxisTitle("Intensity (mW/cm^2)");
     }
 
     protected void buildLiveExposureGraph(String data) {
@@ -92,8 +93,22 @@ public class GraphActivity extends AppCompatActivity {
         counter = counter + 1; // Increment by 1
     }
 
+    protected String convertVoltageToIntensity(double data) {
+        double voltage = (data * 3.3) / 1023; // Convert analog values to voltage out of 3.3V (should be done on arduino side later)
+        double intensity = mapIntensity(voltage, 0.0, 2.8, 0.0, 15.0);
+        String stringIntensity = Double.toString(intensity);
+
+        return stringIntensity;
+    }
+
     protected void fetchData() {
         // Will be used to fetch some UV exposure points <time, UV> from the database
+    }
+
+    //The Arduino Map function but for doubles for UV intensity
+    //From: http://forum.arduino.cc/index.php?topic=3922.0
+    double mapIntensity(double x, double in_min, double in_max, double out_min, double out_max) {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
 }
