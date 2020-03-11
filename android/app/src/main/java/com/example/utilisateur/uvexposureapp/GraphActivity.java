@@ -2,7 +2,12 @@ package com.example.utilisateur.uvexposureapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
@@ -15,6 +20,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 */
 
 public class GraphActivity extends AppCompatActivity {
+    BroadcastReceiver mBroadcastReceiver;
+    TextView dataTextView;
     GraphView graph;
     LineGraphSeries<DataPoint> series;
 
@@ -23,9 +30,37 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        dataTextView = findViewById(R.id.dataTextView);
         graph = findViewById(R.id.graph);
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
+    }
+
+    /* Used to get the broadcasted message from main activity of bluetooth data */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBroadcastReceiver = new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch (action) { // Several actions may be added here later for different activities
+                    case "graph-activity":
+                        String data = intent.getStringExtra("uv-live-data");
+                        dataTextView.setText(data);
+                        break;
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter("graph-activity");
+        registerReceiver(mBroadcastReceiver, filter); // Setup the action filter with the receiver
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
     protected void setupGraph() {

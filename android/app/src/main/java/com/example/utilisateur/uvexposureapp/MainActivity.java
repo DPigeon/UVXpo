@@ -161,22 +161,17 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
                         String data = new String(characteristic.getValue()); // Converting from byte[] to string
-                        processDataOnScreen(data);
+
+                        /* Here we broadcast data to other activities using a specific action */
+                        Intent intent = new Intent("graph-activity"); // New intent to send called live-data
+                        intent.setPackage(getPackageName()); // Setup package
+                        intent.putExtra("uv-live-data", data); // Put a string message with it
+                        getApplicationContext().sendBroadcast(intent); // Send the message over broadcast
                     }
                 };
                 gatt = bluetoothDevice.connectGatt(this, true, gattCallback); // Connect with a callback
             }
         }
-    }
-
-    public void processDataOnScreen(final String data) { // Processes the data from Bluetooth Thread --> UI thread
-        final String str = data;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                testDataTextView.setText(data);
-            }
-        });
     }
 
     public UUID convertFromInteger(int i) { // Used to get the right UUID for descriptor and characteristic of Gatt Bluetooth
