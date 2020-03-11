@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -21,8 +22,9 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class GraphActivity extends AppCompatActivity {
     BroadcastReceiver mBroadcastReceiver;
-    TextView dataTextView;
     GraphView graph;
+    DataPoint[] liveValues;
+    int counter = 0;
     LineGraphSeries<DataPoint> series;
 
     @Override
@@ -30,8 +32,8 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
-        dataTextView = findViewById(R.id.dataTextView);
         graph = findViewById(R.id.graph);
+        liveValues = new DataPoint[1000];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
     }
@@ -47,40 +49,49 @@ public class GraphActivity extends AppCompatActivity {
                 switch (action) { // Several actions may be added here later for different activities
                     case "graph-activity":
                         String data = intent.getStringExtra("uv-live-data");
-                        dataTextView.setText(data);
+                        if (Double.parseDouble(data) > 0) // Rejecting all 0's and negative values
+                            buildLiveExposureGraph(data);
                         break;
                 }
             }
         };
 
         IntentFilter filter = new IntentFilter("graph-activity");
-        registerReceiver(mBroadcastReceiver, filter); // Setup the action filter with the receiver
+        registerReceiver(mBroadcastReceiver, filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        liveValues = null;
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
     protected void setupGraph() {
-        double x, y;
-        x = -5.0;
-
-        for (int i = 0; i < 500; i++) {
-            x = x + 0.04;
-            y = Math.tanh(x); // A simple example
-            series.appendData(new DataPoint(x, y), true, 500);
-        }
         graph.addSeries(series);
 
         // Legend
-        series.setTitle("UV Exposure Against Time");
+        series.setTitle("Live UV Exposure");
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        // Axis
+        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+        gridLabel.setHorizontalAxisTitle("Time");
+        gridLabel.setVerticalAxisTitle("UV Exposure");
+    }
+
+    protected void buildLiveExposureGraph(String data) {
+        double x = counter / 2;
+        double y = Double.parseDouble(data);
+        DataPoint point = new DataPoint(x, y);
+        liveValues[counter] = point;
+
+        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, 1000);
+        counter = counter + 1;
     }
 
     protected void fetchData() {
         // Will be used to fetch some UV exposure points <time, UV>
     }
+
 }
