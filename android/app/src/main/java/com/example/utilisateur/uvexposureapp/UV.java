@@ -1,4 +1,4 @@
-package com.example.uv;
+package com.example.utilisateur.uvexposureapp;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import java.time.*;
