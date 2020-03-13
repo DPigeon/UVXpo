@@ -180,6 +180,9 @@ public class UserActivity extends AppCompatActivity {
                 radioSkintype5.setEnabled(true);
                 radioSkintype6.setEnabled(true);
                 return true;
+            case R.id.EditUserPassword:
+                ChangePasswordFragment dialog = new ChangePasswordFragment();
+                dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
 
         }
         return super.onOptionsItemSelected(item); /**RETURNS ITEM CLICKED*/
