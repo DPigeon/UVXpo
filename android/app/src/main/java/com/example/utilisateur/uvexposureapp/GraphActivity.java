@@ -16,6 +16,8 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import org.w3c.dom.Text;
+
 /*
 * An activity that displays the UV exposure graph depending on the time chosen.
 * Data from the database will have to be fetched in order to view them.
@@ -24,6 +26,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 public class GraphActivity extends AppCompatActivity {
     BroadcastReceiver mBroadcastReceiver;
     GraphView graph;
+    TextView uvIndexTextView;
     DataPoint[] liveValues;
     int counter = 0;
     int maxLivePoints = 1000;
@@ -35,6 +38,7 @@ public class GraphActivity extends AppCompatActivity {
         setContentView(R.layout.activity_graph);
 
         graph = findViewById(R.id.graph);
+        uvIndexTextView = findViewById(R.id.uvIndexTextView);
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
@@ -52,8 +56,10 @@ public class GraphActivity extends AppCompatActivity {
                     case "graph-activity":
                         String data = intent.getStringExtra("uv-live-data");
                         double preciseData = Double.parseDouble(data);
-                        if (preciseData > 0) // Rejecting all 0's and negative values
+                        if (preciseData > 0) { // Rejecting all 0's and negative values
                             buildLiveExposureGraph(convertVoltageToIntensity(preciseData));
+                            convertVoltageToUvIndex(preciseData);
+                        }
                         break;
                 }
             }
@@ -95,10 +101,43 @@ public class GraphActivity extends AppCompatActivity {
 
     protected String convertVoltageToIntensity(double data) {
         double voltage = (data * 3.3) / 1023; // Convert analog values to voltage out of 3.3V (should be done on arduino side later)
-        double intensity = mapIntensity(voltage, 0.0, 2.8, 0.0, 15.0);
+        double intensity = mapIntensity(voltage, 0, 2.8, 0.0, 15.0);
         String stringIntensity = Double.toString(intensity);
 
         return stringIntensity;
+    }
+
+    protected void convertVoltageToUvIndex(double data) {
+        String uvIndex = "0";
+        double voltage = data * (3.3 / 1023) * 1000; // using 3.3 mV
+
+        // From http://educ8s.tv/arduino-uv-meter-project/ with converting of 3.3V output
+        if (voltage < 33)
+            uvIndex = "0";
+        else if (voltage > 33 && voltage <= 150)
+            uvIndex = "1";
+        else if (voltage > 150 && voltage <= 210)
+            uvIndex = "2";
+        else if (voltage > 210 && voltage <= 269)
+            uvIndex = "3";
+        else if (voltage > 269 && voltage <= 332)
+            uvIndex = "4";
+        else if (voltage > 332 && voltage <= 400)
+            uvIndex = "5";
+        else if (voltage > 400 && voltage <= 459)
+            uvIndex = "6";
+        else if (voltage > 459 && voltage <= 525)
+            uvIndex = "7";
+        else if (voltage > 525 && voltage <= 581)
+            uvIndex = "8";
+        else if (voltage > 581 && voltage <= 644)
+            uvIndex = "9";
+        else if (voltage > 644 && voltage <= 712)
+            uvIndex = "10";
+        else if (voltage > 712)
+            uvIndex = "11";
+
+        uvIndexTextView.setText("UV Index: " + uvIndex);
     }
 
     protected void fetchData() {
