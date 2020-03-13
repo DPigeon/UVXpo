@@ -85,23 +85,23 @@ public class GraphActivity extends AppCompatActivity {
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
-        gridLabel.setHorizontalAxisTitle("Time");
+        gridLabel.setHorizontalAxisTitle("Time"); // 5t is 5 times the actual time to reject fluctuations
         gridLabel.setVerticalAxisTitle("Intensity (mW/cm^2)");
     }
 
     protected void buildLiveExposureGraph(String data) {
-        double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation
+        double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
         DataPoint point = new DataPoint(x, y);
         liveValues[counter] = point;
 
-        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph
+        series.appendData(new DataPoint(liveValues[counter].getX() / 5, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
         counter = counter + 1; // Increment by 1
     }
 
     protected String convertVoltageToIntensity(double data) {
         double voltage = (data * 3.3) / 1023; // Convert analog values to voltage out of 3.3V (should be done on arduino side later)
-        double intensity = mapIntensity(voltage, 0, 2.8, 0.0, 15.0);
+        double intensity = mapIntensity(voltage, 0, 2.8, 0.0, 15.0); // Mapping from 0V at 0 mW/cm^2 and from 2.8V max to 15 mW/cm^2
         String stringIntensity = Double.toString(intensity);
 
         return stringIntensity;
