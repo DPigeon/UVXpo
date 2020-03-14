@@ -10,7 +10,7 @@ public class UV {
     private double uv;
     private LocalDateTime date;
 
-    public UV (double uv, LocalDateTime date){
+    public UV (double uv, LocalDateTime date) {
         this.uv = uv;
         this.date = date;
     }
