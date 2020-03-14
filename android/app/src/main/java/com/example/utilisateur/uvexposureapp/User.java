@@ -79,11 +79,11 @@ public class User {
     public int getSkin() {
         return skin;
     }
-    /* Set name*/
+    /* Set notifications*/
     public void setNotifications(String notifications) {
         this.notifications = notifications;
     }
-    /* Get name*/
+    /* Get notifications*/
     public String getNotifications() {
         return notifications;
     }
