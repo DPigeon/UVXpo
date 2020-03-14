@@ -13,9 +13,9 @@ public class User {
     private double uv;
     private int skin;
     private String notifications;
-    private LocalDateTime date;
+    
 
-    public User (String name,String username, String password,int age,double uv,int skin, String notifications,LocalDateTime date){
+    public User (String name,String username, String password,int age,double uv,int skin, String notifications){
 
         this.name=name;
         this.username=username;
@@ -25,7 +25,7 @@ public class User {
         this.uv=uv;
         this.skin=skin;
         this.notifications=notifications;
-        this.date=date;
+       
 
     }
 
@@ -87,13 +87,5 @@ public class User {
     public String getNotifications() {
         return notifications;
     }
-    /* Set time and  date*/
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-
-    }
-    /* Get time and date*/
-    public LocalDateTime getDate() {
-        return date;
-    }
+ 
 }
