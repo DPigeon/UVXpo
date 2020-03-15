@@ -10,7 +10,7 @@ public class User {
     private String username;
     private String password;
     private int age;
-    private double uv;
+    public double uv;
     private int skin;
     private String notifications;
     
