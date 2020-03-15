@@ -12,10 +12,10 @@ public class User {
     private int age;
     public double uv;
     private int skin;
-    private String notifications;
+    private boolean notifications;
     
 
-    public User (String username, String password,int age,double uv,int skin, String notifications){
+    public User (String username, String password,int age,double uv,int skin, boolean notifications){
 
       
         this.username=username;
@@ -71,11 +71,11 @@ public class User {
         return skin;
     }
     /* Set notifications*/
-    public void setNotifications(String notifications) {
+    public void setNotifications(boolean notifications) {
         this.notifications = notifications;
     }
     /* Get notifications*/
-    public String getNotifications() {
+    public boolean getNotifications() {
         return notifications;
     }
  
