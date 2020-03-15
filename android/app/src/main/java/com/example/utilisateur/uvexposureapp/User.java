@@ -6,7 +6,7 @@ import java.time.*;
 
 public class User {
 
-    private String name;
+
     private String username;
     private String password;
     private int age;
@@ -15,9 +15,9 @@ public class User {
     private String notifications;
     
 
-    public User (String name,String username, String password,int age,double uv,int skin, String notifications){
+    public User (String username, String password,int age,double uv,int skin, String notifications){
 
-        this.name=name;
+      
         this.username=username;
         this.password=password;
         this.age=age;
@@ -30,15 +30,6 @@ public class User {
     }
 
 
-    /*  Set name*/
-    public void setName(String name) {
-        this.name = name;
-    }
-    /* Get name*/
-    public String getName() {
-        return name;
-
-    }
     /* set Username*/
     public void setUsername(String username) {
         this.username = username;
