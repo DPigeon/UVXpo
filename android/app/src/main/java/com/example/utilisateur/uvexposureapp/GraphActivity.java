@@ -1,15 +1,21 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
@@ -17,6 +23,8 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.w3c.dom.Text;
+
+import java.time.LocalDateTime;
 
 /*
 * An activity that displays the UV exposure graph depending on the time chosen.
@@ -31,6 +39,7 @@ public class GraphActivity extends AppCompatActivity {
     int counter = 0;
     int maxLivePoints = 1000;
     LineGraphSeries<DataPoint> series;
+    FirebaseFirestore fireStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,7 @@ public class GraphActivity extends AppCompatActivity {
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
+        initFirestore();
     }
 
     /* Used to get the broadcasted message from main activity of bluetooth data */
@@ -49,6 +59,7 @@ public class GraphActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mBroadcastReceiver = new BroadcastReceiver() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -59,6 +70,7 @@ public class GraphActivity extends AppCompatActivity {
                         if (preciseData > 0) { // Rejecting all 0's and negative values
                             buildLiveExposureGraph(convertVoltageToIntensity(preciseData));
                             convertVoltageToUvIndex(preciseData);
+                            addUvValue(preciseData, LocalDateTime.now());
                         }
                         break;
                 }
@@ -73,6 +85,22 @@ public class GraphActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
+    }
+
+    private void initFirestore() {
+        fireStore = FirebaseFirestore.getInstance();
+    }
+
+    public void addUvValue(double value, LocalDateTime date) {
+        /* Read database */
+        DocumentReference user = fireStore.collection("users").document("name");
+        // From sharedPrefs, get the username logged in
+        String name = "Marc";
+       // Log.d("query:", query.);
+
+        /* Write to database with user id from previous query */
+        CollectionReference uvData = fireStore.collection("uvData");
+        UV uv = new UV(value, date);
     }
 
     protected void setupGraph() {
