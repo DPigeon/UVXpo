@@ -1,82 +1,81 @@
 package com.example.utilisateur.uvexposureapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import java.time.*;
+import java.util.ArrayList;
 
 public class User {
-
-
     private String username;
     private String password;
     private int age;
-    public double uv;
+    private ArrayList<UV> uvData; // A user will have stored uv values tracked
     private int skin;
     private boolean notifications;
-    
 
-    public User (String username, String password,int age,double uv,int skin, boolean notifications){
-
-      
-        this.username=username;
-        this.password=password;
-        this.age=age;
-
-        this.uv=uv;
-        this.skin=skin;
-        this.notifications=notifications;
-       
-
+    public User (String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications) {
+        this.username = username;
+        this.password = password;
+        this.age = age;
+        this.uvData = uv;
+        this.skin = skin;
+        this.notifications = notifications;
     }
-
 
     /* set Username*/
     public void setUsername(String username) {
         this.username = username;
     }
+
     /* Get Username*/
     public String getUsername() {
         return username;
     }
+
     /* Set Password*/
     public void setPassword(String password) {
         this.password = password;
     }
+
     /* Get Password*/
     public String getPassword() {
         return password;
     }
+
     /* Set age*/
     public void setAge(int age) {
         this.age = age;
     }
+
     /* Get age*/
     public int getAge() {
         return age;
     }
-    /* Get uv value*/
-    public void setUv(double uv) {
-        this.uv = uv;
-    }
+
     /* set uv value*/
-    public double getUv() {
-        return uv;
+    public void setUv(UV uv) {
+        this.uvData.add(uv);
     }
+
+    /* get uv values*/
+    public ArrayList<UV> getUvData() {
+        return uvData;
+    }
+
     /* set Skin type*/
     public void setSkin(int skin) {
         this.skin = skin;
     }
+
     /* get Skin type*/
     public int getSkin() {
         return skin;
     }
+
     /* Set notifications*/
     public void setNotifications(boolean notifications) {
         this.notifications = notifications;
     }
+
     /* Get notifications*/
     public boolean getNotifications() {
         return notifications;
     }
- 
 }
