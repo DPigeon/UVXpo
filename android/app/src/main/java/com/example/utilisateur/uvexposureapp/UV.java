@@ -18,12 +18,12 @@ public class UV {
     }
 
     /* set UVId*/
-    public void setUVId(int uvid) {
+    public void setUvId(int uvid) {
         this.uvid = uvid;
     }
 
     /* Get UVId*/
-    public int getUVId() {
+    public int getUvId() {
         return uvid;
     }
 

@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="02de3d0a-7ffa-473e-a44a-c92788bb929c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/UV.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/UV.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,19 +74,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/User.java</url>
-          <line>23</line>
-          <properties class="com.example.utilisateur.uvexposureapp.User" method="setUserId">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
