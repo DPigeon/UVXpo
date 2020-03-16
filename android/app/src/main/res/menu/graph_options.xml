@@ -4,5 +4,5 @@
     <item
         android:id="@+id/toggleLivePastExposure"
         android:icon="@drawable/ic_action_settings"
-        android:title="See Past Data" />
+        android:title="See Past Exposure" />
 </menu>

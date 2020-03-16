@@ -54,6 +54,7 @@ public class GraphActivity extends AppCompatActivity {
 
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
+    Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class GraphActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) { // Creates the three dot action menu
         getMenuInflater().inflate(R.menu.graph_options, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -116,19 +118,23 @@ public class GraphActivity extends AppCompatActivity {
         int menuId = item.getItemId();
         if(menuId == R.id.toggleLivePastExposure) { // If we click on the ... button
             toggleLivePastData = !toggleLivePastData; // Toggle
-            if (toggleLivePastData) // past data
-                switchMode(false, "Past Data");
-            else // live data
-                switchMode(true, "Live Exposure");
+            if (toggleLivePastData) { // past data
+                menu.findItem(R.id.toggleLivePastExposure).setTitle("See Live Exposure");
+                switchMode(false, "Past Data", "Pick a date!");
+            } else { // live data
+                menu.findItem(R.id.toggleLivePastExposure).setTitle("See Past Exposure");
+                switchMode(true, "Live Exposure", "Today");
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void switchMode(Boolean status, String title) {
+    protected void switchMode(Boolean status, String title, String dateText) {
         series.resetData(new DataPoint[] {}); // Reset previous series
         counter = 0; // Reset the time counter
         series.setTitle(title);
         uvIndexTextView.setEnabled(status);
+        datePick.setText(dateText);
         datePick.setEnabled(!status);
     }
 
