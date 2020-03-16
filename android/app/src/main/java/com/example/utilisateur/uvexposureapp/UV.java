@@ -7,12 +7,34 @@ import java.time.*;
 */
 
 public class UV {
+    private int uvid;
+    private int userid;
     private double uv;
     private LocalDateTime date;
 
     public UV (double uv, LocalDateTime date) {
         this.uv = uv;
         this.date = date;
+    }
+
+    /* set UVId*/
+    public void setUVId(int uvid) {
+        this.uvid = uvid;
+    }
+
+    /* Get UVId*/
+    public int getUVId() {
+        return uvid;
+    }
+
+    /* set UserId*/
+    public void setUserId(int userid) {
+        this.userid = userid;
+    }
+
+    /* Get UserId*/
+    public int getUserId() {
+        return userid;
     }
 
     /*set UV value */

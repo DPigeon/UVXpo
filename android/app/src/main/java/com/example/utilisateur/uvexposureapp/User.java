@@ -3,6 +3,7 @@ package com.example.utilisateur.uvexposureapp;
 import java.util.ArrayList;
 
 public class User {
+    private int userid;
     private String username;
     private String password;
     private int age;
@@ -17,6 +18,16 @@ public class User {
         this.uvData = uv;
         this.skin = skin;
         this.notifications = notifications;
+    }
+
+    /* set UserId*/
+    public void setUserId(int userid) {
+        this.userid = userid;
+    }
+
+    /* Get UserId*/
+    public int getUserId() {
+        return userid;
     }
 
     /* set Username*/
