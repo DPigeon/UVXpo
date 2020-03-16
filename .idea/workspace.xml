@@ -2,6 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02de3d0a-7ffa-473e-a44a-c92788bb929c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Database/Config.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Database/DatabaseHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Database/SharedPreferenceHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/Database/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/COEN390-ELEC390-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/COEN390-ELEC390-Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -26,6 +37,9 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\nickm\Documents\GitHub\COEN390-ELEC390-Project\android\app\src\main\java\com\example\utilisateur\uvexposureapp" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Users\nickm\Documents\GitHub\COEN390-ELEC390-Project\android\app\src\main\java\com\example\utilisateur\uvexposureapp\Database" />
       <recent name="D:\Users\nickm\Documents\GitHub\COEN390-ELEC390-Project\android\app\src\main\java\com\example\utilisateur\uvexposureapp" />
