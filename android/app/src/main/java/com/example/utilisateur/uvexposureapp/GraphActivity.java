@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,17 +13,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-
-import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 
@@ -41,6 +42,7 @@ public class GraphActivity extends AppCompatActivity {
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +53,8 @@ public class GraphActivity extends AppCompatActivity {
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
-        initFirestore();
+        fireStore = FirebaseFirestore.getInstance();
+        addUvValue(20.0, LocalDateTime.now());
     }
 
     /* Used to get the broadcasted message from main activity of bluetooth data */
@@ -87,16 +90,25 @@ public class GraphActivity extends AppCompatActivity {
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
-    private void initFirestore() {
-        fireStore = FirebaseFirestore.getInstance();
-    }
-
     public void addUvValue(double value, LocalDateTime date) {
-        /* Read database */
-        DocumentReference user = fireStore.collection("users").document("name");
         // From sharedPrefs, get the username logged in
         String name = "Marc";
-       // Log.d("query:", query.);
+        String id;
+
+        /* Read database */
+        CollectionReference users = fireStore.collection("users");
+        users.whereEqualTo("name", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                id = document.getId();
+                            }
+                        } else {
+                            Log.d("DB:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
         /* Write to database with user id from previous query */
         CollectionReference uvData = fireStore.collection("uvData");
