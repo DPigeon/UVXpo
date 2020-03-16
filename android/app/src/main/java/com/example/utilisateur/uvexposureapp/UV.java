@@ -7,8 +7,8 @@ import java.time.*;
 */
 
 public class UV {
-    private int uvid;
-    private int userid;
+    private int uvId;
+    private int userId;
     private double uv;
     private LocalDateTime date;
 
@@ -19,22 +19,22 @@ public class UV {
 
     /* set UVId*/
     public void setUvId(int uvid) {
-        this.uvid = uvid;
+        this.uvId = uvid;
     }
 
     /* Get UVId*/
     public int getUvId() {
-        return uvid;
+        return uvId;
     }
 
     /* set UserId*/
     public void setUserId(int userid) {
-        this.userid = userid;
+        this.userId = userid;
     }
 
     /* Get UserId*/
     public int getUserId() {
-        return userid;
+        return userId;
     }
 
     /*set UV value */

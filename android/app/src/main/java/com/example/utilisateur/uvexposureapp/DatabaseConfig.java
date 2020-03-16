@@ -1,6 +1,6 @@
-package com.example.coenelec390_uv_exposure.Database;
+package com.example.utilisateur.uvexposureapp;
 
-public class Config {
+public class DatabaseConfig {
     public static final String DATABASE_NAME = "uv_exposure_db";               /** Database name */
     public static final int DATABASE_VERSION = 1;                            /** Database version */
 
