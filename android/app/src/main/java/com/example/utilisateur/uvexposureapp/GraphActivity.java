@@ -4,15 +4,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.View;
 import android.widget.DatePicker;
-import android.widget.Spinner;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,7 +30,6 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.time.LocalDate;
 import java.util.Calendar;
 
 /*
@@ -39,12 +41,14 @@ public class GraphActivity extends AppCompatActivity {
     BroadcastReceiver mBroadcastReceiver;
     GraphView graph;
     TextView uvIndexTextView;
-    DatePicker datePicker;
+    DatePickerDialog datePicker;
+    EditText datePick;
     DataPoint[] liveValues;
     int counter = 0;
     int maxLivePoints = 1000;
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
+    String lastDate = ""; // To keep track of the last date entered
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -54,13 +58,14 @@ public class GraphActivity extends AppCompatActivity {
 
         graph = findViewById(R.id.graph);
         uvIndexTextView = findViewById(R.id.uvIndexTextView);
-        datePicker = findViewById(R.id.datePicker1);
+        datePick = findViewById(R.id.datePicker);
+        datePick.setInputType(InputType.TYPE_NULL);
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
-        setupGraph();
+        setupGraph("Live UV Exposure");
         fireStore = FirebaseFirestore.getInstance();
 
-        setSpinner();
+        setDate();
     }
 
     /* Used to get the broadcasted message from main activity of bluetooth data */
@@ -96,66 +101,34 @@ public class GraphActivity extends AppCompatActivity {
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
-    public void fetchUVDataByDate(final double value, final String date) {
-        // From sharedPrefs, get the username logged in
-        String name = "Marc";
-
-        /* Read user from database */
-        CollectionReference users = fireStore.collection("user_info");
-        users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    protected void setDate() {
+        datePick.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document_user : task.getResult()) {
-
-                        /* Read all uv (time, uv) values of that user */
-                        CollectionReference uvData = fireStore.collection("uv_data");
-                        uvData.whereEqualTo("uv_user_id", document_user.getId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                DataPoint[] newPoints = new DataPoint[10000];
-                                int newCounter = 0;
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document_uv_data : task.getResult()) {
-                                        double x = Double.parseDouble(document_uv_data.getData().get("uv_time").toString());
-                                        double y = Double.parseDouble(document_uv_data.getData().get("uv_value").toString());
-                                        DataPoint point = new DataPoint(x, y);
-                                        newPoints[newCounter] = point;
-                                        series.appendData(new DataPoint(point.getX(), point.getY()), false, document_uv_data.getData().size());
-                                        newCounter = newCounter + 1;
-                                    }
-                                } else {
-                                    Log.d("DB:", "Error getting documents: ", task.getException());
-                                }
-                            }
-                        });
-                        //UV uv = new UV(value, date);
-                        //uvData.add()
+            public void onClick(View v) {
+                final Calendar cldr = Calendar.getInstance();
+                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                int month = cldr.get(Calendar.MONTH);
+                int year = cldr.get(Calendar.YEAR);
+                // date picker dialog
+                datePicker = new DatePickerDialog(GraphActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int monthAdjusted = monthOfYear + 1;
+                        String spinDate = year + "-" + monthAdjusted + "-" + dayOfMonth;
+                        datePick.setText(spinDate);
+                        fetchUVDataByDate(spinDate); // year - month - day
                     }
-                } else {
-                    Log.d("DB:", "Error getting documents: ", task.getException());
-                }
+                }, year, month, day);
+                datePicker.show();
             }
         });
     }
 
-    protected void setSpinner() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-                String spinDate = year + "-" + month + "-" + dayOfMonth;
-                fetchUVDataByDate(20.0, spinDate); // year - month- day
-            }
-        });
-    }
-
-    protected void setupGraph() {
+    protected void setupGraph(String title) {
         graph.addSeries(series);
 
         // Legend
-        series.setTitle("Live UV Exposure");
+        series.setTitle(title);
         series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
@@ -163,6 +136,51 @@ public class GraphActivity extends AppCompatActivity {
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time"); // 5t is 5 times the actual time to reject fluctuations
         gridLabel.setVerticalAxisTitle("Intensity (mW/cm^2)");
+    }
+
+    public void fetchUVDataByDate(final String date) {
+        // From sharedPrefs, get the username logged in
+        String name = "Marc";
+
+        /* Read user from database */
+        if (!lastDate.equals(date)) { // We check if the last date chosen isn't the same otherwise don't fetch new data
+            series.resetData(new DataPoint[] {}); // Reset previous series
+            CollectionReference users = fireStore.collection("user_info");
+            users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document_user : task.getResult()) {
+
+                            /* Read all uv (time, uv) values of that user */
+                            CollectionReference uvData = fireStore.collection("uv_data");
+                            uvData.whereEqualTo("uv_user_id", document_user.getId()).whereEqualTo("date", date).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    DataPoint[] newPoints = new DataPoint[10000];
+                                    int newCounter = 0;
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document_uv_data : task.getResult()) {
+                                            double x = Double.parseDouble(document_uv_data.getData().get("uv_time").toString());
+                                            double y = Double.parseDouble(document_uv_data.getData().get("uv_value").toString());
+                                            DataPoint point = new DataPoint(x, y);
+                                            newPoints[newCounter] = point;
+                                            series.appendData(new DataPoint(point.getX(), point.getY()), false, document_uv_data.getData().size());
+                                            newCounter = newCounter + 1;
+                                        }
+                                    } else {
+                                        Log.d("DB:", "Error getting documents: ", task.getException());
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        Log.d("DB:", "Error getting documents: ", task.getException());
+                    }
+                }
+            });
+            lastDate = date;
+        }
     }
 
     protected void buildLiveExposureGraph(String data) {
@@ -214,10 +232,6 @@ public class GraphActivity extends AppCompatActivity {
             uvIndex = "11";
 
         uvIndexTextView.setText("UV Index: " + uvIndex);
-    }
-
-    protected void fetchData() {
-        // Will be used to fetch some UV exposure points <time, UV> from the database
     }
 
     //The Arduino Map function but for doubles for UV intensity
