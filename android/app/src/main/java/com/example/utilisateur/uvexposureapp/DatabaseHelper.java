@@ -79,7 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(DatabaseConfig.COLUMN_UV_USER_ID, uv.getUserId() );
-        contentValues.put(DatabaseConfig.COLUMN_DATE, uv.getDate().now().toString() );
+        contentValues.put(DatabaseConfig.COLUMN_DATE, uv.getDate() );
         contentValues.put(DatabaseConfig.COLUMN_UV_VALUE, uv.getUv() );
 
         try {

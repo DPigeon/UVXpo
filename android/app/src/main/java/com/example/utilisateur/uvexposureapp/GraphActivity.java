@@ -32,7 +32,7 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Calendar;
 
 /*
@@ -136,6 +136,10 @@ public class GraphActivity extends AppCompatActivity {
         uvIndexTextView.setEnabled(status);
         datePick.setText(dateText);
         datePick.setEnabled(!status);
+        graph.getViewport().setScalable(!status);
+        graph.getViewport().setScalableY(!status);
+        graph.getViewport().setScrollable(!status);
+        graph.getViewport().setScrollableY(!status);
     }
 
     protected void setDate() { // Used to date the date with calendar
@@ -146,13 +150,21 @@ public class GraphActivity extends AppCompatActivity {
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
-                // date picker dialog
+
                 datePicker = new DatePickerDialog(GraphActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         int monthAdjusted = monthOfYear + 1;
-                        String spinDate = year + "-" + monthAdjusted + "-" + dayOfMonth;
-                        datePick.setText(spinDate);
+
+                        String zeroMonth = "";
+                        if (monthAdjusted < 10) {
+                            zeroMonth = "0"+String.valueOf(monthAdjusted);
+                        } else {
+                            zeroMonth = String.valueOf(monthAdjusted);
+                        }
+
+                        String spinDate = year + "-" + zeroMonth + "-" + dayOfMonth;
+                        datePick.setText("Date: "+ spinDate);
                         fetchUVDataByDate(spinDate); // send the format to the database (year - month - day)
                     }
                 }, year, month, day);
@@ -192,18 +204,18 @@ public class GraphActivity extends AppCompatActivity {
                             /* Read all uv (time, uv) values of that user */
                             CollectionReference uvData = fireStore.collection("uv_data");
                             // We want to filter by userID and date chosen from uv data
-                            uvData.whereEqualTo("uv_user_id", document_user.getId()).whereEqualTo("date", date).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     DataPoint[] newPoints = new DataPoint[10000];
                                     int newCounter = 0;
                                     if (task.isSuccessful()) {
                                         for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
-                                            double x = Double.parseDouble(document_uv_data.getData().get("uv_time").toString());
-                                            double y = Double.parseDouble(document_uv_data.getData().get("uv_value").toString());
+                                            double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
+                                            double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
                                             DataPoint point = new DataPoint(x, y);
                                             newPoints[newCounter] = point;
-                                            series.appendData(new DataPoint(point.getX(), point.getY()), false, document_uv_data.getData().size());
+                                            series.appendData(new DataPoint(point.getX(), point.getY()), true, document_uv_data.getData().size());
                                             newCounter = newCounter + 1;
                                         }
                                     } else {
@@ -221,7 +233,7 @@ public class GraphActivity extends AppCompatActivity {
         }
     }
 
-    protected void addDataToDatabase(final double dataX, final double dataY, final LocalDateTime date) { // Should store every 5 seconds ? otherwise we may have too many data in database
+    protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
         // From sharedPrefs, get the username logged in
         String name = "Marc";
 
@@ -234,8 +246,8 @@ public class GraphActivity extends AppCompatActivity {
 
                         /* Add a uv (time, uv) value for that user */
                         CollectionReference uvData = fireStore.collection("uv_data");
-                        //UV uv = new UV(document_user.getId(), dataX, dataY, date.toString());
-                        //uvData.add(uv); // Add a new uv value
+                        UV uv = new UV(document_user.getId(), dataX, dataY, date.toString());
+                        uvData.add(uv); // Add a new uv value
                     }
                 } else {
                     Log.d("DB:", "Error getting documents: ", task.getException());
@@ -252,7 +264,7 @@ public class GraphActivity extends AppCompatActivity {
         liveValues[counter] = point;
 
         series.appendData(new DataPoint(liveValues[counter].getX() / 5, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
-        addDataToDatabase(x / 5, y, LocalDateTime.now());
+        addDataToDatabase(x / 5, y, LocalDate.now());
         counter = counter + 1; // Increment by 1
     }
 
