@@ -9,6 +9,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -70,7 +72,6 @@ public class GraphActivity extends AppCompatActivity {
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
         fireStore = FirebaseFirestore.getInstance();
-
         setDate();
     }
 
@@ -127,6 +128,25 @@ public class GraphActivity extends AppCompatActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /* Checks if we have a wifi or LTE connection */
+    /* Will be used if we are not connected to internet and want to use local db */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
     protected void switchMode(Boolean status, String title, String dateText) {
@@ -189,11 +209,66 @@ public class GraphActivity extends AppCompatActivity {
 
     public void fetchUVDataByDate(final String date) {
         // From sharedPrefs, get the username logged in
-        String name = "Marc";
+        String name = "Marc"; // example
 
         /* Read user from database */
-        if (!lastDate.equals(date) && toggleLivePastData) { // We check if the last date chosen isn't the same otherwise don't fetch new data
-            series.resetData(new DataPoint[] {}); // Reset previous series
+        if (haveNetworkConnection()) {
+            if (!lastDate.equals(date) && toggleLivePastData) { // We check if the last date chosen isn't the same otherwise don't fetch new data
+                series.resetData(new DataPoint[]{}); // Reset previous series
+                CollectionReference users = fireStore.collection("user_info");
+                users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document_user : task.getResult()) {
+
+                               constructUvDataByDate(document_user, date);
+                            }
+                        } else {
+                            Log.d("DB:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+                lastDate = date;
+            }
+        } else {
+            DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
+            /* TODO: We will have to get the user info such as id here from SQLite */
+            //UV uv = new UV(userId, dataX, dataY, date.toString());
+            //databaseHelper.getAllUVData(); // Add value
+        }
+    }
+
+    protected void constructUvDataByDate(QueryDocumentSnapshot document_user, String date) {
+        /* Read all uv (time, uv) values of that user */
+        CollectionReference uvData = fireStore.collection("uv_data");
+        // We want to filter by userID and date chosen from uv data
+        uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            DataPoint[] newPoints = new DataPoint[10000];
+            int newCounter = 0;
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
+                    double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
+                    double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
+                    DataPoint point = new DataPoint(x, y);
+                    newPoints[newCounter] = point;
+                    series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
+                    newCounter = newCounter + 1;
+                }
+            } else {
+                Log.d("DB:", "Error getting documents: ", task.getException());
+            }
+            }
+        });
+    }
+
+    protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
+        // From sharedPrefs, get the username logged in
+        String name = "Marc"; // example
+
+        if (haveNetworkConnection()) { // If connected wifi or LTE
             CollectionReference users = fireStore.collection("user_info");
             users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -201,60 +276,22 @@ public class GraphActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document_user : task.getResult()) {
 
-                            /* Read all uv (time, uv) values of that user */
+                            /* Add a uv (time, uv) value for that user */
                             CollectionReference uvData = fireStore.collection("uv_data");
-                            // We want to filter by userID and date chosen from uv data
-                            uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    DataPoint[] newPoints = new DataPoint[10000];
-                                    int newCounter = 0;
-                                    if (task.isSuccessful()) {
-                                        for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
-                                            double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
-                                            double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
-                                            DataPoint point = new DataPoint(x, y);
-                                            Log.d("data:", Double.toString(point.getX()));
-                                            newPoints[newCounter] = point;
-                                            series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
-                                            newCounter = newCounter + 1;
-                                        }
-                                    } else {
-                                        Log.d("DB:", "Error getting documents: ", task.getException());
-                                    }
-                                }
-                            });
+                            UV uv = new UV(document_user.getId(), dataX, dataY, date.toString());
+                            uvData.add(uv); // Add a new uv value
                         }
                     } else {
                         Log.d("DB:", "Error getting documents: ", task.getException());
                     }
                 }
             });
-            lastDate = date;
+        } else {
+            DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
+            /* TODO: We will have to get the user info such as id here from SQLite */
+            //UV uv = new UV(userId, dataX, dataY, date.toString());
+            //databaseHelper.insertUV(uv); // Add value
         }
-    }
-
-    protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
-        // From sharedPrefs, get the username logged in
-        String name = "Marc";
-
-        CollectionReference users = fireStore.collection("user_info");
-        users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document_user : task.getResult()) {
-
-                        /* Add a uv (time, uv) value for that user */
-                        CollectionReference uvData = fireStore.collection("uv_data");
-                        UV uv = new UV(document_user.getId(), dataX, dataY, date.toString());
-                        uvData.add(uv); // Add a new uv value
-                    }
-                } else {
-                    Log.d("DB:", "Error getting documents: ", task.getException());
-                }
-            }
-        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
