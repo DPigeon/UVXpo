@@ -214,8 +214,9 @@ public class GraphActivity extends AppCompatActivity {
                                             double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
                                             double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
                                             DataPoint point = new DataPoint(x, y);
+                                            Log.d("data:", Double.toString(point.getX()));
                                             newPoints[newCounter] = point;
-                                            series.appendData(new DataPoint(point.getX(), point.getY()), true, document_uv_data.getData().size());
+                                            series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
                                             newCounter = newCounter + 1;
                                         }
                                     } else {
