@@ -17,4 +17,5 @@ public class DatabaseConfig {
     public static final String COLUMN_UV_USER_ID = "uv_user_id";
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_UV_VALUE = "uv_value";
+    public static final String COLUMN_UV_TIME = "uv_time";
 }

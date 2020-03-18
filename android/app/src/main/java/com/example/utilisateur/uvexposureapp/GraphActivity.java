@@ -1,22 +1,41 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import org.w3c.dom.Text;
+import java.time.LocalDate;
+import java.util.Calendar;
 
 /*
 * An activity that displays the UV exposure graph depending on the time chosen.
@@ -27,10 +46,17 @@ public class GraphActivity extends AppCompatActivity {
     BroadcastReceiver mBroadcastReceiver;
     GraphView graph;
     TextView uvIndexTextView;
+    DatePickerDialog datePicker;
+    EditText datePick;
     DataPoint[] liveValues;
     int counter = 0;
     int maxLivePoints = 1000;
     LineGraphSeries<DataPoint> series;
+    FirebaseFirestore fireStore;
+
+    String lastDate = ""; // To keep track of the last date entered
+    Boolean toggleLivePastData = false; // If false: live data, if true: past data
+    Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +65,14 @@ public class GraphActivity extends AppCompatActivity {
 
         graph = findViewById(R.id.graph);
         uvIndexTextView = findViewById(R.id.uvIndexTextView);
+        datePick = findViewById(R.id.datePicker);
+        datePick.setInputType(InputType.TYPE_NULL);
+        datePick.setEnabled(false);
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
+        fireStore = FirebaseFirestore.getInstance();
+        setDate();
     }
 
     /* Used to get the broadcasted message from main activity of bluetooth data */
@@ -49,6 +80,7 @@ public class GraphActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mBroadcastReceiver = new BroadcastReceiver() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -56,7 +88,7 @@ public class GraphActivity extends AppCompatActivity {
                     case "graph-activity":
                         String data = intent.getStringExtra("uv-live-data");
                         double preciseData = Double.parseDouble(data);
-                        if (preciseData > 0) { // Rejecting all 0's and negative values
+                        if (preciseData > 0 && !toggleLivePastData) { // Rejecting all 0's and negative values & enable if toggle is on live data
                             buildLiveExposureGraph(convertVoltageToIntensity(preciseData));
                             convertVoltageToUvIndex(preciseData);
                         }
@@ -75,11 +107,97 @@ public class GraphActivity extends AppCompatActivity {
         unregisterReceiver(mBroadcastReceiver); // Unregister once paused
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) { // Creates the three dot action menu
+        getMenuInflater().inflate(R.menu.graph_options, menu);
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int menuId = item.getItemId();
+        if(menuId == R.id.toggleLivePastExposure) { // If we click on the ... button
+            toggleLivePastData = !toggleLivePastData; // Toggle
+            if (toggleLivePastData) { // past data
+                menu.findItem(R.id.toggleLivePastExposure).setTitle("See Live Exposure");
+                switchMode(false, "Past Data", "Pick a date!");
+            } else { // live data
+                menu.findItem(R.id.toggleLivePastExposure).setTitle("See Past Exposure");
+                switchMode(true, "Live Exposure", "Today");
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /* Checks if we have a wifi or LTE connection */
+    /* Will be used if we are not connected to internet and want to use local db */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    protected void switchMode(Boolean status, String title, String dateText) {
+        series.resetData(new DataPoint[] {}); // Reset previous series
+        counter = 0; // Reset the time counter
+        series.setTitle(title);
+        uvIndexTextView.setEnabled(status);
+        datePick.setText(dateText);
+        datePick.setEnabled(!status);
+        graph.getViewport().setScalable(!status);
+        graph.getViewport().setScalableY(!status);
+        graph.getViewport().setScrollable(!status);
+        graph.getViewport().setScrollableY(!status);
+    }
+
+    protected void setDate() { // Used to date the date with calendar
+        datePick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar calendar = Calendar.getInstance();
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                int month = calendar.get(Calendar.MONTH);
+                int year = calendar.get(Calendar.YEAR);
+
+                datePicker = new DatePickerDialog(GraphActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int monthAdjusted = monthOfYear + 1;
+
+                        String zeroMonth = "";
+                        if (monthAdjusted < 10) {
+                            zeroMonth = "0"+String.valueOf(monthAdjusted);
+                        } else {
+                            zeroMonth = String.valueOf(monthAdjusted);
+                        }
+
+                        String spinDate = year + "-" + zeroMonth + "-" + dayOfMonth;
+                        datePick.setText("Date: "+ spinDate);
+                        fetchUVDataByDate(spinDate); // send the format to the database (year - month - day)
+                    }
+                }, year, month, day);
+                datePicker.show();
+            }
+        });
+    }
+
     protected void setupGraph() {
         graph.addSeries(series);
 
         // Legend
-        series.setTitle("Live UV Exposure");
+        series.setTitle("Live Exposure");
         series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
@@ -89,6 +207,94 @@ public class GraphActivity extends AppCompatActivity {
         gridLabel.setVerticalAxisTitle("Intensity (mW/cm^2)");
     }
 
+    public void fetchUVDataByDate(final String date) {
+        // From sharedPrefs, get the username logged in
+        String name = "Marc"; // example
+
+        /* Read user from database */
+        if (haveNetworkConnection()) {
+            if (!lastDate.equals(date) && toggleLivePastData) { // We check if the last date chosen isn't the same otherwise don't fetch new data
+                series.resetData(new DataPoint[]{}); // Reset previous series
+                CollectionReference users = fireStore.collection("user_info");
+                users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document_user : task.getResult()) {
+
+                               constructUvDataByDate(document_user, date);
+                            }
+                        } else {
+                            Log.d("DB:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+                lastDate = date;
+            }
+        } else {
+            DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
+            /* TODO: We will have to get the user info such as id here from SQLite */
+            //UV uv = new UV(userId, dataX, dataY, date.toString());
+            //databaseHelper.getAllUVData(); // Add value
+        }
+    }
+
+    protected void constructUvDataByDate(QueryDocumentSnapshot document_user, String date) {
+        /* Read all uv (time, uv) values of that user */
+        CollectionReference uvData = fireStore.collection("uv_data");
+        // We want to filter by userID and date chosen from uv data
+        uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            DataPoint[] newPoints = new DataPoint[10000];
+            int newCounter = 0;
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
+                    double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
+                    double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
+                    DataPoint point = new DataPoint(x, y);
+                    newPoints[newCounter] = point;
+                    series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
+                    newCounter = newCounter + 1;
+                }
+            } else {
+                Log.d("DB:", "Error getting documents: ", task.getException());
+            }
+            }
+        });
+    }
+
+    protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
+        // From sharedPrefs, get the username logged in
+        String name = "Marc"; // example
+
+        if (haveNetworkConnection()) { // If connected wifi or LTE
+            CollectionReference users = fireStore.collection("user_info");
+            users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document_user : task.getResult()) {
+
+                            /* Add a uv (time, uv) value for that user */
+                            CollectionReference uvData = fireStore.collection("uv_data");
+                            UV uv = new UV(document_user.getId(), dataX, dataY, date.toString());
+                            uvData.add(uv); // Add a new uv value
+                        }
+                    } else {
+                        Log.d("DB:", "Error getting documents: ", task.getException());
+                    }
+                }
+            });
+        } else {
+            DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
+            /* TODO: We will have to get the user info such as id here from SQLite */
+            //UV uv = new UV(userId, dataX, dataY, date.toString());
+            //databaseHelper.insertUV(uv); // Add value
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
         double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
@@ -96,6 +302,7 @@ public class GraphActivity extends AppCompatActivity {
         liveValues[counter] = point;
 
         series.appendData(new DataPoint(liveValues[counter].getX() / 5, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
+        addDataToDatabase(x / 5, y, LocalDate.now());
         counter = counter + 1; // Increment by 1
     }
 
@@ -138,10 +345,6 @@ public class GraphActivity extends AppCompatActivity {
             uvIndex = "11";
 
         uvIndexTextView.setText("UV Index: " + uvIndex);
-    }
-
-    protected void fetchData() {
-        // Will be used to fetch some UV exposure points <time, UV> from the database
     }
 
     //The Arduino Map function but for doubles for UV intensity
