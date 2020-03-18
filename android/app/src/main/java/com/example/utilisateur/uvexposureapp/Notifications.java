@@ -21,7 +21,7 @@ public class Notifications extends Application {
             NotificationChannel channel1 = new NotificationChannel(CHANNELID_1,"channel 1", NotificationManager.IMPORTANCE_DEFAULT);
             channel1.setDescription("HIGH UV radiation!!");
             NotificationChannel channel2 = new NotificationChannel(CHANNELID_2,"channel 2", NotificationManager.IMPORTANCE_DEFAULT);
-            channel1.setDescription("Apply Sunscreen");
+            channel2.setDescription("Apply Sunscreen");
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel1);
