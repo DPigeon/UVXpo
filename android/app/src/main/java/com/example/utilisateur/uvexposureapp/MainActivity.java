@@ -224,29 +224,25 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-        if (uvIndex >= 6) {
+
+        if (uvIndex >= 0) {
             channel1Notif();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif() {
-    NotificationCompat.Builder notification;
-    final int uniqueID = 17811;
-    notification = new NotificationCompat.Builder(this,CHANNELID_1);
-    //notification.setAutoCancel(true);
-    notification.setSmallIcon(R.drawable.ic_notif1);
-    notification.setTicker("tiker");
-    notification.setWhen(System.currentTimeMillis());
-    notification.setContentTitle("UV App");
-    notification.setContentText("WARNING! High UV readings");
+        NotificationCompat.Builder notification;
+        final int uniqueID = 17811;
+        notification = new NotificationCompat.Builder(this,CHANNELID_1);
+        //notification.setAutoCancel(true);
+        notification.setSmallIcon(R.drawable.ic_notif1);
+        notification.setTicker("tiker");
+        notification.setWhen(System.currentTimeMillis());
+        notification.setContentTitle("UV App");
+        notification.setContentText("WARNING! High UV readings");
 
-
-    NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-    notificationManager.notify(uniqueID,notification.build());
-
-
-
-
+        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(uniqueID,notification.build());
     }
 }

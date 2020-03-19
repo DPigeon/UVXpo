@@ -12,12 +12,10 @@ public class Notifications extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
     }
 
-
-        public void createChannels (){
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+    public void createChannels () {
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
             NotificationChannel channel1 = new NotificationChannel(CHANNELID_1,"channel 1", NotificationManager.IMPORTANCE_DEFAULT);
             channel1.setDescription("HIGH UV radiation!!");
             NotificationChannel channel2 = new NotificationChannel(CHANNELID_2,"channel 2", NotificationManager.IMPORTANCE_DEFAULT);
@@ -26,15 +24,6 @@ public class Notifications extends Application {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel1);
             manager.createNotificationChannel(channel2);
-
         }
-
-
-
-
-        }
-
-
-
-
+    }
 }

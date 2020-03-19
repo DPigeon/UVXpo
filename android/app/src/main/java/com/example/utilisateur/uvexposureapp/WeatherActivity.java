@@ -24,7 +24,7 @@ public class WeatherActivity extends AppCompatActivity {
     protected TextView montreal;
     protected TextView Status;
     protected ListView citiesView;
-    static String cityName = "Vancouver";
+    static String cityName = "Montreal";
     String main = "";
     String desc = "";
     String temps = "";
@@ -85,7 +85,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     }
     void cityList() {
-        final String[] cities = {"Montreal", "Vancouver", "Toronto", "Calgary", "Edmonton","Quebec"};
+        final String[] cities = {"   Montreal", "   Vancouver", "   Toronto", "   Calgary", "   Edmonton","   Quebec"};
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cities);
         citiesView.setAdapter(adapter);
 
