@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         gatt.writeCharacteristic(characteristic);
                     }
 
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
                         String data = new String(characteristic.getValue()); // Converting from byte[] to string
@@ -191,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void notificationFunction (double data){
         int uvIndex = 0;
         double voltage = data * (3.3 / 1023) * 1000; // using 3.3 mV
@@ -224,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
             channel1Notif();
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif(){
 
         Notification notification = new Notification.Builder(this,CHANNELID_1)
