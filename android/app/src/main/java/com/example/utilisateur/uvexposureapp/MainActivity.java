@@ -3,6 +3,7 @@ package com.example.utilisateur.uvexposureapp;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.TargetApi;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        channel1Notif();      //NOTIFICATOPN TEST !
         setupUI();
         connectAndListen();
     }
@@ -99,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* Linking website to FAQ button */
-    public void openFaqWebsite(View view){
-        Intent browserIntent=new Intent(Intent.ACTION_VIEW, Uri.parse(FaqURL));
+    public void openFaqWebsite(View view) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(FaqURL));
         startActivity(browserIntent);
     }
 
@@ -191,10 +192,10 @@ public class MainActivity extends AppCompatActivity {
         return new UUID(MSB | (value << 32), LSB);
 
 
-
     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void notificationFunction (double data){
+    public void notificationFunction(double data) {
         int uvIndex = 0;
         double voltage = data * (3.3 / 1023) * 1000; // using 3.3 mV
 
@@ -223,19 +224,28 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-        if (uvIndex>=0){
+        if (uvIndex >= 6) {
             channel1Notif();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void channel1Notif(){
+    public void channel1Notif() {
+    NotificationCompat.Builder notification;
+    final int uniqueID = 17811;
+    notification = new NotificationCompat.Builder(this,CHANNELID_1);
+    //notification.setAutoCancel(true);
+    notification.setSmallIcon(R.drawable.ic_notif1);
+    notification.setTicker("tiker");
+    notification.setWhen(System.currentTimeMillis());
+    notification.setContentTitle("UV App");
+    notification.setContentText("WARNING! High UV readings");
 
-        Notification notification = new Notification.Builder(this,CHANNELID_1)
-                .setSmallIcon(R.drawable.ic_notif1)
-                .setContentTitle("UV Data")
-                .setContentText("WARNING! High UV readings!")
-                .build();
+
+    NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+    notificationManager.notify(uniqueID,notification.build());
+
+
 
 
     }
