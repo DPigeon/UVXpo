@@ -47,9 +47,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        channel1Notif();      //NOTIFICATOPN TEST !
         setupUI();
         connectAndListen();
+        notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        channel1Notif();      //NOTIFICATOPN TEST !
+
     }
 
     protected void setupAction() { // No action bar for the main activity
@@ -96,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 openFaqWebsite(view);
             }
         });
-        notificationManagerCompat = NotificationManagerCompat.from(this);
     }
 
     /* Linking website to FAQ button */
@@ -224,27 +226,19 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-        if (uvIndex >= 6) {
+        if (uvIndex >= 0) {
             channel1Notif();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif() {
-    NotificationCompat.Builder notification;
-    final int uniqueID = 17811;
-    notification = new NotificationCompat.Builder(this,CHANNELID_1);
-    //notification.setAutoCancel(true);
-    notification.setSmallIcon(R.drawable.ic_notif1);
-    notification.setTicker("tiker");
-    notification.setWhen(System.currentTimeMillis());
-    notification.setContentTitle("UV App");
-    notification.setContentText("WARNING! High UV readings");
-
-
-    NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-    notificationManager.notify(uniqueID,notification.build());
-
+    Notification notifications = new NotificationCompat.Builder(this,CHANNELID_1)
+            .setSmallIcon(R.drawable.ic_notif1)
+            .setContentTitle("Title")
+            .setContentText("text text")
+            .build();
+        notificationManagerCompat.notify(1,notifications);
 
 
 
