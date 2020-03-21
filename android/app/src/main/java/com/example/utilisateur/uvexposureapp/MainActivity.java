@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-
+      
         if (uvIndex >= 1) {
             channel2Notif();
         }if  (uvIndex>=0 && uvIndex<=2){
@@ -314,8 +314,5 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("Best to stay indoors today, dangerous levels of UV detected.")
                 .build();
         notificationManagerCompat.notify(2,notifications);
-
-
-
     }
 }
