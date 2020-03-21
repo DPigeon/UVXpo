@@ -24,7 +24,7 @@ public class WeatherActivity extends AppCompatActivity {
     protected TextView montreal;
     protected TextView Status;
     protected ListView citiesView;
-    static String cityName = "Vancouver";
+    static String cityName = "Montreal";
     String main = "";
     String desc = "";
     String temps = "";

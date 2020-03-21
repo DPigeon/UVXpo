@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_1;
+import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
 
 /*
  * The MainActivity where the bluetooth connection is made and the data is fetched.
@@ -51,7 +52,10 @@ public class MainActivity extends AppCompatActivity {
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
 
-        channel1Notif();      //NOTIFICATOPN TEST !
+
+        //channel2Notifextremelyhigh();
+
+        //channel2Notif();//NOTIFICATOPN TEST !
 
     }
 
@@ -226,7 +230,22 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-        if (uvIndex >= 0) {
+
+        if (uvIndex >= 1) {
+            channel2Notif();
+        }if  (uvIndex>=0 && uvIndex<=2){
+            channel2Notifmedium();
+        } else if (uvIndex >2 &&uvIndex<=5) {
+            channel2Notifhigh();
+        } else if (uvIndex >5&& uvIndex<=7) {
+            channel2Notifhigh();
+        } else if (uvIndex > 7&&uvIndex<=10) {
+            channel2Notifveryhigh();
+        } else if (uvIndex >11) {
+            channel2Notifextremelyhigh();
+        }
+
+        if (uvIndex>5){
             channel1Notif();
         }
     }
@@ -235,10 +254,66 @@ public class MainActivity extends AppCompatActivity {
     public void channel1Notif() {
     Notification notifications = new NotificationCompat.Builder(this,CHANNELID_1)
             .setSmallIcon(R.drawable.ic_notif1)
-            .setContentTitle("Title")
-            .setContentText("text text")
+            .setContentTitle("It is pretty sunny out there!")
+            .setContentText("Stay in shade, apply sunscreen and wear sunglasses!")
             .build();
         notificationManagerCompat.notify(1,notifications);
+
+
+
+    }
+
+    public void channel2Notif() {
+        Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
+                .setSmallIcon(R.drawable.ic_notif1)
+                .setContentTitle("Wow its hot! ")
+                .setContentText("Make sure to protect yourself with a hat!")
+                .build();
+        notificationManagerCompat.notify(2,notifications);
+
+
+
+    }
+    public void channel2Notifmedium() {
+        Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
+                .setSmallIcon(R.drawable.ic_notif1)
+                .setContentTitle("Yikes! The sun is strong today!")
+                .setContentText("A little sunscreen wouldn't hurt!")
+                .build();
+        notificationManagerCompat.notify(2,notifications);
+
+
+
+    }
+    public void channel2Notifhigh() {
+        Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
+                .setSmallIcon(R.drawable.ic_notif1)
+                .setContentTitle("UV app")
+        .setContentText("Sunscreen, Shade and a hat would be nice to combat UV exposure today!")
+                .build();
+        notificationManagerCompat.notify(2,notifications);
+
+
+
+    }
+    public void channel2Notifveryhigh() {
+        Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
+                .setSmallIcon(R.drawable.ic_notif1)
+                .setContentTitle("WARNING! Dangerous levels of UV detected! ")
+                .setContentText("Make sure to be careful out there and apply lots of suncreen!")
+                .build();
+        notificationManagerCompat.notify(2,notifications);
+
+
+
+    }
+    public void channel2Notifextremelyhigh() {
+        Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
+                .setSmallIcon(R.drawable.ic_notif1)
+                .setContentTitle("WARNING!!!")
+                .setContentText("Best to stay indoors today, dangerous levels of UV detected.")
+                .build();
+        notificationManagerCompat.notify(2,notifications);
 
 
 
