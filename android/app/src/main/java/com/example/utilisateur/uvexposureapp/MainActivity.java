@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif() {
     Notification notifications = new NotificationCompat.Builder(this,CHANNELID_1)
-            .setSmallIcon(R.drawable.ic_notif1)
+            .setSmallIcon(R.drawable.ic_sentiment_satisfied_black_24dp)
             .setContentTitle("It is pretty sunny out there!")
             .setContentText("Stay in shade, apply sunscreen and wear sunglasses!")
             .build();
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void channel2Notif() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
-                .setSmallIcon(R.drawable.ic_notif1)
+                .setSmallIcon(R.drawable.ic_sentiment_satisfied_black_24dp)
                 .setContentTitle("Wow its hot! ")
                 .setContentText("Make sure to protect yourself with a hat!")
                 .build();
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void channel2Notifmedium() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
-                .setSmallIcon(R.drawable.ic_notif1)
+                .setSmallIcon(R.drawable.ic_sun)
                 .setContentTitle("Yikes! The sun is strong today!")
                 .setContentText("A little sunscreen wouldn't hurt!")
                 .build();
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
-                .setSmallIcon(R.drawable.ic_notif1)
+                .setSmallIcon(R.drawable.ic_sun)
                 .setContentTitle("UV app")
         .setContentText("Sunscreen, Shade and a hat would be nice to combat UV exposure today!")
                 .build();
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void channel2Notifextremelyhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
-                .setSmallIcon(R.drawable.ic_notif1)
+                .setSmallIcon(R.drawable.ic_warning)
                 .setContentTitle("WARNING!!!")
                 .setContentText("Best to stay indoors today, dangerous levels of UV detected.")
                 .build();
