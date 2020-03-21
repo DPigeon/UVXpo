@@ -8,7 +8,6 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -230,23 +229,17 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 10;
         else if (voltage > 712)
             uvIndex = 11;
-      
-        if (uvIndex >= 1) {
-            channel2Notif();
-        }if  (uvIndex>=0 && uvIndex<=2){
-            channel2Notifmedium();
-        } else if (uvIndex >2 &&uvIndex<=5) {
-            channel2Notifhigh();
-        } else if (uvIndex >5&& uvIndex<=7) {
-            channel2Notifhigh();
-        } else if (uvIndex > 7&&uvIndex<=10) {
-            channel2Notifveryhigh();
-        } else if (uvIndex >11) {
-            channel2Notifextremelyhigh();
-        }
 
-        if (uvIndex>5){
-            channel1Notif();
+        if  (uvIndex >=1 && uvIndex <= 2){
+            channel2Notifmedium();
+        } else if (uvIndex > 2 &&uvIndex <= 5) {
+            channel2Notifhigh();
+        } else if (uvIndex > 5&& uvIndex <=7) {
+            channel2Notifhigh();
+        } else if (uvIndex > 7&&uvIndex <= 10) {
+            channel2Notifveryhigh();
+        } else if (uvIndex > 11) {
+            channel2Notifextremelyhigh();
         }
     }
 
