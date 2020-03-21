@@ -31,6 +31,7 @@ public class UserActivity extends AppCompatActivity {
     RadioButton radioSkintype4;
     RadioButton radioSkintype5;
     RadioButton radioSkintype6;
+    Button bluetoothButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class UserActivity extends AppCompatActivity {
         radioSkintype4 = findViewById(R.id.radioSkinTypefour);
         radioSkintype5 = findViewById(R.id.radioSkinTypefive);
         radioSkintype6 = findViewById(R.id.radioSkinTypesix);
+        bluetoothButton = findViewById(R.id.bluetoothButton);
 
         radioGroup.setEnabled(false); /**SET TO UNEDITABLE UNTIL EDIT MODE IS SET ON*/
         editTextAge.setEnabled(false);
@@ -136,12 +138,12 @@ public class UserActivity extends AppCompatActivity {
 
             }
         });
-        deleteBackHomeArrowTopLeft();
-    }
-
-    protected void deleteBackHomeArrowTopLeft() { // No backHone left arrow needed as we already have one included with actionBar
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
+        bluetoothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToActivity(BluetoothActivity.class);
+            }
+        });
     }
 
     @Override
@@ -156,9 +158,6 @@ public class UserActivity extends AppCompatActivity {
     {
         switch(item.getItemId())
         {
-            case R.id.BackButtonItem: /**IF 'BACK' IS PRESSED, GO BACK TO HOME INTERFACE*/
-                sendToHome(); /**FUNCTION TO GO BACK HOME*/
-                return true;
             case R.id.EditUserProfileItem: /**IF 'EDIT MODE' IS PRESSED, LET USER EDIT INPUTS*/
                 Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
                 radioGroup.setEnabled(true); /**SET ALL BUTTONS AND INPUTS TO ENABLED SO USER CAN CHANGE*/
@@ -195,11 +194,9 @@ public class UserActivity extends AppCompatActivity {
         radioButton.setId(radioGroup.getCheckedRadioButtonId()); /**GETS THIS VALUE AS ID SO IT CAN BE CHECKED AFTER SAVE*/
 
     }
-    public void sendToHome()
-    {
-        /**RETURN TO MAIN ACTIVITY WHICH HASNT BEEN SET YET (MAIN PAGE ACTIVITY)*/
-        Intent intent = new Intent(this, MainActivity.class);
+
+    void goToActivity(Class page) { // Function that goes from the main activity to another one
+        Intent intent = new Intent(UserActivity.this, page); // from the main activity to the profile class
         startActivity(intent);
-        /**I JUST SET IT TO MAIN ACTIVITY FOR NOW BUT IT SHOULD BE CHANGED TO THE HOME INTERFACE*/
     }
 }

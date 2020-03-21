@@ -30,7 +30,7 @@
             android:parentActivityName=".MainActivity"></activity>
         <activity
             android:name=".BluetoothActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".UserActivity" />
         <activity android:name=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

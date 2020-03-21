@@ -35,10 +35,9 @@ import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
  */
 
 public class MainActivity extends AppCompatActivity {
-    TextView testDataTextView;
     private NotificationManagerCompat notificationManagerCompat;
 
-    protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
+    protected Button weatherButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
 
@@ -65,17 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
     protected void setupUI() {
         setupAction();
-        bluetoothActivityButton = findViewById(R.id.bluetoothButton);
-        testDataTextView = findViewById(R.id.testDataTextView);
         graphButton = findViewById(R.id.graphButton);
         weatherButton = findViewById(R.id.weatherButton);
         settingsButton = findViewById(R.id.settingsButton);
-        bluetoothActivityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToActivity(BluetoothActivity.class);
-            }
-        });
         weatherButton.setText("Get Current Weather Data");
         weatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -274,20 +265,14 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("A little sunscreen wouldn't hurt!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
-
-
-
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
                 .setSmallIcon(R.drawable.ic_sun)
                 .setContentTitle("UV app")
-        .setContentText("Sunscreen, Shade and a hat would be nice to combat UV exposure today!")
+                .setContentText("Sunscreen, Shade and a hat would be nice to combat UV exposure today!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
-
-
-
     }
     public void channel2Notifveryhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
@@ -296,9 +281,6 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("Make sure to be careful out there and apply lots of suncreen!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
-
-
-
     }
     public void channel2Notifextremelyhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)

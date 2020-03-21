@@ -3,11 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/BackButtonItem"
-        android:icon="@drawable/ic_action_backbutton"
-        android:title="BackButton"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/MoreOptionsItem"
         android:icon="@drawable/ic_action_settings"
         android:title="MoreOptions"
