@@ -1,17 +1,23 @@
 package com.example.utilisateur.uvexposureapp;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 public class Notifications extends Application {
     public static final String CHANNELID_1 = "channel1";
     public static final String CHANNELID_2 = "channel2";
-
+    private NotificationManagerCompat notificationManagerCompat;
     @Override
     public void onCreate() {
         super.onCreate();
+        createChannels();
     }
 
     public void createChannels () {
@@ -23,6 +29,7 @@ public class Notifications extends Application {
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel1);
+
             manager.createNotificationChannel(channel2);
         }
     }
