@@ -40,7 +40,6 @@
         android:layout_marginBottom="150dp"
         android:text="Log In" />
 
-
     <Button
         android:id="@+id/registerButton"
         android:layout_width="wrap_content"
@@ -50,4 +49,12 @@
         android:layout_marginBottom="22dp"
         android:text="New User? Register!" />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="188dp"
+        android:layout_height="99dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp"
+        app:srcCompat="@drawable/android" />
 </RelativeLayout>

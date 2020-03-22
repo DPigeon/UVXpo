@@ -124,5 +124,14 @@
         android:visibility="visible"
         tools:visibility="visible" />
 
+    <Button
+        android:id="@+id/bluetoothButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:text="Bluetooth" />
+
 
 </RelativeLayout>
