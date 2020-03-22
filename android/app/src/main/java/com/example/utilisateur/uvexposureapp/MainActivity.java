@@ -63,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }
+
+        if (newusercheck == true)
+        {
+            TutorialFragment dialog = new TutorialFragment();
+            dialog.show(getSupportFragmentManager(), "TutorialFragment");
+            newusercheck = false;
+        }
       
         setupUI();
         connectAndListen();

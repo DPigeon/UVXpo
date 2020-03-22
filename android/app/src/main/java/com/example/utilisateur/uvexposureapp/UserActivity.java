@@ -213,6 +213,7 @@ public class UserActivity extends AppCompatActivity {
         if (newuserregcheck == false) {
             MenuInflater inflater = getMenuInflater(); /**SHOWS 'BACK' AND 'EDIT MODE'*/
             inflater.inflate(R.menu.user_options, menu);
+
         }
         return true;
     }
@@ -224,10 +225,20 @@ public class UserActivity extends AppCompatActivity {
             case R.id.EditUserProfileItem: /**IF 'EDIT MODE' IS PRESSED, LET USER EDIT INPUTS*/
                 Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
                 setAllObjectsTrue();
-                return true;
             case R.id.EditUserPassword:
                 ChangePasswordFragment dialog = new ChangePasswordFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", usernameIntent);
+                dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+
+            case R.id.setTutorialOn:
+                newuserregcheck = true;
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.removeExtra("checknewuser");
+                intent.putExtra("checknewuser", newuserregcheck);
+                startActivity(intent);
+                finish();
 
         }
         return super.onOptionsItemSelected(item); /**RETURNS ITEM CLICKED*/
