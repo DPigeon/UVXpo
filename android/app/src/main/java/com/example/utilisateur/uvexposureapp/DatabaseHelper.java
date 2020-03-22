@@ -36,7 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DatabaseConfig.COLUMN_PASSWORD + " TEXT NOT NULL," +
                 DatabaseConfig.COLUMN_AGE + " INTEGER NOT NULL," +
                 DatabaseConfig.COLUMN_SKIN_TYPE + " INT NOT NULL," + // boolean stored as 0 or 1
-                DatabaseConfig.COLUMN_NOTIF + " TEXT NOT NULL,"
+                DatabaseConfig.COLUMN_NOTIF + " TEXT NOT NULL," +
                 DatabaseConfig.COLUMN_NEW_USER + " TEXT NOT NULL)";
 
         db.execSQL(CREATE_TABLE_USER_INFO);     /** Creating the user info table */
@@ -101,13 +101,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;                                                                    /**If no exception thrown, ID of the Row of the new record is returned */
     }
 
-    public List<UV> getAllUVData(int userId) {
+    public List<UV> getAllUVData(int userId, String date) {
         SQLiteDatabase database = this.getReadableDatabase(); // We get the reference to the database to read
         Cursor cursor = null;
 
         try {
             // We select * UV values, groupBy their ID and having the user ID to show them per courses. Order them by uv time values
-            cursor = database.query(DatabaseConfig.UV_TABLE_NAME, null, null, null, DatabaseConfig.COLUMN_UV_ID, DatabaseConfig.COLUMN_UV_USER_ID + "=" + "'" + userId + "'", DatabaseConfig.COLUMN_UV_TIME);
+            cursor = database.query(DatabaseConfig.UV_TABLE_NAME, null, null, null, DatabaseConfig.COLUMN_UV_ID, DatabaseConfig.COLUMN_UV_USER_ID + "=" + "'" + userId + "' AND " + DatabaseConfig.COLUMN_DATE + "=" + "'" + date + "'", DatabaseConfig.COLUMN_UV_TIME);
 
             if (cursor != null && cursor.moveToFirst()) {
                 cursor.moveToFirst();
@@ -120,7 +120,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     String uvUserId = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_UV_USER_ID));
                     double time = cursor.getDouble(cursor.getColumnIndex(DatabaseConfig.COLUMN_UV_TIME));
                     double value = cursor.getDouble(cursor.getColumnIndex(DatabaseConfig.COLUMN_UV_VALUE));
-                    String date = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_DATE));
                     UV uv = new UV(uvUserId, time, value, date);
                     uvList.add(uv);
                 } while (cursor.moveToNext());

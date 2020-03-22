@@ -36,6 +36,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.List;
 
 /*
 * An activity that displays the UV exposure graph depending on the time chosen.
@@ -51,6 +52,7 @@ public class GraphActivity extends AppCompatActivity {
     DataPoint[] liveValues;
     int counter = 0;
     int maxLivePoints = 1000;
+    int databasePoints = 10000;
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
 
@@ -210,6 +212,7 @@ public class GraphActivity extends AppCompatActivity {
     public void fetchUVDataByDate(final String date) {
         // From sharedPrefs, get the username logged in
         String name = "Marc"; // example
+        int userId = 1;
 
         /* Read user from database */
         if (haveNetworkConnection()) {
@@ -232,11 +235,24 @@ public class GraphActivity extends AppCompatActivity {
                 lastDate = date;
             }
         } else {
+            List<UV> uvList;
             DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
-            String userID = User.getUserID();    // Fetch current users ID
-            UV uv = new UV(userID, dataX, dataY, date.toString());
-            databaseHelper.getAllUVData(); // fetch all UV values
+            //String userID = User.getUserId();    // Fetch current users ID
+            uvList = databaseHelper.getAllUVData(userId, date); // fetch all UV values by date
+
+            series.resetData(new DataPoint[]{}); // Reset previous series
+            DataPoint[] newPoints = new DataPoint[databasePoints];
+            int newCounter = 0;
+            for (int i = 0; i < uvList.size(); i++) {
+                double x = uvList.get(i).getUvTime();
+                double y = uvList.get(i).getUv();
+                DataPoint point = new DataPoint(x, y);
+                newPoints[newCounter] = point;
+                series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
+                newCounter = newCounter + 1;
+            }
         }
+        lastDate = date;
     }
 
     protected void constructUvDataByDate(QueryDocumentSnapshot document_user, String date) {
@@ -246,7 +262,7 @@ public class GraphActivity extends AppCompatActivity {
         uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-            DataPoint[] newPoints = new DataPoint[10000];
+            DataPoint[] newPoints = new DataPoint[databasePoints];
             int newCounter = 0;
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
@@ -267,6 +283,7 @@ public class GraphActivity extends AppCompatActivity {
     protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
         // From sharedPrefs, get the username logged in
         String name = "Marc"; // example
+        String userID = "1";
 
         if (haveNetworkConnection()) { // If connected wifi or LTE
             CollectionReference users = fireStore.collection("user_info");
@@ -288,7 +305,6 @@ public class GraphActivity extends AppCompatActivity {
             });
         } else {
             DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
-            String userID = User.getUserID();    // Fetch current users ID
             UV uv = new UV(userID, dataX, dataY, date.toString());
             databaseHelper.insertUV(uv);    // Add the current UV value to the database
         }
