@@ -51,22 +51,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupUI();
+
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
-        Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
         try {
+            Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+
             usernameIntentExtra = userNameIntent.getString("username");
             newusercheck = userNameIntent.getBoolean("checknewuser");
 
-            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, null, 0, null, 1, true, true)); // We save the profile
-            String profileName = sharedPreferencesHelper.getProfile().getUsername();
-            welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
+            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, "", 0, null, 1, true, newusercheck)); // We save the profile
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }
-      
-        setupUI();
+
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        try {
+            String profileName = sharedPreferencesHelper.getProfile().getUsername();
+            if (profileName == null || profileName.isEmpty())
+                goToActivity(LoginActivity.class); // Send back to login
+            else
+                welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
+        } catch(Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
     }
 
     protected void setupAction() { // No action bar for the main activity
