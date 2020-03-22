@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02de3d0a-7ffa-473e-a44a-c92788bb929c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/DatabaseHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/GraphActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/example/utilisateur/uvexposureapp/GraphActivity.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,7 +24,7 @@
   <component name="ProjectId" id="1Z6GRwYNbAHhAFkkekzBSQ5G5pm" />
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/40015762_Ass2/40015762_Ass2" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">

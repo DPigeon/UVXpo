@@ -233,9 +233,9 @@ public class GraphActivity extends AppCompatActivity {
             }
         } else {
             DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
-            /* TODO: We will have to get the user info such as id here from SQLite */
-            //UV uv = new UV(userId, dataX, dataY, date.toString());
-            //databaseHelper.getAllUVData(); // Add value
+            String userID = User.getUserID();    // Fetch current users ID
+            UV uv = new UV(userID, dataX, dataY, date.toString());
+            databaseHelper.getAllUVData(); // fetch all UV values
         }
     }
 
@@ -288,9 +288,9 @@ public class GraphActivity extends AppCompatActivity {
             });
         } else {
             DatabaseHelper databaseHelper = new DatabaseHelper(GraphActivity.this);
-            /* TODO: We will have to get the user info such as id here from SQLite */
-            //UV uv = new UV(userId, dataX, dataY, date.toString());
-            //databaseHelper.insertUV(uv); // Add value
+            String userID = User.getUserID();    // Fetch current users ID
+            UV uv = new UV(userID, dataX, dataY, date.toString());
+            databaseHelper.insertUV(uv);    // Add the current UV value to the database
         }
     }
 
