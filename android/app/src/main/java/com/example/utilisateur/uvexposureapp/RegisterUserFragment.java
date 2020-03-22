@@ -57,6 +57,12 @@ public class RegisterUserFragment extends DialogFragment {
         cancelregisterButton = view.findViewById(R.id.cancelnewuserButton);
         dbhelper = new DatabaseHelper(getActivity());
 
+        cancelregisterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDialog().dismiss();
+            }
+        });
 
         registeruserButton.setOnClickListener(new View.OnClickListener()
         {

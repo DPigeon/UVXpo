@@ -20,6 +20,10 @@
                 android:id="@+id/EditUserPassword"
                 android:title="Change Password"
                 app:showAsAction="never"/>
+            <item
+                android:id="@+id/userLogOut"
+                android:title="Log Out"
+                app:showAsAction="never"/>
         </menu>
     </item>
 </menu>

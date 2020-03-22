@@ -2,6 +2,7 @@ package com.example.utilisateur.uvexposureapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /*
  * Created by David from the assignment 1 page
@@ -36,7 +37,7 @@ public class SharedPreferencesHelper {
         int age = sharedPreferences.getInt("ProfileAge", 0);
         int skin = sharedPreferences.getInt("ProfileSkin", 0);
         boolean notifications = sharedPreferences.getBoolean("ProfileNotif", true);
-        boolean newUser = sharedPreferences.getBoolean("ProfileName", true);
+        boolean newUser = sharedPreferences.getBoolean("ProfileNewUser", true);
         int id = sharedPreferences.getInt("ProfileId", 0);
         return new User(name, password, age, null, skin, notifications, newUser);
     }

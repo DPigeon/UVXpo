@@ -231,6 +231,12 @@ public class UserActivity extends AppCompatActivity {
                 bundle.putString("username", usernameIntent);
                 dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+            case R.id.userLogOut:
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.removeExtra("username");
+                intent.removeExtra("checknewuser");
+                startActivity(intent);
+                finish();
 
             case R.id.setTutorialOn:
                 newuserregcheck = true;

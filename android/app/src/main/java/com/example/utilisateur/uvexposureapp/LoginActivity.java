@@ -30,7 +30,8 @@ public class LoginActivity extends AppCompatActivity {
         newregisterButton = findViewById(R.id.registerButton);
         usernameEditText = findViewById(R.id.usernameEditText); /**assign to edittext*/
         passwordEditText = findViewById(R.id.passwordEditText); /**assign to edittext*/
-
+        usernameEditText.setText(null);
+        passwordEditText.setText(null);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
                 {
                     if (userIDcheck.get(i).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(i).getPassword().equals(passwordEditText.getText().toString()))
                     {
+                        ivalueCheck = i;
                         /**currently set the password and username to 'abc' but it should be attached to database*/
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.removeExtra("username");
@@ -50,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                         intent.putExtra("checknewuser", false);
                         startActivity(intent); /**if correct, open mainactivity*/
                         finish();
-                        ivalueCheck = i;
+
                     }
                 }
                 if (ivalueCheck == -1)
