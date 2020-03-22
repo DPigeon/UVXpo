@@ -11,6 +11,7 @@ public class DatabaseConfig {
     public static final String COLUMN_AGE = "age";
     public static final String COLUMN_SKIN_TYPE = "skin_type";
     public static final String COLUMN_NOTIF = "notifications";
+    public static final String COLUMN_NEW_USER = "new_user";
 
     public static final String UV_TABLE_NAME = "uv_data";                        /** UV Data Table */
     public static final String COLUMN_UV_ID = "uv_id";

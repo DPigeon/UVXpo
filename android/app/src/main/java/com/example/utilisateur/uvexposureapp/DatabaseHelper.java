@@ -36,7 +36,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DatabaseConfig.COLUMN_PASSWORD + " TEXT NOT NULL," +
                 DatabaseConfig.COLUMN_AGE + " INTEGER NOT NULL," +
                 DatabaseConfig.COLUMN_SKIN_TYPE + " INT NOT NULL," + // boolean stored as 0 or 1
-                DatabaseConfig.COLUMN_NOTIF + " TEXT NOT NULL)";
+                DatabaseConfig.COLUMN_NOTIF + " TEXT NOT NULL,"
+                DatabaseConfig.COLUMN_NEW_USER + " TEXT NOT NULL)";
 
         db.execSQL(CREATE_TABLE_USER_INFO);     /** Creating the user info table */
 
@@ -65,6 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DatabaseConfig.COLUMN_AGE, user.getAge() );
         contentValues.put(DatabaseConfig.COLUMN_SKIN_TYPE, user.getSkin() );
         contentValues.put(DatabaseConfig.COLUMN_NOTIF, user.getNotifications() );
+        contentValues.put(DatabaseConfig.COLUMN_NEW_USER, user.getNewUser());
 
         try {
             id = db.insertOrThrow(DatabaseConfig.USER_TABLE_NAME, null, contentValues);

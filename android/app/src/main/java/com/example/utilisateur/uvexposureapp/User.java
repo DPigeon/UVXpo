@@ -10,14 +10,16 @@ public class User {
     private ArrayList<UV> uvData; // A user will have stored uv values tracked
     private int skin;
     private boolean notifications;
+    private boolean newuser;
 
-    public User (String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications) {
+    public User (String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications, boolean newuser) {
         this.username = username;
         this.password = password;
         this.age = age;
         this.uvData = uv;
         this.skin = skin;
         this.notifications = notifications;
+        this.newuser = newuser
     }
 
     /* set UserId*/
@@ -89,4 +91,12 @@ public class User {
     public boolean getNotifications() {
         return notifications;
     }
+
+    /* Set new or old user*/
+    public void setNewUser(boolean newuser) {
+        this.newuser = newuser;
+    }
+
+    /* Get new or old user*/
+    public boolean getNewUser() { return newuser; }
 }
