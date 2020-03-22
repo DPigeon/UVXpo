@@ -1,10 +1,12 @@
 package com.example.utilisateur.uvexposureapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +18,12 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.List;
+
+import static java.lang.Integer.parseInt;
 
 public class UserActivity extends AppCompatActivity {
 
@@ -32,10 +39,19 @@ public class UserActivity extends AppCompatActivity {
     RadioButton radioSkintype5;
     RadioButton radioSkintype6;
 
+    Boolean newuserregcheck = false;
+    String usernameIntent;
+    String passwordfornewuser;
+    DatabaseHelper dbhelper;
+    Cursor userInfoAllData;
+    List<User> userInfo;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+
         /**SET ALL OBJECTS TO VARIABLES*/
         radioGroup = findViewById(R.id.radiogroupSkinColor); /**CHECKBOXES FOR SKIN COLOR*/
         editTextAge = findViewById(R.id.editTextAge); /**AGE INPUT*/
@@ -48,76 +64,122 @@ public class UserActivity extends AppCompatActivity {
         radioSkintype5 = findViewById(R.id.radioSkinTypefive);
         radioSkintype6 = findViewById(R.id.radioSkinTypesix);
 
-        radioGroup.setEnabled(false); /**SET TO UNEDITABLE UNTIL EDIT MODE IS SET ON*/
-        editTextAge.setEnabled(false);
-        radioGroup.setClickable(false);
-        notifSwitch.setClickable(false);
-        notifSwitch.setEnabled(false);
-        saveButton.setEnabled(false);
-        radioSkintype1.setClickable(false);
-        radioSkintype2.setClickable(false);
-        radioSkintype3.setClickable(false);
-        radioSkintype4.setClickable(false);
-        radioSkintype5.setClickable(false);
-        radioSkintype6.setClickable(false);
-        radioSkintype1.setEnabled(false);
-        radioSkintype2.setEnabled(false);
-        radioSkintype3.setEnabled(false);
-        radioSkintype4.setEnabled(false);
-        radioSkintype5.setEnabled(false);
-        radioSkintype6.setEnabled(false);
+        dbhelper = new DatabaseHelper(this);
+        userInfoAllData = dbhelper.getData();
+        userInfo = dbhelper.getAllUserData();
 
 
-        /**STILL NEED TO ADD CALLS THAT BRING RADIOBUTTON VALUE IN, AND AGE, AND NOTIF*/
+        Bundle bndset = getIntent().getExtras();
+        newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
+        usernameIntent = bndset.getString("username");
+
+        if (newuserregcheck == false) /**IF USER IS NOT NEW DATA WILL BE ADDED TO OBJECTS*/
+        {
+
+            //setAllValues();
+
+
+            for (int i = 0; i < userInfo.size(); i++)
+            {
+                if (userInfo.get(i).getUsername().equals(usernameIntent))
+                {
+                    int numintcheck = userInfo.get(i).getAge();
+                    String numintToString = Integer.toString(numintcheck);
+                    editTextAge.setText(numintToString);
+                    switch (userInfo.get(i).getSkin()) {
+                        case 1:
+                            radioSkintype1.setChecked(true);
+                        case 2:
+                            radioSkintype2.setChecked(true);
+                        case 3:
+                            radioSkintype3.setChecked(true);
+                        case 4:
+                            radioSkintype4.setChecked(true);
+                        case 5:
+                            radioSkintype5.setChecked(true);
+                        case 6:
+                            radioSkintype6.setChecked(true);
+                    }
+                    Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck, Toast.LENGTH_SHORT).show();
+                }
+            }
+            setAllObjectsFalse();
+
+        }
 
         saveButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                radioGroup.setEnabled(false); /**SET TO UNEDITABLE WHEN SAVE IS CLICKED*/
-                editTextAge.setEnabled(false);
-                radioGroup.setClickable(false);
-                notifSwitch.setClickable(false);
-                notifSwitch.setEnabled(false);
-                saveButton.setEnabled(false);
-                radioSkintype1.setClickable(false);
-                radioSkintype2.setClickable(false);
-                radioSkintype3.setClickable(false);
-                radioSkintype4.setClickable(false);
-                radioSkintype5.setClickable(false);
-                radioSkintype6.setClickable(false);
-                radioSkintype1.setEnabled(false);
-                radioSkintype2.setEnabled(false);
-                radioSkintype3.setEnabled(false);
-                radioSkintype4.setEnabled(false);
-                radioSkintype5.setEnabled(false);
-                radioSkintype6.setEnabled(false);
+
+                List<User> userAgeChange = dbhelper.getAllUserData();
+
                 /**THIS IS WHERE THE NEW VALUES SHOULD BE ENTERED IF CHANGES ARE MADE, (DATABASE)*/
-                if (editTextAge.getText() == null || Integer.parseInt(editTextAge.getText().toString()) <= 0)
+
+                for (int i = 0; i < userAgeChange.size(); i++)
                 {
-                    /**PUSH NEW AGE TO DATABASE*/
+                    if (userAgeChange.get(i).getUsername().equals(usernameIntent))
+                    {
+
+                        if (editTextAge.getText() == null || parseInt(editTextAge.getText().toString()) <= 0)
+                        {
+                            Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
+                            editTextAge.setText(null);
+                            /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
+
+                        }
+                        else if (radioSkintype1.isChecked() ||radioSkintype2.isChecked() ||radioSkintype3.isChecked() ||
+                                radioSkintype4.isChecked() ||radioSkintype5.isChecked() ||radioSkintype6.isChecked())
+                        {
+                            int userID = userAgeChange.get(i).getUserId();
+                            int oldSkinType = userAgeChange.get(i).getSkin();
+                            int oldAge = userAgeChange.get(i).getAge();
+
+                            int ageInteger = parseInt(editTextAge.getText().toString());
+
+                            switch (radioGroup.getCheckedRadioButtonId()){ /**UPDATE DATABASE FUNCTIONS*/
+                                case R.id.radioSkinTypeone:
+                                    dbhelper.updateSkin(userID, 1, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                case R.id.radioSkinTypetwo:
+                                    dbhelper.updateSkin(userID, 2, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                case R.id.radioSkinTypethree:
+                                    dbhelper.updateSkin(userID, 3, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                case R.id.radioSkinTypefour:
+                                    dbhelper.updateSkin(userID, 4, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                case R.id.radioSkinTypefive:
+                                    dbhelper.updateSkin(userID, 5, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                case R.id.radioSkinTypesix:
+                                    dbhelper.updateSkin(userID, 6, oldSkinType);
+                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+
+                            }
+
+                            dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
+
+                            setAllObjectsFalse();
+                                newuserregcheck = false;
+                                Intent intent = new Intent(UserActivity.this, MainActivity.class);
+                                intent.removeExtra("username");
+                                intent.removeExtra("checknewuser");
+                                intent.putExtra("username", usernameIntent);
+                                intent.putExtra("checknewuser", newuserregcheck);
+                                startActivity(intent);
+                                finish();
+
+                        }
+                        else
+                        {
+                            Toast.makeText(UserActivity.this, "INVALID SKIN TONE", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
-                else
-                {
-                    Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
-                    /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
-                }
-                switch (radioButton.getId())
-                {
-                    case R.id.radioSkinTypeone:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                    case R.id.radioSkinTypetwo:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                    case R.id.radioSkinTypethree:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                    case R.id.radioSkinTypefour:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                    case R.id.radioSkinTypefive:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                    case R.id.radioSkinTypesix:
-                        /**PUSH NEW SKIN COLOR TO DATABASE*/
-                }
+
 
                 /**THE FUNCTION BELOW IS TO CHECK FOR NOTIFICATION ON OFF CHANGES*/
                 notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -146,10 +208,11 @@ public class UserActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) { /**OPTIONS ACTION BAR*/
-        MenuInflater inflater = getMenuInflater(); /**SHOWS 'BACK' AND 'EDIT MODE'*/
-        inflater.inflate(R.menu.user_options, menu);
+        if (newuserregcheck == false) {
+            MenuInflater inflater = getMenuInflater(); /**SHOWS 'BACK' AND 'EDIT MODE'*/
+            inflater.inflate(R.menu.user_options, menu);
+        }
         return true;
-
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) /**FOR OPENING THE ACTION BAR*/
@@ -161,24 +224,7 @@ public class UserActivity extends AppCompatActivity {
                 return true;
             case R.id.EditUserProfileItem: /**IF 'EDIT MODE' IS PRESSED, LET USER EDIT INPUTS*/
                 Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
-                radioGroup.setEnabled(true); /**SET ALL BUTTONS AND INPUTS TO ENABLED SO USER CAN CHANGE*/
-                radioGroup.setClickable(true);
-                notifSwitch.setClickable(true);
-                editTextAge.setEnabled(true);
-                notifSwitch.setEnabled(true);
-                saveButton.setEnabled(false); // Not available for now (but later yes)
-                radioSkintype1.setClickable(true);
-                radioSkintype2.setClickable(true);
-                radioSkintype3.setClickable(true);
-                radioSkintype4.setClickable(true);
-                radioSkintype5.setClickable(true);
-                radioSkintype6.setClickable(true);
-                radioSkintype1.setEnabled(true);
-                radioSkintype2.setEnabled(true);
-                radioSkintype3.setEnabled(true);
-                radioSkintype4.setEnabled(true);
-                radioSkintype5.setEnabled(true);
-                radioSkintype6.setEnabled(true);
+                setAllObjectsTrue();
                 return true;
             case R.id.EditUserPassword:
                 ChangePasswordFragment dialog = new ChangePasswordFragment();
@@ -201,5 +247,49 @@ public class UserActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         /**I JUST SET IT TO MAIN ACTIVITY FOR NOW BUT IT SHOULD BE CHANGED TO THE HOME INTERFACE*/
+
+    }
+    public void setAllObjectsFalse()
+    {
+        radioGroup.setEnabled(false); /**SET TO UNEDITABLE */
+        editTextAge.setEnabled(false);
+        radioGroup.setClickable(false);
+        notifSwitch.setClickable(false);
+        notifSwitch.setEnabled(false);
+        saveButton.setEnabled(false);
+        radioSkintype1.setClickable(false);
+        radioSkintype2.setClickable(false);
+        radioSkintype3.setClickable(false);
+        radioSkintype4.setClickable(false);
+        radioSkintype5.setClickable(false);
+        radioSkintype6.setClickable(false);
+        radioSkintype1.setEnabled(false);
+        radioSkintype2.setEnabled(false);
+        radioSkintype3.setEnabled(false);
+        radioSkintype4.setEnabled(false);
+        radioSkintype5.setEnabled(false);
+        radioSkintype6.setEnabled(false);
+    }
+    public void setAllObjectsTrue()
+    {
+        radioGroup.setEnabled(true); /**SET ALL BUTTONS AND INPUTS TO ENABLED*/
+        radioGroup.setClickable(true);
+        notifSwitch.setClickable(true);
+        editTextAge.setEnabled(true);
+        notifSwitch.setEnabled(true);
+        saveButton.setEnabled(true);
+        radioSkintype1.setClickable(true);
+        radioSkintype2.setClickable(true);
+        radioSkintype3.setClickable(true);
+        radioSkintype4.setClickable(true);
+        radioSkintype5.setClickable(true);
+        radioSkintype6.setClickable(true);
+        radioSkintype1.setEnabled(true);
+        radioSkintype2.setEnabled(true);
+        radioSkintype3.setEnabled(true);
+        radioSkintype4.setEnabled(true);
+        radioSkintype5.setEnabled(true);
+        radioSkintype6.setEnabled(true);
+
     }
 }

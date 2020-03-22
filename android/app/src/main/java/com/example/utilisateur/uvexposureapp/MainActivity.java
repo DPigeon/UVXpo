@@ -33,12 +33,18 @@ public class MainActivity extends AppCompatActivity {
     protected Button weatherButton, bluetoothActivityButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
+    String usernameIntentExtra;
+    Boolean newusercheck;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+        usernameIntentExtra = userNameIntent.getString("username");
+        newusercheck = userNameIntent.getBoolean("checknewuser");
 
         setupUI();
         connectAndListen();
@@ -78,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToActivity(UserActivity.class);
+                Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                intent.removeExtra("username");
+                intent.removeExtra("checknewuser");
+                intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+                intent.putExtra("checknewuser", newusercheck);
+                startActivity(intent);
             }
         });
         faqButton = findViewById(R.id.faqButton);
