@@ -36,25 +36,37 @@ import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
 
 public class MainActivity extends AppCompatActivity {
     private NotificationManagerCompat notificationManagerCompat;
+    protected SharedPreferencesHelper sharedPreferencesHelper;
 
+    protected TextView welcomeUserTextView;
     protected Button weatherButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
+    String usernameIntentExtra;
+    Boolean newusercheck;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
+        Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+        try {
+            usernameIntentExtra = userNameIntent.getString("username");
+            newusercheck = userNameIntent.getBoolean("checknewuser");
+
+            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, null, 0, null, 1, true, true)); // We save the profile
+            String profileName = sharedPreferencesHelper.getProfile().getUsername();
+            welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
+        } catch(Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
+      
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
-
-
-        //channel2Notifextremelyhigh();
-
-        //channel2Notif();//NOTIFICATOPN TEST !
-
     }
 
     protected void setupAction() { // No action bar for the main activity
@@ -64,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void setupUI() {
         setupAction();
+        welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
         weatherButton = findViewById(R.id.weatherButton);
         settingsButton = findViewById(R.id.settingsButton);
@@ -83,7 +96,12 @@ public class MainActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToActivity(UserActivity.class);
+                Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                intent.removeExtra("username");
+                intent.removeExtra("checknewuser");
+                intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+                intent.putExtra("checknewuser", newusercheck);
+                startActivity(intent);
             }
         });
         faqButton = findViewById(R.id.faqButton);
@@ -186,8 +204,6 @@ public class MainActivity extends AppCompatActivity {
         final long LSB = 0x800000805f9b34fbL;
         long value = i & 0xFFFFFFFF;
         return new UUID(MSB | (value << 32), LSB);
-
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -242,9 +258,6 @@ public class MainActivity extends AppCompatActivity {
             .setContentText("Stay in shade, apply sunscreen and wear sunglasses!")
             .build();
         notificationManagerCompat.notify(1,notifications);
-
-
-
     }
 
     public void channel2Notif() {
@@ -254,9 +267,6 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("Make sure to protect yourself with a hat!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
-
-
-
     }
     public void channel2Notifmedium() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)

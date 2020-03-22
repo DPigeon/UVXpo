@@ -22,6 +22,20 @@ public class User {
         this.newUser = newUser;
     }
 
+    public User (String username, String password, int age, int skin, boolean notifications) {
+        this.username = username;
+        this.password = password;
+        this.age = age;
+        this.skin = skin;
+        this.notifications = notifications;
+    }
+
+    public User (String username, String password)
+        {
+        this.username = username;
+        this.password = password;
+    }
+
     /* set UserId*/
     public void setUserId(int userId) {
         this.userId = userId;
