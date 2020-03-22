@@ -228,6 +228,12 @@ public class UserActivity extends AppCompatActivity {
             case R.id.EditUserPassword:
                 ChangePasswordFragment dialog = new ChangePasswordFragment();
                 dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+            case R.id.userLogOut:
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.removeExtra("username");
+                intent.removeExtra("checknewuser");
+                startActivity(intent);
+                finish();
 
         }
         return super.onOptionsItemSelected(item); /**RETURNS ITEM CLICKED*/
