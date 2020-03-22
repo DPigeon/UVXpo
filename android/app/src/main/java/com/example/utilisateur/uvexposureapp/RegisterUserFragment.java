@@ -111,7 +111,7 @@ public class RegisterUserFragment extends DialogFragment {
                 }
                 if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1)
                 {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
-                    dbhelper.insertUser(new User(registerusername, registerpassword, 0, null, 0, true));
+                    dbhelper.insertUser(new User(registerusername, registerpassword, 0, null, 0, true, true));
                     //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
                     getDialog().dismiss();
                     newusercheck = true;

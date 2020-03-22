@@ -36,7 +36,9 @@ import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
 
 public class MainActivity extends AppCompatActivity {
     private NotificationManagerCompat notificationManagerCompat;
+    protected SharedPreferencesHelper sharedPreferencesHelper;
 
+    protected TextView welcomeUserTextView;
     protected Button weatherButton, graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
@@ -49,9 +51,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
         Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
-        usernameIntentExtra = userNameIntent.getString("username");
-        newusercheck = userNameIntent.getBoolean("checknewuser");
+        try {
+            usernameIntentExtra = userNameIntent.getString("username");
+            newusercheck = userNameIntent.getBoolean("checknewuser");
+
+            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, null, 0, null, 1, true, true)); // We save the profile
+            String profileName = sharedPreferencesHelper.getProfile().getUsername();
+            welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
+        } catch(Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
       
         setupUI();
         connectAndListen();
@@ -65,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void setupUI() {
         setupAction();
+        welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
         weatherButton = findViewById(R.id.weatherButton);
         settingsButton = findViewById(R.id.settingsButton);
