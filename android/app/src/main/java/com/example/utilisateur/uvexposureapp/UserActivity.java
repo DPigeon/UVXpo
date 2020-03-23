@@ -120,56 +120,71 @@ public class UserActivity extends AppCompatActivity {
             {
 
                 List<User> userAgeChange = dbhelper.getAllUserData();
+                boolean catcherCheck = true;
 
                 /**THIS IS WHERE THE NEW VALUES SHOULD BE ENTERED IF CHANGES ARE MADE, (DATABASE)*/
 
-                for (int i = 0; i < userAgeChange.size(); i++)
+                String ifTextisNum  = editTextAge.getText().toString();
+                try
                 {
-                    if (userAgeChange.get(i).getUsername().equals(usernameIntent))
-                    {
+                    int num = Integer.parseInt(ifTextisNum);
+                }
+                catch (NumberFormatException e)
+                {
+                    editTextAge.setText(null);
+                    catcherCheck = false;
+                    Toast.makeText(UserActivity.this, "Invalid Age", Toast.LENGTH_SHORT).show();
+                }
+                if (catcherCheck == true) {
+                    if (parseInt(editTextAge.getText().toString()) <= 0) {
+                        Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
+                        editTextAge.setText(null);
+                        /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
 
-                        if (editTextAge.getText() == null || parseInt(editTextAge.getText().toString()) <= 0)
-                        {
-                            Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
-                            editTextAge.setText(null);
-                            /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
+                    } else if (!radioSkintype1.isChecked() && !radioSkintype2.isChecked() && !radioSkintype3.isChecked() &&
+                            !radioSkintype4.isChecked() && !radioSkintype5.isChecked() && !radioSkintype6.isChecked()) {
+                        Toast.makeText(UserActivity.this, "Please select a skin tone.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        for (int i = 0; i < userAgeChange.size(); i++) {
+                            if (userAgeChange.get(i).getUsername().equals(usernameIntent)) {
 
-                        }
-                        else if (radioSkintype1.isChecked() ||radioSkintype2.isChecked() ||radioSkintype3.isChecked() ||
-                                radioSkintype4.isChecked() ||radioSkintype5.isChecked() ||radioSkintype6.isChecked())
-                        {
-                            int userID = userAgeChange.get(i).getUserId();
-                            int oldSkinType = userAgeChange.get(i).getSkin();
-                            int oldAge = userAgeChange.get(i).getAge();
+                                int userID = userAgeChange.get(i).getUserId();
+                                int oldSkinType = userAgeChange.get(i).getSkin();
+                                int oldAge = userAgeChange.get(i).getAge();
 
-                            int ageInteger = parseInt(editTextAge.getText().toString());
+                                int ageInteger = parseInt(editTextAge.getText().toString());
 
-                            switch (radioGroup.getCheckedRadioButtonId()){ /**UPDATE DATABASE FUNCTIONS*/
-                                case R.id.radioSkinTypeone:
-                                    dbhelper.updateSkin(userID, 1, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                case R.id.radioSkinTypetwo:
-                                    dbhelper.updateSkin(userID, 2, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                case R.id.radioSkinTypethree:
-                                    dbhelper.updateSkin(userID, 3, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                case R.id.radioSkinTypefour:
-                                    dbhelper.updateSkin(userID, 4, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                case R.id.radioSkinTypefive:
-                                    dbhelper.updateSkin(userID, 5, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                case R.id.radioSkinTypesix:
-                                    dbhelper.updateSkin(userID, 6, oldSkinType);
-                                    Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                switch (radioGroup.getCheckedRadioButtonId()) { /**UPDATE DATABASE FUNCTIONS*/
+                                    case R.id.radioSkinTypeone:
+                                        dbhelper.updateSkin(userID, 1, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    case R.id.radioSkinTypetwo:
+                                        dbhelper.updateSkin(userID, 2, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    case R.id.radioSkinTypethree:
+                                        dbhelper.updateSkin(userID, 3, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    case R.id.radioSkinTypefour:
+                                        dbhelper.updateSkin(userID, 4, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    case R.id.radioSkinTypefive:
+                                        dbhelper.updateSkin(userID, 5, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    case R.id.radioSkinTypesix:
+                                        dbhelper.updateSkin(userID, 6, oldSkinType);
+                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
 
-                            }
+                                }
 
-                            dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
+                                dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
 
-                            setAllObjectsFalse();
-                                newuserregcheck = false;
+                                setAllObjectsFalse();
+                                if (newuserregcheck == true) {
+                                    newuserregcheck = true;
+                                } else if (newuserregcheck == false) {
+                                    newuserregcheck = false;
+                                }
+
                                 Intent intent = new Intent(UserActivity.this, MainActivity.class);
                                 intent.removeExtra("username");
                                 intent.removeExtra("checknewuser");
@@ -177,11 +192,7 @@ public class UserActivity extends AppCompatActivity {
                                 intent.putExtra("checknewuser", newuserregcheck);
                                 startActivity(intent);
                                 finish();
-
-                        }
-                        else
-                        {
-                            Toast.makeText(UserActivity.this, "INVALID SKIN TONE", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }
@@ -233,8 +244,11 @@ public class UserActivity extends AppCompatActivity {
             newuserregcheck = true;
             Intent intent2 = new Intent(this, MainActivity.class);
             intent2.removeExtra("checknewuser");
+            intent2.removeExtra("username");
+            intent2.putExtra("username", usernameIntent);
             intent2.putExtra("checknewuser", newuserregcheck);
             startActivity(intent2);
+            finish();
         }
         else if (menuId == R.id.EditUserPassword) {
             ChangePasswordFragment dialog = new ChangePasswordFragment();
