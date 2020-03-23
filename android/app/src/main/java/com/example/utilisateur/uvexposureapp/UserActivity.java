@@ -220,33 +220,31 @@ public class UserActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) /**FOR OPENING THE ACTION BAR*/
     {
-        switch(item.getItemId())
-        {
-            case R.id.EditUserProfileItem: /**IF 'EDIT MODE' IS PRESSED, LET USER EDIT INPUTS*/
-                Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
-                setAllObjectsTrue();
-            case R.id.EditUserPassword:
-                ChangePasswordFragment dialog = new ChangePasswordFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("username", usernameIntent);
-                dialog.setArguments(bundle);
-                dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
-            case R.id.userLogOut:
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.removeExtra("username");
-                intent.removeExtra("checknewuser");
-                startActivity(intent);
-                finish();
-            case R.id.setTutorialOn:
-                newuserregcheck = true;
-                Intent intent2 = new Intent(this, MainActivity.class);
-                intent2.removeExtra("checknewuser");
-                intent2.putExtra("checknewuser", newuserregcheck);
-                startActivity(intent2);
-                finish();
-
+        int menuId = item.getItemId();
+        if (menuId == R.id.EditUserProfileItem) { // If we click on the ... button
+            Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
+            setAllObjectsTrue();
+            return true;
         }
-        return super.onOptionsItemSelected(item); /**RETURNS ITEM CLICKED*/
+        else if (menuId == R.id.EditUserPassword) {
+            ChangePasswordFragment dialog = new ChangePasswordFragment();
+            dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+        }
+        else if (menuId == R.id.userLogOut) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.removeExtra("username");
+            intent.removeExtra("checknewuser");
+            startActivity(intent);
+            finish();
+        else if (menuId == R.id.setTutorialOn) {
+            newuserregcheck = true;
+            Intent intent2 = new Intent(this, MainActivity.class);
+            intent2.removeExtra("checknewuser");
+            intent2.putExtra("checknewuser", newuserregcheck);
+            startActivity(intent2);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
     public void checkButton(View v) /**CHECKS WHICH SKIN COLOR HAS BEEN PRESSED*/
     {
