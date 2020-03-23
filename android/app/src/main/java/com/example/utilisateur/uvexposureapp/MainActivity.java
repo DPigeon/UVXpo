@@ -85,11 +85,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /* Tutorial */
-        if (newusercheck == true)
-        {
-            TutorialFragment dialog = new TutorialFragment();
-            dialog.show(getSupportFragmentManager(), "TutorialFragment");
-            newusercheck = false;
+        try {
+            if (newusercheck == true) {
+                TutorialFragment dialog = new TutorialFragment();
+                dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                newusercheck = false;
+            }
+        } catch (Exception exception) {
+            Log.d("New User Check", exception.toString());
         }
     }
 
