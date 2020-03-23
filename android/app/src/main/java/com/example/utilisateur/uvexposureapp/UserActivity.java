@@ -236,6 +236,7 @@ public class UserActivity extends AppCompatActivity {
             intent.removeExtra("checknewuser");
             startActivity(intent);
             finish();
+        }
         else if (menuId == R.id.setTutorialOn) {
             newuserregcheck = true;
             Intent intent2 = new Intent(this, MainActivity.class);
