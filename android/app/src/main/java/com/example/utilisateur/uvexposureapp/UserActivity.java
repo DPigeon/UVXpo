@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -70,10 +71,13 @@ public class UserActivity extends AppCompatActivity {
         userInfoAllData = dbhelper.getData();
         userInfo = dbhelper.getAllUserData();
 
-
-        Bundle bndset = getIntent().getExtras();
-        newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
-        usernameIntent = bndset.getString("username");
+        try {
+            Bundle bndset = getIntent().getExtras();
+            newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
+            usernameIntent = bndset.getString("username");
+        } catch (Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
 
         if (newuserregcheck == false) /**IF USER IS NOT NEW DATA WILL BE ADDED TO OBJECTS*/
         {
