@@ -224,18 +224,6 @@ public class UserActivity extends AppCompatActivity {
         if (menuId == R.id.EditUserProfileItem) { // If we click on the ... button
             Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
             setAllObjectsTrue();
-            return true;
-        }
-        else if (menuId == R.id.EditUserPassword) {
-            ChangePasswordFragment dialog = new ChangePasswordFragment();
-            dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
-        }
-        else if (menuId == R.id.userLogOut) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.removeExtra("username");
-            intent.removeExtra("checknewuser");
-            startActivity(intent);
-            finish();
         }
         else if (menuId == R.id.setTutorialOn) {
             newuserregcheck = true;
@@ -243,8 +231,21 @@ public class UserActivity extends AppCompatActivity {
             intent2.removeExtra("checknewuser");
             intent2.putExtra("checknewuser", newuserregcheck);
             startActivity(intent2);
-            finish();
         }
+        else if (menuId == R.id.EditUserPassword) {
+            ChangePasswordFragment dialog = new ChangePasswordFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", usernameIntent);
+            dialog.setArguments(bundle);
+            dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+        }
+        else if (menuId == R.id.userLogOut) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.removeExtra("username");
+            intent.removeExtra("checknewuser");
+            startActivity(intent);
+        }
+
         return super.onOptionsItemSelected(item);
     }
     public void checkButton(View v) /**CHECKS WHICH SKIN COLOR HAS BEEN PRESSED*/

@@ -58,14 +58,13 @@ public class ChangePasswordFragment extends DialogFragment {
         confirmpassEditText = view.findViewById(R.id.newpassconfirmEditText);
         savepassButton = view.findViewById(R.id.savepassButton);
         cancelpassButton = view.findViewById(R.id.cancelpassButton);
-        userInfo = dbhelper.getAllUserData();
         Bundle bundle = getArguments();
         usernameIntent = bundle.getString("username");
-
 
         savepassButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                userInfo = dbhelper.getAllUserData();
                 String oldpass = currentpassEditText.getText().toString();
                 String newpass = newpassEditText.getText().toString();
                 String confirmpass = confirmpassEditText.getText().toString();
