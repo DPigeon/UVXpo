@@ -237,13 +237,12 @@ public class UserActivity extends AppCompatActivity {
                 intent.removeExtra("checknewuser");
                 startActivity(intent);
                 finish();
-
             case R.id.setTutorialOn:
                 newuserregcheck = true;
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.removeExtra("checknewuser");
-                intent.putExtra("checknewuser", newuserregcheck);
-                startActivity(intent);
+                Intent intent2 = new Intent(this, MainActivity.class);
+                intent2.removeExtra("checknewuser");
+                intent2.putExtra("checknewuser", newuserregcheck);
+                startActivity(intent2);
                 finish();
 
         }
