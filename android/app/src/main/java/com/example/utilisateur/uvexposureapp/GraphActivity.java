@@ -44,12 +44,14 @@ import java.util.List;
 */
 
 public class GraphActivity extends AppCompatActivity {
+    protected SharedPreferencesHelper sharedPreferencesHelper;
     BroadcastReceiver mBroadcastReceiver;
     GraphView graph;
     TextView uvIndexTextView;
     DatePickerDialog datePicker;
     EditText datePick;
     DataPoint[] liveValues;
+    String username;
     int counter = 0;
     int maxLivePoints = 1000;
     int databasePoints = 10000;
@@ -75,6 +77,21 @@ public class GraphActivity extends AppCompatActivity {
         setupGraph();
         fireStore = FirebaseFirestore.getInstance();
         setDate();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        try {
+            String profileName = sharedPreferencesHelper.getProfile().getUsername();
+            if (profileName == null || profileName.isEmpty())
+                goToActivity(LoginActivity.class); // Send back to login
+            else
+                username = profileName;
+        } catch(Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
     }
 
     /* Used to get the broadcasted message from main activity of bluetooth data */
@@ -367,6 +384,11 @@ public class GraphActivity extends AppCompatActivity {
     //From: http://forum.arduino.cc/index.php?topic=3922.0
     double mapIntensity(double x, double in_min, double in_max, double out_min, double out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+    void goToActivity(Class page) { // Function that goes from the main activity to another one
+        Intent intent = new Intent(GraphActivity.this, page); // from the main activity to the profile class
+        startActivity(intent);
     }
 
 }
