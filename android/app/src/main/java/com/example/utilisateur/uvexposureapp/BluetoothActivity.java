@@ -32,6 +32,19 @@ public class BluetoothActivity extends AppCompatActivity {
         setupUI();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     protected void setupUI() {
         toggleButton = findViewById(R.id.toggleButton);
         discoverableButton = findViewById(R.id.discoverableButton);

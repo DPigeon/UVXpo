@@ -102,32 +102,38 @@ public class RegisterUserFragment extends DialogFragment {
                     newusercheck = false;
                     Toast.makeText(getActivity(), "Password has to be 8 or more characters.", Toast.LENGTH_SHORT).show();
                 }
-
-
-                for (int i = 0; i < usernameCheck.size(); i++)
+                else if (!registerpassword.equals(registerconfirmpassword))
                 {
-                    if (usernameCheck.get(i).getUsername().equals(registerusername)) { /**CHECKS IF USERNAME IS TAKEN*/
-                        usernameinputEditText.setText(null);
-                        passwordinputEditText.setText(null);
-                        confirmpassinputEditText.setText(null);
-                        ivalueForStatement = i; /**IF IT IS, THEN VALUE OF THIS INT WILL CHANGE FROM -1 to i*/
-                        newusercheck = false;
-                        Toast.makeText(getActivity(), "Username is taken.", Toast.LENGTH_SHORT).show();
-                    }
+
+                    confirmpassinputEditText.setText(null);
+                    newusercheck = false;
+                    Toast.makeText(getActivity(), "Passwords don't match.", Toast.LENGTH_SHORT).show();
                 }
-                if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1)
-                {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
-                    dbhelper.insertUser(new User(registerusername, registerpassword, 0, null, 0, true, true));
-                    //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
-                    getDialog().dismiss();
-                    newusercheck = true;
-                    Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
-                    intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
-                    intent.removeExtra("username");
-                    intent.putExtra("checknewuser", newusercheck);
-                    intent.putExtra("username", registerusername);
-                    startActivity(intent);
-                    Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                else {
+
+                    for (int i = 0; i < usernameCheck.size(); i++) {
+                        if (usernameCheck.get(i).getUsername().equals(registerusername)) { /**CHECKS IF USERNAME IS TAKEN*/
+                            usernameinputEditText.setText(null);
+                            passwordinputEditText.setText(null);
+                            confirmpassinputEditText.setText(null);
+                            ivalueForStatement = i; /**IF IT IS, THEN VALUE OF THIS INT WILL CHANGE FROM -1 to i*/
+                            newusercheck = false;
+                            Toast.makeText(getActivity(), "Username is taken.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1) {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
+                        dbhelper.insertUser(new User(registerusername, registerpassword, 0, null, 0, true, true));
+                        //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
+                        getDialog().dismiss();
+                        newusercheck = true;
+                        Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
+                        intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
+                        intent.removeExtra("username");
+                        intent.putExtra("checknewuser", newusercheck);
+                        intent.putExtra("username", registerusername);
+                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
