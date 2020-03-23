@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.List;
+
 public class ChangePasswordFragment extends DialogFragment {
 
     protected EditText currentpassEditText;
@@ -23,6 +25,9 @@ public class ChangePasswordFragment extends DialogFragment {
     protected EditText confirmpassEditText;
     protected Button savepassButton;
     protected Button cancelpassButton;
+    String usernameIntent;
+    List<User> userInfo;
+    DatabaseHelper dbhelper;
 
     @Override
     public void onResume() {
@@ -53,17 +58,31 @@ public class ChangePasswordFragment extends DialogFragment {
         confirmpassEditText = view.findViewById(R.id.newpassconfirmEditText);
         savepassButton = view.findViewById(R.id.savepassButton);
         cancelpassButton = view.findViewById(R.id.cancelpassButton);
+        Bundle bundle = getArguments();
+        usernameIntent = bundle.getString("username");
 
         savepassButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                userInfo = dbhelper.getAllUserData();
                 String oldpass = currentpassEditText.getText().toString();
                 String newpass = newpassEditText.getText().toString();
                 String confirmpass = confirmpassEditText.getText().toString();
-                if (oldpass.equals("abc") && newpass.equals(confirmpass))
+                String databasePassword = null;
+
+                for (int i = 0; i < userInfo.size(); i++)
+                {
+                    if (userInfo.get(i).getUsername().equals(usernameIntent))
+                    {
+                        databasePassword = userInfo.get(i).getPassword();
+                    }
+                }
+
+                if (oldpass.equals(databasePassword) && newpass.equals(confirmpass))
                 {
 
                         /**INSERT NEW PASSWORD INTO DATABASE, ABC SHOULD BE DATABASE FETCH TO OLD PASSWORD*/
+
                         getDialog().dismiss();
                         Toast.makeText(getActivity(), "Password Changed", Toast.LENGTH_SHORT).show();
 

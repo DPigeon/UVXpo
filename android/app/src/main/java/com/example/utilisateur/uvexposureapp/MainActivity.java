@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }
-
+      
+        setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
     }
@@ -81,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
                 welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
+        }
+
+        /* Tutorial */
+        try {
+            if (newusercheck == true) {
+                TutorialFragment dialog = new TutorialFragment();
+                dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                newusercheck = false;
+            }
+        } catch (Exception exception) {
+            Log.d("New User Check", exception.toString());
         }
     }
 

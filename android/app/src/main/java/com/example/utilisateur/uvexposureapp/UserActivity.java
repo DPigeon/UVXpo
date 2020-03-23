@@ -213,6 +213,7 @@ public class UserActivity extends AppCompatActivity {
         if (newuserregcheck == false) {
             MenuInflater inflater = getMenuInflater(); /**SHOWS 'BACK' AND 'EDIT MODE'*/
             inflater.inflate(R.menu.user_options, menu);
+
         }
         return true;
     }
@@ -223,10 +224,19 @@ public class UserActivity extends AppCompatActivity {
         if (menuId == R.id.EditUserProfileItem) { // If we click on the ... button
             Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
             setAllObjectsTrue();
-            return true;
+        }
+        else if (menuId == R.id.setTutorialOn) {
+            newuserregcheck = true;
+            Intent intent2 = new Intent(this, MainActivity.class);
+            intent2.removeExtra("checknewuser");
+            intent2.putExtra("checknewuser", newuserregcheck);
+            startActivity(intent2);
         }
         else if (menuId == R.id.EditUserPassword) {
             ChangePasswordFragment dialog = new ChangePasswordFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", usernameIntent);
+            dialog.setArguments(bundle);
             dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
         }
         else if (menuId == R.id.userLogOut) {
@@ -234,8 +244,8 @@ public class UserActivity extends AppCompatActivity {
             intent.removeExtra("username");
             intent.removeExtra("checknewuser");
             startActivity(intent);
-            finish();
         }
+
         return super.onOptionsItemSelected(item);
     }
     public void checkButton(View v) /**CHECKS WHICH SKIN COLOR HAS BEEN PRESSED*/
