@@ -3,6 +3,7 @@ package com.example.utilisateur.uvexposureapp;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,6 +13,13 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +33,10 @@ public class RegisterUserFragment extends DialogFragment {
     protected EditText confirmpassinputEditText;
     protected Button registeruserButton;
     protected Button cancelregisterButton;
+    Boolean hasInternet;
     DatabaseHelper dbhelper;
+    FirebaseFirestore fireStore;
+
 
     @Override
     public void onResume() { /**MAKES THE FRAGMENT BIG*/
@@ -50,12 +61,16 @@ public class RegisterUserFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register_user, container, false);
 
+        Bundle bundle = getArguments();
+        hasInternet = bundle.getBoolean("hasInternet");
+
         usernameinputEditText = view.findViewById(R.id.registerusernameEditText); /**INITIALIZE OBJECTS*/
         passwordinputEditText = view.findViewById(R.id.registerpasswordregEditText);
         confirmpassinputEditText = view.findViewById(R.id.confirmpasswordregEditText);
         registeruserButton = view.findViewById(R.id.registernewuserButton);
         cancelregisterButton = view.findViewById(R.id.cancelnewuserButton);
         dbhelper = new DatabaseHelper(getActivity());
+        fireStore = FirebaseFirestore.getInstance();
 
         cancelregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,20 +125,35 @@ public class RegisterUserFragment extends DialogFragment {
                     Toast.makeText(getActivity(), "Passwords don't match.", Toast.LENGTH_SHORT).show();
                 }
                 else {
-
-                    for (int i = 0; i < usernameCheck.size(); i++) {
-                        if (usernameCheck.get(i).getUsername().equals(registerusername)) { /**CHECKS IF USERNAME IS TAKEN*/
-                            usernameinputEditText.setText(null);
-                            passwordinputEditText.setText(null);
-                            confirmpassinputEditText.setText(null);
-                            ivalueForStatement = i; /**IF IT IS, THEN VALUE OF THIS INT WILL CHANGE FROM -1 to i*/
-                            newusercheck = false;
-                            Toast.makeText(getActivity(), "Username is taken.", Toast.LENGTH_SHORT).show();
+                    if (!hasInternet) {
+                        for (int i = 0; i < usernameCheck.size(); i++) {
+                            if (usernameCheck.get(i).getUsername().equals(registerusername)) { /**CHECKS IF USERNAME IS TAKEN*/
+                                usernameinputEditText.setText(null);
+                                passwordinputEditText.setText(null);
+                                confirmpassinputEditText.setText(null);
+                                ivalueForStatement = i; /**IF IT IS, THEN VALUE OF THIS INT WILL CHANGE FROM -1 to i*/
+                                newusercheck = false;
+                                Toast.makeText(getActivity(), "Username is taken.", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                    if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1) {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
-                        dbhelper.insertUser(new User(registerusername, registerpassword, 0, null, 0, true, true));
-                        //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
+                        if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1) {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
+                            dbhelper.insertUser(new User(registerusername, registerpassword, 0, 0, true, true));
+                            //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
+                            getDialog().dismiss();
+                            newusercheck = true;
+                            Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
+                            intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
+                            intent.removeExtra("username");
+                            intent.putExtra("checknewuser", newusercheck);
+                            intent.putExtra("username", registerusername);
+                            startActivity(intent);
+                            Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                        User user = new User(registerusername, registerpassword, 0, 0, true, true);
+                        users.add(user); // Add a new user value
+
                         getDialog().dismiss();
                         newusercheck = true;
                         Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/

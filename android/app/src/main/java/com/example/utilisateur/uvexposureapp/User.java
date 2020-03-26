@@ -1,49 +1,44 @@
 package com.example.utilisateur.uvexposureapp;
 
-import java.util.ArrayList;
-
 public class User {
-    private int userId;
+    private int user_id;
     private String username;
     private String password;
     private int age;
-    private ArrayList<UV> uvData; // A user will have stored uv values tracked
-    private int skin;
+    private int skin_type;
     private boolean notifications;
-    private boolean newUser;
+    private boolean new_user;
 
-    public User (String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications, boolean newUser) {
+    public User(String username, String password, int age, int skin_type, boolean notifications, boolean new_user) {
         this.username = username;
         this.password = password;
         this.age = age;
-        this.uvData = uv;
-        this.skin = skin;
+        this.skin_type = skin_type;
         this.notifications = notifications;
-        this.newUser = newUser;
+        this.new_user = new_user;
     }
 
-    public User (String username, String password, int age, int skin, boolean notifications) {
+    public User(String username, String password, int age, int skin_type, boolean notifications) {
         this.username = username;
         this.password = password;
         this.age = age;
-        this.skin = skin;
+        this.skin_type = skin_type;
         this.notifications = notifications;
     }
 
-    public User (String username, String password)
-        {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
     /* set UserId*/
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUserId(int user_id) {
+        this.user_id = user_id;
     }
 
     /* Get UserId*/
     public int getUserId() {
-        return userId;
+        return user_id;
     }
 
     /* set Username*/
@@ -76,24 +71,14 @@ public class User {
         return age;
     }
 
-    /* set uv value*/
-    public void setUv(UV uv) {
-        this.uvData.add(uv);
-    }
-
-    /* get uv values*/
-    public ArrayList<UV> getUvData() {
-        return uvData;
-    }
-
     /* set Skin type*/
-    public void setSkin(int skin) {
-        this.skin = skin;
+    public void setSkin(int skin_type) {
+        this.skin_type = skin_type;
     }
 
     /* get Skin type*/
     public int getSkin() {
-        return skin;
+        return skin_type;
     }
 
     /* Set notifications*/
@@ -107,10 +92,10 @@ public class User {
     }
 
     /* Set new or old user*/
-    public void setNewUser(boolean newUser) {
-        this.newUser = newUser;
+    public void setNewUser(boolean new_user) {
+        this.new_user = new_user;
     }
 
     /* Get new or old user*/
-    public boolean getNewUser() { return newUser; }
+    public boolean getNewUser() { return new_user; }
 }

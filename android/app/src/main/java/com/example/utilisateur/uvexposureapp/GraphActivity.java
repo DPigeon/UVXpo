@@ -43,6 +43,8 @@ import java.util.List;
 * Data from the database will have to be fetched in order to view them.
 */
 
+// TODO FIX: Delete last live exposure before making another one for today otherwise graphs overlaps
+
 public class GraphActivity extends AppCompatActivity {
     protected SharedPreferencesHelper sharedPreferencesHelper;
     BroadcastReceiver mBroadcastReceiver;
@@ -75,6 +77,7 @@ public class GraphActivity extends AppCompatActivity {
         liveValues = new DataPoint[maxLivePoints];
         series = new LineGraphSeries<DataPoint>();
         setupGraph();
+        sharedPreferencesHelper = new SharedPreferencesHelper(GraphActivity.this);
         fireStore = FirebaseFirestore.getInstance();
         setDate();
     }
@@ -228,20 +231,20 @@ public class GraphActivity extends AppCompatActivity {
 
     public void fetchUVDataByDate(final String date) {
         // From sharedPrefs, get the username logged in
-        String name = "Marc"; // example
         int userId = 1;
+
+        Log.d("user:", username);
 
         /* Read user from database */
         if (haveNetworkConnection()) {
             if (!lastDate.equals(date) && toggleLivePastData) { // We check if the last date chosen isn't the same otherwise don't fetch new data
                 series.resetData(new DataPoint[]{}); // Reset previous series
-                CollectionReference users = fireStore.collection("user_info");
-                users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, username).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document_user : task.getResult()) {
-
                                constructUvDataByDate(document_user, date);
                             }
                         } else {
@@ -274,7 +277,7 @@ public class GraphActivity extends AppCompatActivity {
 
     protected void constructUvDataByDate(QueryDocumentSnapshot document_user, String date) {
         /* Read all uv (time, uv) values of that user */
-        CollectionReference uvData = fireStore.collection("uv_data");
+        CollectionReference uvData = fireStore.collection(DatabaseConfig.UV_TABLE_NAME);
         // We want to filter by userID and date chosen from uv data
         uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -299,12 +302,11 @@ public class GraphActivity extends AppCompatActivity {
 
     protected void addDataToDatabase(final double dataX, final double dataY, final LocalDate date) { // Should store every 5 seconds ? otherwise we may have too many data in database
         // From sharedPrefs, get the username logged in
-        String name = "Marc"; // example
         String userID = "1";
 
         if (haveNetworkConnection()) { // If connected wifi or LTE
             CollectionReference users = fireStore.collection("user_info");
-            users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            users.whereEqualTo("username", username).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {

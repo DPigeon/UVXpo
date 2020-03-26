@@ -31,6 +31,10 @@ public class SharedPreferencesHelper {
         editor.apply(); // Using apply instead of commit now
     }
 
+    public void deleteProfile() { // When logging out
+        sharedPreferences.edit().clear().commit();
+    }
+
     public User getProfile() { // Getter for profile with different keys
         String name = sharedPreferences.getString("ProfileName", null);
         String password = sharedPreferences.getString("ProfilePass", null);
@@ -39,6 +43,6 @@ public class SharedPreferencesHelper {
         boolean notifications = sharedPreferences.getBoolean("ProfileNotif", true);
         boolean newUser = sharedPreferences.getBoolean("ProfileNewUser", true);
         int id = sharedPreferences.getInt("ProfileId", 0);
-        return new User(name, password, age, null, skin, notifications, newUser);
+        return new User(name, password, age, skin, notifications, newUser);
     }
 }
