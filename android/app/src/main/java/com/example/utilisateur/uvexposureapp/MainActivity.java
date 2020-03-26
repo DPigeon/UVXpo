@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             usernameIntentExtra = userNameIntent.getString("username");
             newusercheck = userNameIntent.getBoolean("checknewuser");
 
-            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, "", 0, null, 1, true, newusercheck)); // We save the profile
+            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, "", 0, 1, true, newusercheck)); // We save the profile
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }

@@ -43,6 +43,8 @@ import java.util.List;
 * Data from the database will have to be fetched in order to view them.
 */
 
+// TODO FIX: Delete last live exposure before making another one for today otherwise graphs overlaps
+
 public class GraphActivity extends AppCompatActivity {
     protected SharedPreferencesHelper sharedPreferencesHelper;
     BroadcastReceiver mBroadcastReceiver;
@@ -235,13 +237,12 @@ public class GraphActivity extends AppCompatActivity {
         if (haveNetworkConnection()) {
             if (!lastDate.equals(date) && toggleLivePastData) { // We check if the last date chosen isn't the same otherwise don't fetch new data
                 series.resetData(new DataPoint[]{}); // Reset previous series
-                CollectionReference users = fireStore.collection("user_info");
-                users.whereEqualTo("username", name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, name).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document_user : task.getResult()) {
-
                                constructUvDataByDate(document_user, date);
                             }
                         } else {
@@ -274,7 +275,7 @@ public class GraphActivity extends AppCompatActivity {
 
     protected void constructUvDataByDate(QueryDocumentSnapshot document_user, String date) {
         /* Read all uv (time, uv) values of that user */
-        CollectionReference uvData = fireStore.collection("uv_data");
+        CollectionReference uvData = fireStore.collection(DatabaseConfig.UV_TABLE_NAME);
         // We want to filter by userID and date chosen from uv data
         uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

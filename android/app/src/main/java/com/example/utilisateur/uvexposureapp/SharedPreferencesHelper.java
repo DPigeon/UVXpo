@@ -39,6 +39,6 @@ public class SharedPreferencesHelper {
         boolean notifications = sharedPreferences.getBoolean("ProfileNotif", true);
         boolean newUser = sharedPreferences.getBoolean("ProfileNewUser", true);
         int id = sharedPreferences.getInt("ProfileId", 0);
-        return new User(name, password, age, null, skin, notifications, newUser);
+        return new User(name, password, age, skin, notifications, newUser);
     }
 }

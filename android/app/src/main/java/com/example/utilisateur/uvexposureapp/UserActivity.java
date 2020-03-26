@@ -5,8 +5,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +24,14 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -45,6 +56,7 @@ public class UserActivity extends AppCompatActivity {
     String usernameIntent;
     String passwordfornewuser;
     DatabaseHelper dbhelper;
+    FirebaseFirestore fireStore;
     Cursor userInfoAllData;
     List<User> userInfo;
 
@@ -68,6 +80,7 @@ public class UserActivity extends AppCompatActivity {
         bluetoothButton = findViewById(R.id.bluetoothButton);
 
         dbhelper = new DatabaseHelper(this);
+        fireStore = FirebaseFirestore.getInstance();
         userInfoAllData = dbhelper.getData();
         userInfo = dbhelper.getAllUserData();
 
@@ -145,54 +158,64 @@ public class UserActivity extends AppCompatActivity {
                             !radioSkintype4.isChecked() && !radioSkintype5.isChecked() && !radioSkintype6.isChecked()) {
                         Toast.makeText(UserActivity.this, "Please select a skin tone.", Toast.LENGTH_SHORT).show();
                     } else {
-                        for (int i = 0; i < userAgeChange.size(); i++) {
-                            if (userAgeChange.get(i).getUsername().equals(usernameIntent)) {
+                        if (!haveNetworkConnection()) { // Locally, no internet
+                            for (int i = 0; i < userAgeChange.size(); i++) {
+                                if (userAgeChange.get(i).getUsername().equals(usernameIntent)) {
 
-                                int userID = userAgeChange.get(i).getUserId();
-                                int oldSkinType = userAgeChange.get(i).getSkin();
-                                int oldAge = userAgeChange.get(i).getAge();
+                                    int userID = userAgeChange.get(i).getUserId();
+                                    int oldSkinType = userAgeChange.get(i).getSkin();
+                                    int oldAge = userAgeChange.get(i).getAge();
 
-                                int ageInteger = parseInt(editTextAge.getText().toString());
+                                    int ageInteger = parseInt(editTextAge.getText().toString());
+                                    int skin_type = getSkinType();
 
-                                switch (radioGroup.getCheckedRadioButtonId()) { /**UPDATE DATABASE FUNCTIONS*/
-                                    case R.id.radioSkinTypeone:
-                                        dbhelper.updateSkin(userID, 1, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                    case R.id.radioSkinTypetwo:
-                                        dbhelper.updateSkin(userID, 2, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                    case R.id.radioSkinTypethree:
-                                        dbhelper.updateSkin(userID, 3, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                    case R.id.radioSkinTypefour:
-                                        dbhelper.updateSkin(userID, 4, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                    case R.id.radioSkinTypefive:
-                                        dbhelper.updateSkin(userID, 5, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
-                                    case R.id.radioSkinTypesix:
-                                        dbhelper.updateSkin(userID, 6, oldSkinType);
-                                        Toast.makeText(UserActivity.this, "ACCESSED", Toast.LENGTH_SHORT).show();
+                                    dbhelper.updateSkin(userID, skin_type, oldSkinType); /** UPDATE SKIN*/
+                                    dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
 
+                                    setAllObjectsFalse();
+                                    if (newuserregcheck == true) {
+                                        newuserregcheck = true;
+                                    } else if (newuserregcheck == false) {
+                                        newuserregcheck = false;
+                                    }
+
+                                    Intent intent = new Intent(UserActivity.this, MainActivity.class);
+                                    intent.removeExtra("username");
+                                    intent.removeExtra("checknewuser");
+                                    intent.putExtra("username", usernameIntent);
+                                    intent.putExtra("checknewuser", newuserregcheck);
+                                    startActivity(intent);
+                                    finish();
                                 }
-
-                                dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
-
-                                setAllObjectsFalse();
-                                if (newuserregcheck == true) {
-                                    newuserregcheck = true;
-                                } else if (newuserregcheck == false) {
-                                    newuserregcheck = false;
-                                }
-
-                                Intent intent = new Intent(UserActivity.this, MainActivity.class);
-                                intent.removeExtra("username");
-                                intent.removeExtra("checknewuser");
-                                intent.putExtra("username", usernameIntent);
-                                intent.putExtra("checknewuser", newuserregcheck);
-                                startActivity(intent);
-                                finish();
                             }
+                        } else { // Online
+                            final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                            users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                            users.document(document_user.getId()).update("age", parseInt(editTextAge.getText().toString()), "skin", getSkinType());
+                                        }
+                                    } else {
+                                        Toast.makeText(UserActivity.this, "Invalid Age and/or Skin Type", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            setAllObjectsFalse();
+                            if (newuserregcheck == true) {
+                                newuserregcheck = true;
+                            } else if (newuserregcheck == false) {
+                                newuserregcheck = false;
+                            }
+
+                            Intent intent = new Intent(UserActivity.this, MainActivity.class);
+                            intent.removeExtra("username");
+                            intent.removeExtra("checknewuser");
+                            intent.putExtra("username", usernameIntent);
+                            intent.putExtra("checknewuser", newuserregcheck);
+                            startActivity(intent);
+                            finish();
                         }
                     }
                 }
@@ -324,4 +347,42 @@ public class UserActivity extends AppCompatActivity {
         radioSkintype5.setEnabled(true);
         radioSkintype6.setEnabled(true);
     }
+
+    protected int getSkinType() {
+        int skin_type = 0;
+        int radioButton = radioGroup.getCheckedRadioButtonId();
+        if (radioButton == R.id.radioSkinTypeone)
+            skin_type = 1;
+        else if (radioButton == R.id.radioSkinTypetwo)
+            skin_type = 2;
+        else if (radioButton == R.id.radioSkinTypethree)
+            skin_type = 3;
+        else if (radioButton == R.id.radioSkinTypefour)
+            skin_type = 4;
+        else if (radioButton == R.id.radioSkinTypefive)
+            skin_type = 5;
+        else if (radioButton == R.id.radioSkinTypesix)
+            skin_type = 6;
+        return skin_type;
+    }
+
+    /* Checks if we have a wifi or LTE connection */
+    /* Will be used if we are not connected to internet and want to use local db */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
 }
