@@ -54,9 +54,10 @@ public class UserActivity extends AppCompatActivity {
 
     Boolean newuserregcheck = false;
     String usernameIntent;
-    String passwordfornewuser;
+    String passwordIntent;
     DatabaseHelper dbhelper;
     FirebaseFirestore fireStore;
+    protected SharedPreferencesHelper sharedPreferencesHelper;
     Cursor userInfoAllData;
     List<User> userInfo;
 
@@ -81,6 +82,7 @@ public class UserActivity extends AppCompatActivity {
 
         dbhelper = new DatabaseHelper(this);
         fireStore = FirebaseFirestore.getInstance();
+        sharedPreferencesHelper = new SharedPreferencesHelper(UserActivity.this);
         userInfoAllData = dbhelper.getData();
         userInfo = dbhelper.getAllUserData();
 
@@ -88,6 +90,7 @@ public class UserActivity extends AppCompatActivity {
             Bundle bndset = getIntent().getExtras();
             newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
             usernameIntent = bndset.getString("username");
+            passwordIntent = bndset.getString("password");
         } catch (Exception exception) {
             Log.d("Error: ", exception.toString());
         }
@@ -260,6 +263,7 @@ public class UserActivity extends AppCompatActivity {
             ChangePasswordFragment dialog = new ChangePasswordFragment();
             Bundle bundle = new Bundle();
             bundle.putString("username", usernameIntent);
+            bundle.putString("password", passwordIntent);
             bundle.putBoolean("hasInternet", haveNetworkConnection());
             dialog.setArguments(bundle);
             dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
@@ -267,7 +271,10 @@ public class UserActivity extends AppCompatActivity {
         else if (menuId == R.id.userLogOut) {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.removeExtra("username");
+            intent.removeExtra("password");
             intent.removeExtra("checknewuser");
+            sharedPreferencesHelper.deleteProfile();
+            Toast.makeText(UserActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         }
 
@@ -289,8 +296,10 @@ public class UserActivity extends AppCompatActivity {
     public void changeActivityWithIntent() {
         Intent intent = new Intent(UserActivity.this, MainActivity.class);
         intent.removeExtra("username");
+        intent.removeExtra("password");
         intent.removeExtra("checknewuser");
         intent.putExtra("username", usernameIntent);
+        intent.putExtra("password", passwordIntent);
         intent.putExtra("checknewuser", newuserregcheck);
         startActivity(intent);
         finish();

@@ -30,11 +30,13 @@ import java.util.List;
 public class LoginActivity extends AppCompatActivity {
 
     FirebaseFirestore fireStore;
+    protected SharedPreferencesHelper sharedPreferencesHelper;
     Button loginButton; /**log in button that checks for username and password*/
     Button newregisterButton;
     EditText usernameEditText; /**user input for username*/
     EditText passwordEditText; /**user input for password*/
-
+    String persistentUsername;
+    String persistentPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText.setText(null);
         passwordEditText.setText(null);
         fireStore = FirebaseFirestore.getInstance();
+        sharedPreferencesHelper = new SharedPreferencesHelper(LoginActivity.this);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                     for (int i = 0; i < userIDcheck.size(); i++) {
                         if (userIDcheck.get(i).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(i).getPassword().equals(passwordEditText.getText().toString())) {
                             ivalueCheck = i;
-                            proceedLogin();
+                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
 
                         } else
                             Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
@@ -83,16 +86,31 @@ public class LoginActivity extends AppCompatActivity {
         setupAction();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Persistent Login here: allows the user to stay logged in and skip login activity
+        try {
+            persistentUsername = sharedPreferencesHelper.getProfile().getUsername();
+            persistentPassword = sharedPreferencesHelper.getProfile().getPassword();
+            if (!persistentUsername.isEmpty() && !persistentPassword.isEmpty())
+                proceedLogin(persistentUsername, persistentPassword);
+        } catch (Exception exception) {
+            Log.d("Login", exception.toString());
+        }
+    }
+
     protected void setupAction() { // No action bar for the main activity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
-    public void proceedLogin() {
+    public void proceedLogin(String username, String password) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.removeExtra("username");
         intent.removeExtra("checknewuser");
-        intent.putExtra("username", usernameEditText.getText().toString());
+        intent.putExtra("username", username);
+        intent.putExtra("password", password);
         intent.putExtra("checknewuser", false);
         Toast.makeText(LoginActivity.this, "Logged In!", Toast.LENGTH_SHORT).show();
         startActivity(intent); /**if correct, open mainactivity*/
@@ -105,15 +123,16 @@ public class LoginActivity extends AppCompatActivity {
         Query query;
         query = users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, username);
         /* Have to look if this query fails to output message */
+        Toast.makeText(LoginActivity.this, "Loggin in...", Toast.LENGTH_SHORT).show();
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document_user : task.getResult()) {
                         if (document_user.getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password))
-                            proceedLogin();
+                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
                         else
-                            Toast.makeText(LoginActivity.this, "Wrong password!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();

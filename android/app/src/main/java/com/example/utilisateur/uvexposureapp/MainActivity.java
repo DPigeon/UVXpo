@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
     String usernameIntentExtra;
+    String passwordIntent;
     Boolean newusercheck;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
@@ -55,12 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
         try {
-            Bundle userNameIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+            Bundle userIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
 
-            usernameIntentExtra = userNameIntent.getString("username");
-            newusercheck = userNameIntent.getBoolean("checknewuser");
+            usernameIntentExtra = userIntent.getString("username");
+            passwordIntent = userIntent.getString("password");
+            Log.d("user:", passwordIntent);
+            newusercheck = userIntent.getBoolean("checknewuser");
 
-            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, "", 0, 1, true, newusercheck)); // We save the profile
+            sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, passwordIntent, 0, 1, true, newusercheck)); // We save the profile
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }
@@ -76,8 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String profileName = sharedPreferencesHelper.getProfile().getUsername();
-            if (profileName == null || profileName.isEmpty())
+            if (profileName == null || profileName.isEmpty()) {
                 goToActivity(LoginActivity.class); // Send back to login
+                Toast.makeText(MainActivity.this, "You may now login!", Toast.LENGTH_SHORT).show();
+            }
             else
                 welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
         } catch(Exception exception) {

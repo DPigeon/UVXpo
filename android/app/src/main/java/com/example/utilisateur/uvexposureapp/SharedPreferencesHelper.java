@@ -31,6 +31,10 @@ public class SharedPreferencesHelper {
         editor.apply(); // Using apply instead of commit now
     }
 
+    public void deleteProfile() { // When logging out
+        sharedPreferences.edit().clear().commit();
+    }
+
     public User getProfile() { // Getter for profile with different keys
         String name = sharedPreferences.getString("ProfileName", null);
         String password = sharedPreferences.getString("ProfilePass", null);
