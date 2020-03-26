@@ -96,31 +96,32 @@ public class UserActivity extends AppCompatActivity {
         {
 
             //setAllValues();
+            if (!haveNetworkConnection()) { // Local, offline
+                for (int i = 0; i < userInfo.size(); i++) {
+                    if (userInfo.get(i).getUsername().equals(usernameIntent)) {
+                        int numintcheck = userInfo.get(i).getAge();
+                        String numintToString = Integer.toString(numintcheck);
+                        editTextAge.setText(numintToString);
+                        fetchSkinType(userInfo.get(i).getSkin());
 
-
-            for (int i = 0; i < userInfo.size(); i++)
-            {
-                if (userInfo.get(i).getUsername().equals(usernameIntent))
-                {
-                    int numintcheck = userInfo.get(i).getAge();
-                    String numintToString = Integer.toString(numintcheck);
-                    editTextAge.setText(numintToString);
-                    switch (userInfo.get(i).getSkin()) {
-                        case 1:
-                            radioSkintype1.setChecked(true);
-                        case 2:
-                            radioSkintype2.setChecked(true);
-                        case 3:
-                            radioSkintype3.setChecked(true);
-                        case 4:
-                            radioSkintype4.setChecked(true);
-                        case 5:
-                            radioSkintype5.setChecked(true);
-                        case 6:
-                            radioSkintype6.setChecked(true);
+                        Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck, Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck, Toast.LENGTH_SHORT).show();
                 }
+            } else { // Online
+                CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                editTextAge.setText(document_user.getData().get("age").toString());
+                                fetchSkinType(Integer.parseInt(document_user.getData().get("skin").toString()));
+                            }
+                        } else {
+                            Toast.makeText(UserActivity.this, "Invalid Age and/or Skin Type", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
             setAllObjectsFalse();
 
@@ -179,13 +180,7 @@ public class UserActivity extends AppCompatActivity {
                                         newuserregcheck = false;
                                     }
 
-                                    Intent intent = new Intent(UserActivity.this, MainActivity.class);
-                                    intent.removeExtra("username");
-                                    intent.removeExtra("checknewuser");
-                                    intent.putExtra("username", usernameIntent);
-                                    intent.putExtra("checknewuser", newuserregcheck);
-                                    startActivity(intent);
-                                    finish();
+                                    changeActivityWithIntent();
                                 }
                             }
                         } else { // Online
@@ -209,13 +204,7 @@ public class UserActivity extends AppCompatActivity {
                                 newuserregcheck = false;
                             }
 
-                            Intent intent = new Intent(UserActivity.this, MainActivity.class);
-                            intent.removeExtra("username");
-                            intent.removeExtra("checknewuser");
-                            intent.putExtra("username", usernameIntent);
-                            intent.putExtra("checknewuser", newuserregcheck);
-                            startActivity(intent);
-                            finish();
+                            changeActivityWithIntent();
                         }
                     }
                 }
@@ -265,18 +254,13 @@ public class UserActivity extends AppCompatActivity {
         }
         else if (menuId == R.id.setTutorialOn) {
             newuserregcheck = true;
-            Intent intent2 = new Intent(this, MainActivity.class);
-            intent2.removeExtra("checknewuser");
-            intent2.removeExtra("username");
-            intent2.putExtra("username", usernameIntent);
-            intent2.putExtra("checknewuser", newuserregcheck);
-            startActivity(intent2);
-            finish();
+            changeActivityWithIntent();
         }
         else if (menuId == R.id.EditUserPassword) {
             ChangePasswordFragment dialog = new ChangePasswordFragment();
             Bundle bundle = new Bundle();
             bundle.putString("username", usernameIntent);
+            bundle.putBoolean("hasInternet", haveNetworkConnection());
             dialog.setArguments(bundle);
             dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
         }
@@ -289,6 +273,29 @@ public class UserActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        changeActivityWithIntent();
+    }
+
+    public void changeActivityWithIntent() {
+        Intent intent = new Intent(UserActivity.this, MainActivity.class);
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);
+        intent.putExtra("checknewuser", newuserregcheck);
+        startActivity(intent);
+        finish();
+    }
+
     public void checkButton(View v) /**CHECKS WHICH SKIN COLOR HAS BEEN PRESSED*/
     {
         int radioId = radioGroup.getCheckedRadioButtonId();
@@ -364,6 +371,21 @@ public class UserActivity extends AppCompatActivity {
         else if (radioButton == R.id.radioSkinTypesix)
             skin_type = 6;
         return skin_type;
+    }
+
+    protected void fetchSkinType(int skin) {
+        if (skin == 1)
+            radioSkintype1.setChecked(true);
+        else if (skin == 2)
+            radioSkintype2.setChecked(true);
+        else if (skin == 3)
+            radioSkintype3.setChecked(true);
+        else if (skin == 4)
+            radioSkintype4.setChecked(true);
+        else if (skin == 5)
+            radioSkintype5.setChecked(true);
+        else if (skin == 6)
+            radioSkintype6.setChecked(true);
     }
 
     /* Checks if we have a wifi or LTE connection */
