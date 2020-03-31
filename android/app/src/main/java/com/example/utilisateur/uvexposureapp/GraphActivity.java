@@ -59,6 +59,7 @@ public class GraphActivity extends AppCompatActivity {
     int databasePoints = 10000;
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
+    static final double ALPHA = 0.25F; // If ALPHA = 0 or 1, no filter applies
 
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
@@ -169,6 +170,15 @@ public class GraphActivity extends AppCompatActivity {
                     haveConnectedMobile = true;
         }
         return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    /* Lowpass filter used to filter out noise */
+    protected double[] lowPass(double[] input, double[] output) {
+        if (output == null)
+            return input;
+        for (int i = 0; i < input.length; i++)
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        return output;
     }
 
     protected void switchMode(Boolean status, String title, String dateText) {
