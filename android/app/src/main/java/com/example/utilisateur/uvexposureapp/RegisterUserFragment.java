@@ -84,8 +84,8 @@ public class RegisterUserFragment extends DialogFragment {
             @Override
             public void onClick(View v)
             { /**WHEN REGISTER BUTTON IS CLICKED*/
-                String registerusername = usernameinputEditText.getText().toString();
-                String registerpassword = passwordinputEditText.getText().toString();
+                final String registerusername = usernameinputEditText.getText().toString();
+                final String registerpassword = passwordinputEditText.getText().toString();
                 String registerconfirmpassword = confirmpassinputEditText.getText().toString();
                 Boolean newusercheck;
                 int getpasslength = passwordinputEditText.length();
@@ -150,19 +150,34 @@ public class RegisterUserFragment extends DialogFragment {
                             Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
-                        User user = new User(registerusername, registerpassword, 0, 0, true, true);
-                        users.add(user); // Add a new user value
+                        final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
 
-                        getDialog().dismiss();
-                        newusercheck = true;
-                        Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
-                        intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
-                        intent.removeExtra("username");
-                        intent.putExtra("checknewuser", newusercheck);
-                        intent.putExtra("username", registerusername);
-                        startActivity(intent);
-                        Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                        // Checks if user is already registered
+                        // If not registered, add it to the database
+                        users.whereEqualTo("username", registerusername).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().getDocuments().isEmpty()) { // Username does not exist
+                                        User user = new User(registerusername, registerpassword, 0, 0, true, true);
+                                        users.add(user); // Add a new user value
+
+                                        getDialog().dismiss();
+                                        Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
+                                        intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
+                                        intent.removeExtra("username");
+                                        intent.putExtra("checknewuser", true);
+                                        intent.putExtra("username", registerusername);
+                                        startActivity(intent);
+                                        Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    } else {
+                                        Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }
             }
