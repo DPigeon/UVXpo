@@ -139,5 +139,18 @@ public class WeatherActivity extends AppCompatActivity {
         String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=b6907d289e10d714a6e88b30761fae22";
         return URL;
     }
+
+    //////to open location activity///
+    public void  open(View view){
+        String button_text;
+        button_text=((Button) view).getText() .toString();
+        if(button_text.equals("location")) {///look at android text for name inside
+            Intent intent= new Intent(this, Location.class);
+            startActivity(intent);
+
+        }
+
+    }
+
 }
 
