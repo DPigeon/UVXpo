@@ -59,6 +59,7 @@ public class GraphActivity extends AppCompatActivity {
     int databasePoints = 10000;
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
+    static final double ALPHA = 0.50; // If ALPHA = 0 or 1, no filter applies
 
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
@@ -169,6 +170,18 @@ public class GraphActivity extends AppCompatActivity {
                     haveConnectedMobile = true;
         }
         return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    /* Lowpass filter used to filter out noise */
+    protected double lowPass(double input, double output) {
+        output = output + ALPHA * (input - output);
+        return output;
+    }
+
+    protected double averageValue(double prev, double current) {
+        double output = 0;
+        output = (prev + current) / 2;
+        return output;
     }
 
     protected void switchMode(Boolean status, String title, String dateText) {
@@ -282,17 +295,17 @@ public class GraphActivity extends AppCompatActivity {
         uvData.whereEqualTo("userId", document_user.getId()).whereEqualTo("date", date).orderBy("uvTime").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-            DataPoint[] newPoints = new DataPoint[databasePoints];
-            int newCounter = 0;
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
-                    double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
-                    double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
-                    DataPoint point = new DataPoint(x, y);
-                    newPoints[newCounter] = point;
-                    series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
-                    newCounter = newCounter + 1;
-                }
+                DataPoint[] newPoints = new DataPoint[databasePoints];
+                int newCounter = 0;
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
+                        double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
+                        double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
+                        DataPoint point = new DataPoint(x, y);
+                        newPoints[newCounter] = point;
+                        series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
+                        newCounter = newCounter + 1;
+                    }
             } else {
                 Log.d("DB:", "Error getting documents: ", task.getException());
             }
@@ -329,16 +342,25 @@ public class GraphActivity extends AppCompatActivity {
         }
     }
 
+    double previousY = 0;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
         double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
-        DataPoint point = new DataPoint(x, y);
+        double filteredY = 0;
+        //filteredY = lowPass(y, filteredY); // filtering
+        //Log.d("y:", String.valueOf(y));
+
+        filteredY = averageValue(previousY, y);
+        Log.d("yFilter:", String.valueOf(filteredY));
+
+        DataPoint point = new DataPoint(x, filteredY);
         liveValues[counter] = point;
 
         series.appendData(new DataPoint(liveValues[counter].getX() / 5, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
-        addDataToDatabase(x / 5, y, LocalDate.now());
+        addDataToDatabase(x / 5, filteredY, LocalDate.now());
         counter = counter + 1; // Increment by 1
+        previousY = y;
     }
 
     protected String convertVoltageToIntensity(double data) {
