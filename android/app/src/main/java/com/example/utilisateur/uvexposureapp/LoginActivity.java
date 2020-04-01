@@ -123,20 +123,20 @@ public class LoginActivity extends AppCompatActivity {
         Query query;
         query = users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, username);
         /* Have to look if this query fails to output message */
-        Toast.makeText(LoginActivity.this, "Loggin in...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, "Logging in...", Toast.LENGTH_SHORT).show();
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document_user : task.getResult()) {
-                        if (document_user.getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password))
-                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
-                        else
-                            Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
+                    if (!task.getResult().getDocuments().isEmpty() && task.getResult().getDocuments().get(0).getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password)) { // If user exists and password matches
+                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                        return;
                     }
-                } else {
+                }
+                else {
                     Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
                 }
+                Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
             }
         });
     }
