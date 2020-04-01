@@ -130,13 +130,9 @@ public class UserActivity extends AppCompatActivity {
 
         }
 
-        saveButton.setOnClickListener(new View.OnClickListener()
-        {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-
-                List<User> userAgeChange = dbhelper.getAllUserData();
+            public void onClick(View v) {
                 boolean catcherCheck = true;
 
                 /**THIS IS WHERE THE NEW VALUES SHOULD BE ENTERED IF CHANGES ARE MADE, (DATABASE)*/
@@ -152,7 +148,7 @@ public class UserActivity extends AppCompatActivity {
                     catcherCheck = false;
                     Toast.makeText(UserActivity.this, "Invalid Age", Toast.LENGTH_SHORT).show();
                 }
-                if (catcherCheck == true) {
+                if (catcherCheck) {
                     if (parseInt(editTextAge.getText().toString()) <= 0) {
                         Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
                         editTextAge.setText(null);
@@ -163,6 +159,7 @@ public class UserActivity extends AppCompatActivity {
                         Toast.makeText(UserActivity.this, "Please select a skin tone.", Toast.LENGTH_SHORT).show();
                     } else {
                         if (!haveNetworkConnection()) { // Locally, no internet
+                            List<User> userAgeChange = dbhelper.getAllUserData();
                             for (int i = 0; i < userAgeChange.size(); i++) {
                                 if (userAgeChange.get(i).getUsername().equals(usernameIntent)) {
 
@@ -182,8 +179,10 @@ public class UserActivity extends AppCompatActivity {
                                     } else if (newuserregcheck == false) {
                                         newuserregcheck = false;
                                     }
-
-                                    changeActivityWithIntent();
+                                    if (!newuserregcheck) // user is not new so go back to main activity
+                                        changeActivityWithIntent();
+                                    else // user is new so he must login after registering
+                                        goBackToLogin();
                                 }
                             }
                         } else { // Online
@@ -207,7 +206,10 @@ public class UserActivity extends AppCompatActivity {
                                 newuserregcheck = false;
                             }
 
-                            changeActivityWithIntent();
+                            if (!newuserregcheck) // user is not new so go back to main activity
+                                changeActivityWithIntent();
+                            else // user is new so he must login after registering
+                                goBackToLogin();
                         }
                     }
                 }
@@ -301,6 +303,13 @@ public class UserActivity extends AppCompatActivity {
         intent.putExtra("username", usernameIntent);
         intent.putExtra("password", passwordIntent);
         intent.putExtra("checknewuser", newuserregcheck);
+        startActivity(intent);
+        finish();
+    }
+
+    protected void goBackToLogin() {
+        Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+        Toast.makeText(UserActivity.this, "Account created! You may now login.", Toast.LENGTH_SHORT).show();
         startActivity(intent);
         finish();
     }
