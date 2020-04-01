@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +15,10 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,12 +28,20 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.Set;
 import java.util.UUID;
 
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_1;
 import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
+import static java.lang.Integer.parseInt;
 
 /*
  * The MainActivity where the bluetooth connection is made and the data is fetched.
@@ -38,6 +50,7 @@ import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_2;
 public class MainActivity extends AppCompatActivity {
     private NotificationManagerCompat notificationManagerCompat;
     protected SharedPreferencesHelper sharedPreferencesHelper;
+    FirebaseFirestore fireStore;
 
     protected TextView welcomeUserTextView;
     protected Button weatherButton, graphButton, settingsButton, faqButton;
@@ -56,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
+        fireStore = FirebaseFirestore.getInstance();
         try {
             Bundle userIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
 
             usernameIntentExtra = userIntent.getString("username");
             passwordIntent = userIntent.getString("password");
-            Log.d("user:", passwordIntent);
             newusercheck = userIntent.getBoolean("checknewuser");
 
             sharedPreferencesHelper.saveProfile(new User(usernameIntentExtra, passwordIntent, 0, 1, true, newusercheck)); // We save the profile
@@ -80,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String profileName = sharedPreferencesHelper.getProfile().getUsername();
+
             if (profileName == null || profileName.isEmpty()) {
-                goToActivity(LoginActivity.class); // Send back to login
-                Toast.makeText(MainActivity.this, "You may now login!", Toast.LENGTH_SHORT).show();
+                //goToActivity(LoginActivity.class); // Send back to login
+                Toast.makeText(MainActivity.this, "Welcome!", Toast.LENGTH_SHORT).show();
             }
             else
                 welcomeUserTextView.setText("Welcome, " + profileName + "!"); // Otherwise just set the stored name
@@ -96,6 +110,25 @@ public class MainActivity extends AppCompatActivity {
                 TutorialFragment dialog = new TutorialFragment();
                 dialog.show(getSupportFragmentManager(), "TutorialFragment");
                 newusercheck = false;
+                // Below here we update database newUser field
+                if (!haveNetworkConnection()) { // Offline changes for tutorial
+
+                }
+                else { // Online
+                    final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                    users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntentExtra).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                    users.document(document_user.getId()).update("newUser", newusercheck);
+                                }
+                            } else {
+                                Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
             }
         } catch (Exception exception) {
             Log.d("New User Check", exception.toString());
@@ -133,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.removeExtra("username");
                 intent.removeExtra("checknewuser");
                 intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+                intent.putExtra("password", passwordIntent);
                 intent.putExtra("checknewuser", newusercheck);
                 startActivity(intent);
             }
@@ -333,4 +367,24 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         notificationManagerCompat.notify(2,notifications);
     }
+
+    /* Checks if we have a wifi or LTE connection */
+    /* Will be used if we are not connected to internet and want to use local db */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
 }

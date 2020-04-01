@@ -147,7 +147,7 @@ public class RegisterUserFragment extends DialogFragment {
                             intent.putExtra("checknewuser", newusercheck);
                             intent.putExtra("username", registerusername);
                             startActivity(intent);
-                            Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Confirmed! Setup your preferences!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
@@ -169,7 +169,7 @@ public class RegisterUserFragment extends DialogFragment {
                                         intent.putExtra("checknewuser", true);
                                         intent.putExtra("username", registerusername);
                                         startActivity(intent);
-                                        Toast.makeText(getActivity(), "Confirmed!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "Confirmed! Setup your preferences!", Toast.LENGTH_SHORT).show();
                                         return;
                                     } else {
                                         Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();

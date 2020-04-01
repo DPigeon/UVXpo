@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText passwordEditText; /**user input for password*/
     String persistentUsername;
     String persistentPassword;
+    Boolean persistentCheckNewUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
                     for (int i = 0; i < userIDcheck.size(); i++) {
                         if (userIDcheck.get(i).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(i).getPassword().equals(passwordEditText.getText().toString())) {
                             ivalueCheck = i;
-                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), userIDcheck.get(i).getNewUser());
 
                         } else
                             Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
@@ -93,8 +94,9 @@ public class LoginActivity extends AppCompatActivity {
         try {
             persistentUsername = sharedPreferencesHelper.getProfile().getUsername();
             persistentPassword = sharedPreferencesHelper.getProfile().getPassword();
+            persistentCheckNewUser = sharedPreferencesHelper.getProfile().getNewUser();
             if (!persistentUsername.isEmpty() && !persistentPassword.isEmpty())
-                proceedLogin(persistentUsername, persistentPassword);
+                proceedLogin(persistentUsername, persistentPassword, persistentCheckNewUser);
         } catch (Exception exception) {
             Log.d("Login", exception.toString());
         }
@@ -105,13 +107,13 @@ public class LoginActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
-    public void proceedLogin(String username, String password) {
+    public void proceedLogin(String username, String password, Boolean newUserCheck) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.removeExtra("username");
         intent.removeExtra("checknewuser");
         intent.putExtra("username", username);
         intent.putExtra("password", password);
-        intent.putExtra("checknewuser", false);
+        intent.putExtra("checknewuser", newUserCheck);
         Toast.makeText(LoginActivity.this, "Logged In!", Toast.LENGTH_SHORT).show();
         startActivity(intent); /**if correct, open mainactivity*/
         finish();
@@ -129,7 +131,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if (!task.getResult().getDocuments().isEmpty() && task.getResult().getDocuments().get(0).getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password)) { // If user exists and password matches
-                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                        Boolean checkNewUser = Boolean.valueOf(task.getResult().getDocuments().get(0).getData().get("newUser").toString());
+                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), checkNewUser);
                         return;
                     }
                 }
