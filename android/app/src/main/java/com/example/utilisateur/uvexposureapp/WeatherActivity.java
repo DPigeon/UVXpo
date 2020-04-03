@@ -2,11 +2,13 @@ package com.example.utilisateur.uvexposureapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +26,7 @@ public class WeatherActivity extends AppCompatActivity {
     protected TextView montreal;
     protected TextView Status;
     protected ListView citiesView;
+    protected Button locationButton;
     static String cityName = "Montreal";
     String main = "";
     String desc = "";
@@ -82,7 +85,13 @@ public class WeatherActivity extends AppCompatActivity {
         Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
         Status.setText("Status: "+ main +"\n");
         montreal.setText(cityName);
-
+        locationButton = findViewById(R.id.Location);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                open(view);
+            }
+        });
     }
     void cityList() {
         final String[] cities = {"   Montreal", "   Vancouver", "   Toronto", "   Calgary", "   Edmonton","   Quebec"};
@@ -141,15 +150,9 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     //////to open location activity///
-    public void  open(View view){
-        String button_text;
-        button_text=((Button) view).getText() .toString();
-        if(button_text.equals("location")) {///look at android text for name inside
-            Intent intent= new Intent(this, Location.class);
-            startActivity(intent);
-
-        }
-
+    public void  open(View view) {
+        Intent intent= new Intent(this, Location.class);
+        startActivity(intent);
     }
 
 }
