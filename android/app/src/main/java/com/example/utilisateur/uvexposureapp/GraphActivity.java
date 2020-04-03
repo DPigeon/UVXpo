@@ -212,13 +212,19 @@ public class GraphActivity extends AppCompatActivity {
                         int monthAdjusted = monthOfYear + 1;
 
                         String zeroMonth = "";
+                        String zeroDay = "";
                         if (monthAdjusted < 10) {
                             zeroMonth = "0"+String.valueOf(monthAdjusted);
                         } else {
                             zeroMonth = String.valueOf(monthAdjusted);
                         }
+                        if (dayOfMonth < 10) {
+                            zeroDay = "0"+String.valueOf(dayOfMonth);
+                        } else {
+                            zeroDay = String.valueOf(dayOfMonth);
+                        }
 
-                        String spinDate = year + "-" + zeroMonth + "-" + dayOfMonth;
+                        String spinDate = year + "-" + zeroMonth + "-" + zeroDay;
                         datePick.setText("Date: "+ spinDate);
                         fetchUVDataByDate(spinDate); // send the format to the database (year - month - day)
                     }
