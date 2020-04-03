@@ -62,12 +62,22 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (!haveNetworkConnection()) { // Locally, no internet
                     for (int i = 0; i < userIDcheck.size(); i++) {
-                        if (userIDcheck.get(i).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(i).getPassword().equals(passwordEditText.getText().toString())) {
+                        if (userIDcheck.get(i).getUsername().equals(usernameEditText.getText().toString())) {
                             ivalueCheck = i;
-                            proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), userIDcheck.get(i).getNewUser());
-
-                        } else
-                            Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    if (usernameEditText.equals("")){
+                        Toast.makeText(LoginActivity.this, "Invalid Username.", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (ivalueCheck == -1) {
+                        Toast.makeText(LoginActivity.this, "No username with that account.", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (userIDcheck.get(ivalueCheck).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(ivalueCheck).getPassword().equals(passwordEditText.getText().toString()))
+                    {
+                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), userIDcheck.get(ivalueCheck).getNewUser());
+                    }
+                    else {
+                        Toast.makeText(LoginActivity.this, "Invalid Password.", Toast.LENGTH_SHORT).show();
                     }
                 } else // Online, no internet
                     loginOnline(usernameEditText.getText().toString(), passwordEditText.getText().toString());

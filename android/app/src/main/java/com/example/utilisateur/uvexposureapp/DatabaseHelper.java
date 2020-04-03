@@ -215,4 +215,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "UpdatedSkin: querySkin: " + querySkin);
     }
 
+    public boolean updateData(String id, String username, String password, int age, int skin_type, boolean notifications, boolean new_user)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseConfig.COLUMN_USER_ID, id);
+        values.put(DatabaseConfig.COLUMN_USERNAME, username);
+        values.put(DatabaseConfig.COLUMN_PASSWORD, password);
+        values.put(DatabaseConfig.COLUMN_AGE, age);
+        values.put(DatabaseConfig.COLUMN_SKIN_TYPE, skin_type);
+        values.put(DatabaseConfig.COLUMN_NOTIF, notifications);
+        values.put(DatabaseConfig.COLUMN_NEW_USER, new_user);
+
+        db.update(DatabaseConfig.USER_TABLE_NAME, values, DatabaseConfig.COLUMN_USERNAME + " = ?", new String[] {String.valueOf(username)});
+        return true;
+    }
+
 }

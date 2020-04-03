@@ -39,6 +39,12 @@ public class ChangePasswordFragment extends DialogFragment {
     List<User> userInfo;
     DatabaseHelper dbhelper;
     FirebaseFirestore fireStore;
+    String userID;
+    String userUsername;
+    boolean userNotifications;
+    boolean newUser;
+    int ageInteger;
+    int skin_type;
 
     @Override
     public void onResume() {
@@ -84,25 +90,55 @@ public class ChangePasswordFragment extends DialogFragment {
                 String databasePassword = null;
 
                 if (!hasInternet) { // Offline
+                    dbhelper = new DatabaseHelper(getActivity());
                     userInfo = dbhelper.getAllUserData();
                     for (int i = 0; i < userInfo.size(); i++) {
                         if (userInfo.get(i).getUsername().equals(usernameIntent)) {
                             databasePassword = userInfo.get(i).getPassword();
+                            userID = Integer.toString(userInfo.get(i).getUserId());
+                            userUsername = userInfo.get(i).getUsername();
+                            userNotifications = userInfo.get(i).getNotifications();
+                            newUser = userInfo.get(i).getNewUser();
+                            ageInteger = userInfo.get(i).getAge();
+                            skin_type = userInfo.get(i).getSkin();
                         }
                     }
 
-                    if (oldpass.equals(databasePassword) && newpass.equals(confirmpass)) {
+                    if (!oldpass.equals(databasePassword)) {
 
-                        /**INSERT NEW PASSWORD INTO DATABASE, ABC SHOULD BE DATABASE FETCH TO OLD PASSWORD*/
+                        currentpassEditText.setText(null);
+                        newpassEditText.setText(null);
+                        confirmpassEditText.setText(null);
+                        Toast.makeText(getActivity(), "That is not your old password. Try Again.", Toast.LENGTH_SHORT).show();
 
-                        getDialog().dismiss();
-                        Toast.makeText(getActivity(), "Password Changed", Toast.LENGTH_SHORT).show();
+                    }
+                    if (oldpass.equals("") || newpass.equals("") || currentpassEditText.equals(""))
+                    {
+                        currentpassEditText.setText(null);
+                        newpassEditText.setText(null);
+                        confirmpassEditText.setText(null);
+                        Toast.makeText(getActivity(), "Entries can't be blank.", Toast.LENGTH_SHORT).show();
 
-                    } else {
+                    }
+                    else if (newpass.length() < 8)
+                    {
+                        currentpassEditText.setText(null);
+                        newpassEditText.setText(null);
+                        confirmpassEditText.setText(null);
+                        Toast.makeText(getActivity(), "New password must be 8 or more characters.", Toast.LENGTH_SHORT).show();
+
+                    }
+                    else if (!newpass.equals(confirmpass))
+                    {
                         currentpassEditText.setText(null);
                         newpassEditText.setText(null);
                         confirmpassEditText.setText(null);
                         Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        dbhelper.updateData(userID, userUsername, newpass, ageInteger, skin_type, userNotifications, newUser);
+                        getDialog().dismiss();
+                        Toast.makeText(getActivity(), "Password Changed!", Toast.LENGTH_SHORT).show();
                     }
                 } else { // Online
                     final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);

@@ -149,7 +149,7 @@ public class UserActivity extends AppCompatActivity {
                     Toast.makeText(UserActivity.this, "Invalid Age", Toast.LENGTH_SHORT).show();
                 }
                 if (catcherCheck) {
-                    if (parseInt(editTextAge.getText().toString()) <= 0) {
+                    if (parseInt(editTextAge.getText().toString()) <= 0 || parseInt(editTextAge.getText().toString()) > 100) {
                         Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
                         editTextAge.setText(null);
                         /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
@@ -163,15 +163,15 @@ public class UserActivity extends AppCompatActivity {
                             for (int i = 0; i < userAgeChange.size(); i++) {
                                 if (userAgeChange.get(i).getUsername().equals(usernameIntent)) {
 
-                                    int userID = userAgeChange.get(i).getUserId();
-                                    int oldSkinType = userAgeChange.get(i).getSkin();
-                                    int oldAge = userAgeChange.get(i).getAge();
-
+                                    String userID = Integer.toString(userAgeChange.get(i).getUserId());
+                                    String userUsername = userAgeChange.get(i).getUsername();
+                                    String userPassword = userAgeChange.get(i).getPassword();
                                     int ageInteger = parseInt(editTextAge.getText().toString());
                                     int skin_type = getSkinType();
+                                    boolean userNotifications = userAgeChange.get(i).getNotifications();
+                                    boolean newUser = userAgeChange.get(i).getNewUser();
 
-                                    dbhelper.updateSkin(userID, skin_type, oldSkinType); /** UPDATE SKIN*/
-                                    dbhelper.updateAge(userID, ageInteger, oldAge); /**UPDATE AGE FUNCTION*/
+                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newUser);
 
                                     setAllObjectsFalse();
                                     if (newuserregcheck == true) {
