@@ -10,10 +10,10 @@
 
     <Button
         android:id="@+id/graphButton"
-        android:layout_width="140dp"
+        android:background="@drawable/rounded_button"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:background="@drawable/rounded_button"
         android:text="Graph Exposure"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
