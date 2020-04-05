@@ -17,6 +17,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -81,6 +82,25 @@ public class GraphActivity extends AppCompatActivity {
         sharedPreferencesHelper = new SharedPreferencesHelper(GraphActivity.this);
         fireStore = FirebaseFirestore.getInstance();
         setDate();
+    }
+
+    float x1, y1, x2, y2;
+    @Override
+    public boolean onTouchEvent(MotionEvent touchEvent) {
+        switch(touchEvent.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                x1 = touchEvent.getX();
+                y1 = touchEvent.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                x2 = touchEvent.getX();
+                y2 = touchEvent.getY();
+                if(y1 < y2) {
+                    finishActivity(1);
+                }
+                break;
+        }
+        return false;
     }
 
     @Override

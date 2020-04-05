@@ -1,0 +1,4 @@
+#Sun Mar 22 20:49:03 EDT 2020
+base.0=C\:\\Users\\tianx\\Desktop\\freshgitpull4\\COEN390-ELEC390-Project\\flutter_module\\build\\host\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

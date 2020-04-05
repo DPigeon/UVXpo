@@ -23,8 +23,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,6 +89,28 @@ public class MainActivity extends AppCompatActivity {
         notificationManagerCompat = NotificationManagerCompat.from(this);
     }
 
+
+    float x1, y1, x2, y2;
+    @Override
+    public boolean onTouchEvent(MotionEvent touchEvent) {
+        switch(touchEvent.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                x1 = touchEvent.getX();
+                y1 = touchEvent.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                x2 = touchEvent.getX();
+                y2 = touchEvent.getY();
+                if(y1 >= y2){
+                Intent i = new Intent(MainActivity.this, GraphActivity.class);
+                startActivity(i);
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+            }
+            break;
+        }
+        return false;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -135,9 +159,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     protected void setupAction() { // No action bar for the main activity
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
+        //ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
     protected void setupUI() {
@@ -178,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 openFaqWebsite(view);
             }
         });
+
     }
 
     /* Linking website to FAQ button */
@@ -189,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
     void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(MainActivity.this, page); // from the main activity to the profile class
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 
     // Connects to the Bluetooth device & starts the service to listen to inputs
@@ -278,31 +305,58 @@ public class MainActivity extends AppCompatActivity {
         int uvIndex = 0;
         double voltage = data * (3.3 / 1023) * 1000; // using 3.3 mV
 
+        ImageView uvIndicator= (ImageView) findViewById(R.id.imageView5);
+        uvIndicator.setImageResource(R.drawable.uv_none);
+
         // From http://educ8s.tv/arduino-uv-meter-project/ with converting of 3.3V output
-        if (voltage < 33)
+        if (voltage < 33) {
             uvIndex = 0;
-        else if (voltage > 33 && voltage <= 150)
+            uvIndicator.setImageResource(R.drawable.uv_none);
+        }
+        else if (voltage > 33 && voltage <= 150){
             uvIndex = 1;
-        else if (voltage > 150 && voltage <= 210)
+            uvIndicator.setImageResource(R.drawable.uv_low);
+        }
+        else if (voltage > 150 && voltage <= 210) {
             uvIndex = 2;
-        else if (voltage > 210 && voltage <= 269)
+            uvIndicator.setImageResource(R.drawable.uv_medium);
+        }
+        else if (voltage > 210 && voltage <= 269) {
             uvIndex = 3;
-        else if (voltage > 269 && voltage <= 332)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 269 && voltage <= 332) {
             uvIndex = 4;
-        else if (voltage > 332 && voltage <= 400)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 332 && voltage <= 400) {
             uvIndex = 5;
-        else if (voltage > 400 && voltage <= 459)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 400 && voltage <= 459) {
             uvIndex = 6;
-        else if (voltage > 459 && voltage <= 525)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 459 && voltage <= 525) {
             uvIndex = 7;
-        else if (voltage > 525 && voltage <= 581)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 525 && voltage <= 581) {
             uvIndex = 8;
-        else if (voltage > 581 && voltage <= 644)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 581 && voltage <= 644) {
             uvIndex = 9;
-        else if (voltage > 644 && voltage <= 712)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 644 && voltage <= 712) {
             uvIndex = 10;
-        else if (voltage > 712)
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
+        else if (voltage > 712) {
             uvIndex = 11;
+            uvIndicator.setImageResource(R.drawable.uv_high);
+        }
 
         if  (uvIndex >=1 && uvIndex <= 2){
             channel2Notifmedium();
@@ -386,5 +440,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
 
 }

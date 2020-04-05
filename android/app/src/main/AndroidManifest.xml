@@ -23,7 +23,9 @@
             android:parentActivityName=".MainActivity"></activity>
         <activity
             android:name=".MainActivity"
-            android:parentActivityName=".LoginActivity"></activity>
+            android:parentActivityName=".LoginActivity"
+            android:theme="@style/DefaultScreen"
+            ></activity>
         <activity
             android:name=".WeatherActivity"
             android:parentActivityName=".MainActivity"></activity>
@@ -37,10 +39,15 @@
         <activity android:name=".Location"
             android:parentActivityName=".WeatherActivity"
             />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:parentActivityName=".LoginActivity"
+            android:theme="@style/DefaultScreen"
+            />
+        <activity android:name=".splashScreen"
+            android:theme="@style/SplashScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LoginActivity" />
+                android:value=".splashScreen" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
