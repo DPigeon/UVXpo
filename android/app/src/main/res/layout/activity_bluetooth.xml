@@ -76,7 +76,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="269dp"
-        android:text="Scan"
+        android:text="Scanning..."
+        android:textOff="Scan"
+        android:textOn="Scanning..."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

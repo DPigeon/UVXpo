@@ -5,12 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.AdvertiseData;
+import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,9 +24,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 0;
@@ -36,6 +44,7 @@ public class BluetoothActivity extends AppCompatActivity {
     protected ArrayAdapter adapter;
     protected ListView deviceListView;
     protected List<String> devicesString;
+    int counter = 0; // for scanned devices
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +87,10 @@ public class BluetoothActivity extends AppCompatActivity {
                 IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 if (isChecked) {
                     adapter.clear();
-                    registerReceiver(broadReciever, filter);
+                    registerReceiver(broadReceiver, filter);
                     bluetoothAdapter.startDiscovery();
                 } else {
-                    unregisterReceiver(broadReciever);
+                    unregisterReceiver(broadReceiver);
                     bluetoothAdapter.cancelDiscovery();
                 }
             }
@@ -153,14 +162,31 @@ public class BluetoothActivity extends AppCompatActivity {
         });
     }
 
-    private final BroadcastReceiver broadReciever = new BroadcastReceiver() {
+    private BluetoothAdapter.LeScanCallback mScanCb = new BluetoothAdapter.LeScanCallback() {
+        @Override
+        public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
+            String name = "Device #";
+            final String DEVICE_ADDRESS = "24:0A:C4:05:C6:8A";
+            if (device.getAddress() == DEVICE_ADDRESS)
+                name = "UV Exposure Bracelet";
+
+            String deviceName = device.getName(); // Bug: always get null...
+            if (deviceName == null)
+                devicesString.add("  \n" + name + counter + "\n" + device.getAddress());
+            else
+                devicesString.add("  \n" + deviceName + counter + "\n" + device.getAddress());
+            adapter.notifyDataSetChanged();
+            counter = counter + 1;
+        }
+    };
+
+    private final BroadcastReceiver broadReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); // We find every device broadcasted
                 if(device.getBondState() != BluetoothDevice.BOND_BONDED)
-                    devicesString.add("\n" + device.getName() + "\n" + device.getAddress());
-                adapter.notifyDataSetChanged();
+                    bluetoothAdapter.startLeScan(mScanCb);
             }
         }
     };
