@@ -8,14 +8,20 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class BluetoothActivity extends AppCompatActivity {
@@ -23,15 +29,20 @@ public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_DISCOVER_BT = 1;
 
     Button toggleButton, discoverableButton, pairedDevicesButton;
+    ToggleButton scanButton;
     TextView pairedTextView;
 
     BluetoothAdapter bluetoothAdapter;
     protected ArrayAdapter adapter;
+    protected ListView deviceListView;
+    protected List<String> devicesString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+
+        devicesString = new ArrayList<String>();
 
         setupUI();
     }
@@ -53,11 +64,28 @@ public class BluetoothActivity extends AppCompatActivity {
         toggleButton = findViewById(R.id.toggleButton);
         discoverableButton = findViewById(R.id.discoverableButton);
         pairedDevicesButton = findViewById(R.id.pairedDevicesButton);
+        scanButton = findViewById(R.id.scanButton);
         pairedTextView = findViewById(R.id.pairedDeviceTextView);
+        deviceListView = findViewById(R.id.scanListView);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // Initialize bluetooth
         bluetoothSetStatus();
         bluetoothButtons();
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, devicesString);
+        deviceListView.setAdapter(adapter);
+        scanButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                if (isChecked) {
+                    adapter.clear();
+                    registerReceiver(broadReciever, filter);
+                    bluetoothAdapter.startDiscovery();
+                } else {
+                    unregisterReceiver(broadReciever);
+                    bluetoothAdapter.cancelDiscovery();
+                }
+            }
+        });
     }
 
     protected void bluetoothSetStatus() { // Sets the status of the bluetooth connection
@@ -131,9 +159,8 @@ public class BluetoothActivity extends AppCompatActivity {
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); // We find every device broadcasted
                 if(device.getBondState() != BluetoothDevice.BOND_BONDED)
-                    adapter.add("\n" + device.getName() + "\n" + device.getAddress());
+                    devicesString.add("\n" + device.getName() + "\n" + device.getAddress());
                 adapter.notifyDataSetChanged();
-
             }
         }
     };
