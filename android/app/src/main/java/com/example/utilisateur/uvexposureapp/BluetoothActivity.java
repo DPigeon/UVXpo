@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +26,7 @@ public class BluetoothActivity extends AppCompatActivity {
     TextView pairedTextView;
 
     BluetoothAdapter bluetoothAdapter;
+    protected ArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +114,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     if (devices.size() != 0) {
                         pairedTextView.setText("Paired Devices: \n");
                         for (BluetoothDevice device : devices)
-                            pairedTextView.append("\nDevice" + device.getName() + ", " + device);
+                            pairedTextView.append("\nDevice" + device.getName());
                     } else
                         pairedTextView.setText("Paired Devices: None");
                 } else {
@@ -120,6 +124,19 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
     }
+
+    private final BroadcastReceiver broadReciever = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); // We find every device broadcasted
+                if(device.getBondState() != BluetoothDevice.BOND_BONDED)
+                    adapter.add("\n" + device.getName() + "\n" + device.getAddress());
+                adapter.notifyDataSetChanged();
+
+            }
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
