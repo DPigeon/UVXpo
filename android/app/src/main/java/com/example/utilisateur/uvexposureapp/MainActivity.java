@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Connects to the Bluetooth device & starts the service to listen to inputs
     protected void connectAndListen() {
-        final String DEVICE_ADDRESS = "24:0A:C4:05:C6:8A"; // We will have to allow more devices later
+        final String DEVICE_ADDRESS = sharedPreferencesHelper.getBluetoothAddress(); // Gets the device paired from bluetooth activity
         final UUID SERVICE_UUID = UUID.fromString("b923eeab-9473-4b86-8607-5068911b18fe"); // First layer
         final UUID CHARACTERISTIC_UUID = UUID.fromString("aba24047-b36f-4646-92ce-3d5c0c75bd20"); // Second layer
         final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = convertFromInteger(0x2902); // Used to send data from phone --> microcontroller
