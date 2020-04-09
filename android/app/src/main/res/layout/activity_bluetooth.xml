@@ -8,10 +8,13 @@
 
     <Button
         android:id="@+id/toggleButton"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="148dp"
+        android:background="#3F51B5"
         android:text="Turn On"
+        android:textColor="#F5F6F8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,6 +26,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Bluetooth Settings"
+        android:textColor="#3F51B5"
+        android:textSize="25sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +48,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="216dp"
+        android:background="#3F51B5"
         android:text="Scanning..."
+        android:textColor="#F6F7F8"
         android:textOff="Scan"
         android:textOn="Scanning..."
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,6 +74,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="458dp"
         android:text="Paired Devices"
+        android:textColor="#3F51B5"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
