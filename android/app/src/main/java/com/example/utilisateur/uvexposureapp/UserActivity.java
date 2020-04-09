@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,12 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import static java.lang.Math.toIntExact;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,7 +36,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import static java.lang.Integer.parseInt;
 
@@ -51,6 +59,11 @@ public class UserActivity extends AppCompatActivity {
     RadioButton radioSkintype5;
     RadioButton radioSkintype6;
     Button bluetoothButton;
+    int getDOBday;
+    int getDOBmonth;
+    int getDOByear;
+    int ageChecker;
+
 
     Boolean newuserregcheck = false;
     String usernameIntent;
@@ -60,7 +73,8 @@ public class UserActivity extends AppCompatActivity {
     protected SharedPreferencesHelper sharedPreferencesHelper;
     Cursor userInfoAllData;
     List<User> userInfo;
-
+    DatePickerDialog.OnDateSetListener date;
+    final Calendar myCalendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +100,29 @@ public class UserActivity extends AppCompatActivity {
         userInfoAllData = dbhelper.getData();
         userInfo = dbhelper.getAllUserData();
 
+
+        date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year );
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                getDOBday = dayOfMonth;
+                getDOBmonth = month;
+                getDOByear = year;
+                ageChecker = getAge(getDOByear, getDOBmonth, getDOBday);
+                Toast.makeText(UserActivity.this, "Age is " + ageChecker, Toast.LENGTH_SHORT).show();
+                updateLabel();
+            }
+        };
+
+        editTextAge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(UserActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
         try {
             Bundle bndset = getIntent().getExtras();
             newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
@@ -104,7 +141,7 @@ public class UserActivity extends AppCompatActivity {
                     if (userInfo.get(i).getUsername().equals(usernameIntent)) {
                         int numintcheck = userInfo.get(i).getAge();
                         String numintToString = Integer.toString(numintcheck);
-                        editTextAge.setText(numintToString);
+                        editTextAge.setText("Age: " + numintToString);
                         fetchSkinType(userInfo.get(i).getSkin());
                         fetchNotifs(userInfo.get(i).getNotifications());
 
@@ -118,7 +155,7 @@ public class UserActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document_user : task.getResult()) {
-                                editTextAge.setText(document_user.getData().get("age").toString());
+                                editTextAge.setText("Age: " + document_user.getData().get("age").toString());
                                 fetchSkinType(Integer.parseInt(document_user.getData().get("skin").toString()));
                                 boolean notifChecker = Boolean.valueOf(document_user.getData().get("notifications").toString());
                                 if (notifChecker){
@@ -142,22 +179,10 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean catcherCheck = true;
-
                 /**THIS IS WHERE THE NEW VALUES SHOULD BE ENTERED IF CHANGES ARE MADE, (DATABASE)*/
 
-                String ifTextisNum  = editTextAge.getText().toString();
-                try
-                {
-                    int num = Integer.parseInt(ifTextisNum);
-                }
-                catch (NumberFormatException e)
-                {
-                    editTextAge.setText(null);
-                    catcherCheck = false;
-                    Toast.makeText(UserActivity.this, "Invalid Age", Toast.LENGTH_SHORT).show();
-                }
                 if (catcherCheck) {
-                    if (parseInt(editTextAge.getText().toString()) <= 0 || parseInt(editTextAge.getText().toString()) > 100) {
+                    if (ageChecker <= 0 || ageChecker > 100) {
                         Toast.makeText(UserActivity.this, "INVALID AGE", Toast.LENGTH_SHORT).show();
                         editTextAge.setText(null);
                         /**SET ALL CHANGES BACK TO ORIGINAL SINCE AGE INPUT IS INVALID*/
@@ -174,7 +199,7 @@ public class UserActivity extends AppCompatActivity {
                                     String userID = Integer.toString(userAgeChange.get(i).getUserId());
                                     String userUsername = userAgeChange.get(i).getUsername();
                                     String userPassword = userAgeChange.get(i).getPassword();
-                                    int ageInteger = parseInt(editTextAge.getText().toString());
+                                    int ageInteger = ageChecker;
                                     int skin_type = getSkinType();
                                     boolean userNotifications = getNotifs();
                                     boolean newUser = userAgeChange.get(i).getNewUser();
@@ -201,7 +226,7 @@ public class UserActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         for (QueryDocumentSnapshot document_user : task.getResult()) {
                                             users.document(document_user.getId()).update("notifications", getNotifs());
-                                            users.document(document_user.getId()).update("age", parseInt(editTextAge.getText().toString()), "skin", getSkinType());
+                                            users.document(document_user.getId()).update("age", ageChecker, "skin", getSkinType());
                                         }
                                     } else {
                                         Toast.makeText(UserActivity.this, "Invalid Age and/or Skin Type", Toast.LENGTH_SHORT).show();
@@ -428,6 +453,23 @@ public class UserActivity extends AppCompatActivity {
             radioSkintype5.setChecked(true);
         else if (skin == 6)
             radioSkintype6.setChecked(true);
+    }
+
+    private void updateLabel() {
+        String myFormat = "MM/dd/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        editTextAge.setText(sdf.format(myCalendar.getTime()));
+    }
+
+    public static int getAge(int year, int month, int day){
+        LocalDate today = LocalDate.now();
+        LocalDate birthday = LocalDate.of(year, month, day);
+
+        long years = ChronoUnit.YEARS.between(birthday, today);
+        int ageCalc = Math.toIntExact(years);
+
+        return ageCalc;
     }
 
     /* Checks if we have a wifi or LTE connection */
