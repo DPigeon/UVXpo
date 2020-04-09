@@ -45,4 +45,16 @@ public class SharedPreferencesHelper {
         int id = sharedPreferences.getInt("ProfileId", 0);
         return new User(name, password, age, skin, notifications, newUser);
     }
+
+    public void saveBluetoothConnection(String address) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("BluetoothAddress", address);
+        editor.apply();
+    }
+
+    public String getBluetoothAddress() {
+        String name = sharedPreferences.getString("BluetoothAddress", null);
+        return name;
+    }
+
 }
