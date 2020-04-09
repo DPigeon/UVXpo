@@ -105,11 +105,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="300dp"
         android:layout_marginBottom="150dp"
-        android:saveEnabled="false"
         android:showText="true"
         android:text="Notifications"
         android:textSize="12sp"
         android:thumbTint="#1AC1AD"
+        android:checked="true"
         tools:text="Notifications" />
 
     <Button

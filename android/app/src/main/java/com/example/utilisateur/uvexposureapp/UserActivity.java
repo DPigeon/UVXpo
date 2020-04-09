@@ -106,8 +106,9 @@ public class UserActivity extends AppCompatActivity {
                         String numintToString = Integer.toString(numintcheck);
                         editTextAge.setText(numintToString);
                         fetchSkinType(userInfo.get(i).getSkin());
+                        fetchNotifs(userInfo.get(i).getNotifications());
 
-                        Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck + " Skin " +  userInfo.get(i).getSkin() +  " Notifs " + userInfo.get(i).getNotifications(), Toast.LENGTH_SHORT).show();
                     }
                 }
             } else { // Online
@@ -119,6 +120,13 @@ public class UserActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document_user : task.getResult()) {
                                 editTextAge.setText(document_user.getData().get("age").toString());
                                 fetchSkinType(Integer.parseInt(document_user.getData().get("skin").toString()));
+                                boolean notifChecker = Boolean.valueOf(document_user.getData().get("notifications").toString());
+                                if (notifChecker){
+                                    notifSwitch.setChecked(true);
+                                }
+                                else if (!notifChecker){
+                                    notifSwitch.setChecked(false);
+                                }
                             }
                         } else {
                             Toast.makeText(UserActivity.this, "Invalid Age and/or Skin Type", Toast.LENGTH_SHORT).show();
@@ -168,7 +176,7 @@ public class UserActivity extends AppCompatActivity {
                                     String userPassword = userAgeChange.get(i).getPassword();
                                     int ageInteger = parseInt(editTextAge.getText().toString());
                                     int skin_type = getSkinType();
-                                    boolean userNotifications = userAgeChange.get(i).getNotifications();
+                                    boolean userNotifications = getNotifs();
                                     boolean newUser = userAgeChange.get(i).getNewUser();
 
                                     dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newUser);
@@ -192,6 +200,7 @@ public class UserActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if (task.isSuccessful()) {
                                         for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                            users.document(document_user.getId()).update("notifications", getNotifs());
                                             users.document(document_user.getId()).update("age", parseInt(editTextAge.getText().toString()), "skin", getSkinType());
                                         }
                                     } else {
@@ -371,6 +380,21 @@ public class UserActivity extends AppCompatActivity {
         radioSkintype4.setEnabled(true);
         radioSkintype5.setEnabled(true);
         radioSkintype6.setEnabled(true);
+    }
+
+    protected boolean getNotifs(){
+        boolean notifsReturn;
+        notifsReturn = notifSwitch.isChecked();
+        return notifsReturn;
+    }
+
+    protected void fetchNotifs(boolean Notifications){
+        if (!Notifications){
+            notifSwitch.setChecked(false);
+        }
+        else {
+            notifSwitch.setChecked(true);
+        }
     }
 
     protected int getSkinType() {

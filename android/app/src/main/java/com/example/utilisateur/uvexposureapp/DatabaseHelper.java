@@ -158,13 +158,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Integer ageShow = cursor.getInt(cursor.getColumnIndex(DatabaseConfig.COLUMN_AGE));
                     int skincolorShow = cursor.getInt(cursor.getColumnIndex(DatabaseConfig.COLUMN_SKIN_TYPE));
                     String notifShow = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_NOTIF));
+                    String newuser = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_NEW_USER));
+                    boolean newuserShow = false;
                     boolean notifShowSwitch = true;
-                    if (notifShow == "false")
+                    if (newuser.equals("true"))
+                    {
+                        newuserShow = true;
+                    }
+
+                    if (notifShow.equals("false"))
                     {
                         notifShowSwitch = false;
 
                     }
-                    User user = new User(usernameShow, passwordShow, ageShow, skincolorShow, notifShowSwitch);
+                    User user = new User(usernameShow, passwordShow, ageShow, skincolorShow, notifShowSwitch, newuserShow);
                     userList.add(user);
                 } while (cursor.moveToNext());
                 return userList;
@@ -188,46 +195,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-    public void updateAge(int id, int newAge, int oldAge) /**UPDATE AGE*/
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String queryAge = "UPDATE " + DatabaseConfig.USER_TABLE_NAME + " SET " + DatabaseConfig.COLUMN_AGE +
-                " = '" + newAge + "' WHERE " + DatabaseConfig.COLUMN_USER_ID + " = '" + id + "'" + " AND " +
-        DatabaseConfig.COLUMN_AGE + " = '" + oldAge + "'";
-
-        db.execSQL(queryAge);
-
-        Log.d(TAG, "UpdatedSkin: queryAge: " + queryAge);
-
-    }
-
-    public void updateSkin(int id, int newSkinTone, int oldSkinTone) /**UPDATE SKIN*/
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String querySkin = "UPDATE " + DatabaseConfig.USER_TABLE_NAME + " SET " + DatabaseConfig.COLUMN_SKIN_TYPE +
-                " = '" + newSkinTone + "' WHERE " + DatabaseConfig.COLUMN_USER_ID + " = '" + id + "'" + " AND " +
-                DatabaseConfig.COLUMN_SKIN_TYPE + " = '" + oldSkinTone + "'";
-
-        db.execSQL(querySkin);
-
-        Log.d(TAG, "UpdatedSkin: querySkin: " + querySkin);
-    }
-
     public boolean updateData(String id, String username, String password, int age, int skin_type, boolean notifications, boolean new_user)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DatabaseConfig.COLUMN_USER_ID, id);
+        String notifs = Boolean.toString(notifications);
+        String newuserString = Boolean.toString(new_user);
+        Integer idCheck = Integer.getInteger(id);
+
         values.put(DatabaseConfig.COLUMN_USERNAME, username);
         values.put(DatabaseConfig.COLUMN_PASSWORD, password);
         values.put(DatabaseConfig.COLUMN_AGE, age);
         values.put(DatabaseConfig.COLUMN_SKIN_TYPE, skin_type);
-        values.put(DatabaseConfig.COLUMN_NOTIF, notifications);
-        values.put(DatabaseConfig.COLUMN_NEW_USER, new_user);
+        values.put(DatabaseConfig.COLUMN_NOTIF, notifs);
+        values.put(DatabaseConfig.COLUMN_NEW_USER, newuserString);
 
-        db.update(DatabaseConfig.USER_TABLE_NAME, values, DatabaseConfig.COLUMN_USERNAME + " = ?", new String[] {String.valueOf(username)});
+        db.update(DatabaseConfig.USER_TABLE_NAME, values, DatabaseConfig.COLUMN_USERNAME + " = ?", new String[]{username});
         return true;
     }
 
