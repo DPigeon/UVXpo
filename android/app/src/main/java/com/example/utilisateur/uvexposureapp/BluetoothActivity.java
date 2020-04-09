@@ -52,7 +52,6 @@ public class BluetoothActivity extends AppCompatActivity {
     protected List<BluetoothDevice> availableDevices;
     protected List<BluetoothDevice> pairedDevices;
     protected SharedPreferencesHelper sharedPreferencesHelper;
-    int counter = 0; // for scanned devices
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +93,7 @@ public class BluetoothActivity extends AppCompatActivity {
         pairedDevicesListView = findViewById(R.id.pairedDeviceListView);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); // Initialize bluetooth
-        bluetoothSetStatus();
+        //bluetoothSetStatus();
         bluetoothButtons();
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, devicesString);
         adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pairedDevicesString);
@@ -106,7 +105,9 @@ public class BluetoothActivity extends AppCompatActivity {
                 try {
                     if (pairDevice(device)) { // Pairing the device
                         sharedPreferencesHelper.saveBluetoothConnection(device.getAddress());
-                        updatePairedDevices();
+                        //updatePairedDevices();
+                        pairedDevices.add(device);
+                        pairedDevicesString.add("    " + device.getName());
                         adapter2.notifyDataSetChanged();
                         displayToast("Bluetooth device paired!");
                     }
@@ -138,6 +139,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 try {
                     unpairDevice(device);
                     pairedDevices.remove(position);
+                    pairedDevicesString.remove(position);
                     adapter2.notifyDataSetChanged();
                 } catch (Exception exception) {
                     displayToast("Error unpairing device!");
@@ -210,12 +212,11 @@ public class BluetoothActivity extends AppCompatActivity {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
             String deviceName = device.getName(); // Bug: always get null for most of devices...
-            if (deviceName != null) {
+            if (deviceName != null && !devicesString.contains("    " + deviceName + "\n    " + device.getAddress())) {
                 devicesString.add("    " + deviceName + "\n    " + device.getAddress());
                 availableDevices.add(device);
             }
             adapter.notifyDataSetChanged();
-            counter = counter + 1;
         }
     };
 
