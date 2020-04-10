@@ -1,5 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
+import android.Manifest;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -35,37 +37,35 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
     String currentLongtitude = "";
     String latFound = "";
     String longFound = "";
+    Boolean responseDone = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_store_locator, container, false);
 
-        cancelButton = view.findViewById(R.id.locatorStoreCancelButton);
-
         Bundle coordinates = getArguments();
         currentLatitude = coordinates.getString("latitude");
         currentLongtitude = coordinates.getString("longtitude");
         getNearestStores(currentLatitude, currentLongtitude);
+        Log.d("hi:", currentLatitude);
 
+        cancelButton = view.findViewById(R.id.locatorStoreCancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getDialog().dismiss();
             }
         });
-
-        // Gets the MapView from the XML layout and creates it
-        mapView = (MapView) view.findViewById(R.id.mapView);
+        mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
 
-
-        mapView.getMapAsync(this);
         return view;
     }
 
     public void getNearestStores(String latitude, String longitude) {
         StoreLocator storeLocator = new StoreLocator();
+        storeLocator.parseComments(this.getActivity());
         try {
             String json = storeLocator.execute(latitude, longitude).get();
             if (!json.isEmpty()) {
@@ -76,8 +76,6 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
                 String distanceFromYou = store1.getString("dist");
                 latFound = store1.getString("lat");
                 longFound = store1.getString("lng");
-                Log.d("Location:", name + " " + address);
-
             }
         } catch (InterruptedException | ExecutionException | JSONException exception) {
             exception.printStackTrace();
@@ -99,8 +97,8 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
        */
 
         // Updates the location and zoom of the MapView
-        /*CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
-        map.animateCamera(cameraUpdate);*/
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(Integer.valueOf(currentLatitude), Integer.valueOf(currentLongtitude)), 10);
+        map.animateCamera(cameraUpdate);
         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(Integer.valueOf(latFound), Integer.valueOf(longFound))));
 
     }

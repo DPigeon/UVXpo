@@ -54,12 +54,12 @@
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="364dp"
+        android:layout_height="267dp"
         android:layout_above="@+id/locatorStoreCancelButton"
         android:layout_below="@+id/warningSunTextView2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="133dp"
-        android:layout_marginBottom="130dp" />
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="5dp" />
 
 </RelativeLayout>

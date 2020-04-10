@@ -1,10 +1,9 @@
 package com.example.utilisateur.uvexposureapp;
 
+import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.android.gms.maps.SupportMapFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class StoreLocator extends AsyncTask<String, Void, String> {
+    AppCompatActivity activity;
+
+    public void parseComments(AppCompatActivity activity){
+        this.activity = activity;
+    }
+
     @Override
     protected String doInBackground(String... coordinates) {
         String TAG = "StoreLocator";
@@ -47,4 +54,11 @@ public class StoreLocator extends AsyncTask<String, Void, String> {
         }
         return null;
     }
+
+    @Override
+    protected void onPostExecute(String result) {
+       /* SupportMapFragment mapFragment = (SupportMapFragment)activity.getSupportFragmentManager().find;
+        mapFragment.getMapAsync(this);*/
+    }
+
 }

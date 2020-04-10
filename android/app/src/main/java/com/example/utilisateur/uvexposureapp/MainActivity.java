@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.bluetooth.BluetoothAdapter;
@@ -48,6 +50,7 @@ import static java.lang.Integer.parseInt;
  */
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_LOCATION = 1;
     private NotificationManagerCompat notificationManagerCompat;
     protected SharedPreferencesHelper sharedPreferencesHelper;
     FirebaseFirestore fireStore;
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         setupUI();
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
