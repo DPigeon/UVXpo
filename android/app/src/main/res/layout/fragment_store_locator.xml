@@ -31,20 +31,20 @@
 
     <TextView
         android:id="@+id/warningSunTextView2"
-        android:layout_width="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="85dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="188dp"
         android:text="Let me show you some stores near you..."
         android:textAlignment="center"
         android:textSize="25sp"
         android:textStyle="bold" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/locatorStoreCancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -56,7 +56,7 @@
         android:id="@+id/mapView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button"
+        android:layout_above="@+id/locatorStoreCancelButton"
         android:layout_below="@+id/warningSunTextView2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="133dp"

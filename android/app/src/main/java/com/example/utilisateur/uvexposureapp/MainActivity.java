@@ -85,6 +85,16 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        /* Testing the storeLocatorFragment */
+        String latitude = "45.4968913";
+        String longitude = "-73.5830253";
+        StoreLocatorFragment dialog = new StoreLocatorFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("lat", latitude);
+        bundle.putString("long", longitude);
+        dialog.setArguments(bundle);
+        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
     }
 
     @Override
@@ -343,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManagerCompat.notify(2,notifications);
 
         // Opens a fragment that proposes you store around you with sunscreen?
+        // ADD StoreLocatorFragment HERE
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)

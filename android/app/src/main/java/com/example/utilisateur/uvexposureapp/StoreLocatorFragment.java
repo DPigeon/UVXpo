@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,8 +28,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCallback {
+    Button cancelButton;
     MapView mapView;
     GoogleMap map;
+    String currentLatitude = "";
+    String currentLongtitude = "";
     String latFound = "";
     String longFound = "";
 
@@ -36,6 +40,21 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_store_locator, container, false);
+
+        cancelButton = view.findViewById(R.id.locatorStoreCancelButton);
+
+        Bundle coordinates = getArguments();
+        currentLatitude = coordinates.getString("latitude");
+        currentLongtitude = coordinates.getString("longtitude");
+        getNearestStores(currentLatitude, currentLongtitude);
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDialog().dismiss();
+            }
+        });
+
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -55,8 +74,8 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
                 String name = store1.getString("n");
                 String address = store1.getString("ad");
                 String distanceFromYou = store1.getString("dist");
-                String lat = store1.getString("lat");
-                String lng = store1.getString("lng");
+                latFound = store1.getString("lat");
+                longFound = store1.getString("lng");
                 Log.d("Location:", name + " " + address);
 
             }
@@ -82,7 +101,7 @@ public class StoreLocatorFragment extends DialogFragment implements OnMapReadyCa
         // Updates the location and zoom of the MapView
         /*CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
         map.animateCamera(cameraUpdate);*/
-        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(43.1, -87.9)));
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(Integer.valueOf(latFound), Integer.valueOf(longFound))));
 
     }
 
