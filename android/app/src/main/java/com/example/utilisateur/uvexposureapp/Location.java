@@ -10,10 +10,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.ExecutionException;
 
 public class Location extends AppCompatActivity  {
 
@@ -30,7 +37,7 @@ public class Location extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
-///add permissions //
+        ///add permissions //
 
         ActivityCompat.requestPermissions(this,new String[]
                 {Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
@@ -43,23 +50,19 @@ public class Location extends AppCompatActivity  {
             public void onClick(View v) {
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-
                 //Check if GPS or on or not
                 if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-
-/// write function to enable GPS
+                    /// write function to enable GPS
                     OnGPS();
-
-
                 }
 
                 else {
                     //gps is already on
-
                     getLocation();
 
+                    // Make http call to Blipstar API to fetch nearest store that has sunscreen (Downtown MTL only for now)
+                    getNearestStores();
                 }
-
             }
         });
 
@@ -88,7 +91,6 @@ public class Location extends AppCompatActivity  {
 
                 showLocationTxt.setText("Your location"+"\n"+"Latitude="+latitude+"\n"+"Longitude="+longitude);
             }
-
             else if(LocationNetwork!=null){
 
                 double lat=LocationNetwork.getLatitude();
@@ -98,7 +100,6 @@ public class Location extends AppCompatActivity  {
 
                 showLocationTxt.setText("Your location"+"\n"+"Latitude="+latitude+"\n"+"Longitude="+longitude);
             }
-
             else if(LocationPassive!=null){
 
                 double lat=LocationPassive.getLatitude();
@@ -112,7 +113,26 @@ public class Location extends AppCompatActivity  {
 
                 Toast.makeText(this,"Can't get your location",Toast.LENGTH_SHORT).show();
             }
+        }
+    }
 
+    public void getNearestStores() {
+        StoreLocator storeLocator = new StoreLocator();
+        try {
+            String json = storeLocator.execute(latitude, longitude).get();
+            if (!json.isEmpty()) {
+                JSONArray jsonArray = new JSONArray(json);
+                JSONObject store1 = jsonArray.getJSONObject(0);
+                String name = store1.getString("n");
+                String address = store1.getString("ad");
+                String distanceFromYou = store1.getString("dist");
+                String lat = store1.getString("lat");
+                String lng = store1.getString("lng");
+                Log.d("Location:", name + " " + address);
+
+            }
+        } catch (InterruptedException | ExecutionException | JSONException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -133,10 +153,4 @@ public class Location extends AppCompatActivity  {
         final AlertDialog alertDialog=builder.create();
         alertDialog.show();
     }
-
-
-
-
-
-
 }
