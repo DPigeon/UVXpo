@@ -1,9 +1,6 @@
 package com.example.utilisateur.uvexposureapp;
 
-import android.app.Activity;
 import android.os.AsyncTask;
-
-import com.google.android.gms.maps.SupportMapFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,14 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 public class StoreLocator extends AsyncTask<String, Void, String> {
-    AppCompatActivity activity;
-
-    public void parseComments(AppCompatActivity activity){
-        this.activity = activity;
-    }
 
     @Override
     protected String doInBackground(String... coordinates) {
@@ -27,8 +17,8 @@ public class StoreLocator extends AsyncTask<String, Void, String> {
         String lat = coordinates[0];
         String lng = coordinates[1];
         String BLIPSTAR_ACCOUNT_ID = "5093053"; // Blipstar API (good for 15 days trial)
-        String results = "2"; // Lets limit ourselves with 2 for now
-        String radius = "1"; // kilometers
+        String results = "4"; // Lets limit ourselves with 2 for now
+        String radius = "2"; // kilometers
         String storesUrl = "https://viewer.blipstar.com/api/?uid=" + BLIPSTAR_ACCOUNT_ID + "&lat=" + lat + "&lng=" + lng + "&results=" + results + "&radius=" + radius;
 
         try {
@@ -54,11 +44,4 @@ public class StoreLocator extends AsyncTask<String, Void, String> {
         }
         return null;
     }
-
-    @Override
-    protected void onPostExecute(String result) {
-       /* SupportMapFragment mapFragment = (SupportMapFragment)activity.getSupportFragmentManager().find;
-        mapFragment.getMapAsync(this);*/
-    }
-
 }
