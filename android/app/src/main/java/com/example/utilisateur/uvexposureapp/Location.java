@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Location extends AppCompatActivity  {
 
-    private static final int REQUEST_LOCATION=1;
+    private static final int REQUEST_LOCATION = 1;
 
     Button getLocationBtn;
     TextView showLocationTxt;
@@ -59,9 +59,6 @@ public class Location extends AppCompatActivity  {
                 else {
                     //gps is already on
                     getLocation();
-
-                    // Make http call to Blipstar API to fetch nearest store that has sunscreen (Downtown MTL only for now)
-                    getNearestStores();
                 }
             }
         });
@@ -113,26 +110,6 @@ public class Location extends AppCompatActivity  {
 
                 Toast.makeText(this,"Can't get your location",Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    public void getNearestStores() {
-        StoreLocator storeLocator = new StoreLocator();
-        try {
-            String json = storeLocator.execute(latitude, longitude).get();
-            if (!json.isEmpty()) {
-                JSONArray jsonArray = new JSONArray(json);
-                JSONObject store1 = jsonArray.getJSONObject(0);
-                String name = store1.getString("n");
-                String address = store1.getString("ad");
-                String distanceFromYou = store1.getString("dist");
-                String lat = store1.getString("lat");
-                String lng = store1.getString("lng");
-                Log.d("Location:", name + " " + address);
-
-            }
-        } catch (InterruptedException | ExecutionException | JSONException exception) {
-            exception.printStackTrace();
         }
     }
 

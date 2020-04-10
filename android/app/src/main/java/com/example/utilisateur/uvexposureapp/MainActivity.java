@@ -341,6 +341,8 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("A little sunscreen wouldn't hurt!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
+
+        // Opens a fragment that proposes you store around you with sunscreen?
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
