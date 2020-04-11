@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     String usernameIntentExtra;
     String passwordIntent;
     Boolean newusercheck;
-
+    protected ImageButton newWeatherButton;
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,12 +164,21 @@ public class MainActivity extends AppCompatActivity {
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
         weatherButton = findViewById(R.id.weatherButton);
+        newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
         weatherButton.setText("Get Current Weather Data");
+        weatherbutton();
         weatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goToActivity(WeatherActivity.class);
+            }
+        });
+        newWeatherButton.setOnContextClickListener(new View.OnContextClickListener() {
+            @Override
+            public boolean onContextClick(View v) {
+                goToActivity(WeatherActivity.class);
+                return false;
             }
         });
         graphButton.setOnClickListener(new View.OnClickListener() {
@@ -437,7 +447,33 @@ public class MainActivity extends AppCompatActivity {
        } catch (JSONException e) {
            e.printStackTrace();
        }
+       if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
+           newWeatherButton.setImageResource(R.drawable.clear_sky);
+       }else if(main.equals("few clouds")){
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
 
+       }else if(main.equals("scattered clouds")){
+           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
+
+       }else if(main.equals("broken clouds")){
+           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
+
+       }else if(main.equals("shower rain")){
+           newWeatherButton.setImageResource(R.drawable.shower_rain);
+
+       }else if(main.equals("rain")){
+           newWeatherButton.setImageResource(R.drawable.rain);
+
+       }else if(main.equals("thunderstorm")){
+           newWeatherButton.setImageResource(R.drawable.thunder_storm);
+
+       }else if(main.equals("snow")){
+           newWeatherButton.setImageResource(R.drawable.snow);
+
+       }else if(main.equals("mist")){
+           newWeatherButton.setImageResource(R.drawable.mist);
+
+       }
 
 
 
