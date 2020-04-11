@@ -87,4 +87,16 @@
         app:layout_constraintTop_toTopOf="@+id/welcomeUserTextView"
         app:srcCompat="@android:drawable/ic_lock_power_off" />
 
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="62dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="65dp"
+        app:layout_constraintEnd_toStartOf="@+id/faqButton"
+        app:layout_constraintStart_toEndOf="@+id/settingsButton"
+        app:layout_constraintTop_toBottomOf="@+id/graphButton"
+        app:srcCompat="@drawable/clear_sky" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
