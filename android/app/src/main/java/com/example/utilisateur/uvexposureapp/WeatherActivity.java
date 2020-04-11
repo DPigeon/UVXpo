@@ -66,7 +66,7 @@ public class WeatherActivity extends AppCompatActivity {
                 }
                 JSONObject temp = new JSONObject(temperature);
                 temps = temp.getString("temp");
-                setupUI(main,desc,temps);                         //setup ui
+                //setupUI(main,desc,temps);                         //setup ui
 
             }
         } catch (ExecutionException e) {
@@ -76,6 +76,8 @@ public class WeatherActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        setupUI(main,desc,temps);                         //setup ui
+
     }
 
     void setupUI(String main,String desc,String temps) {
@@ -85,6 +87,7 @@ public class WeatherActivity extends AppCompatActivity {
         Status = findViewById(R.id.Status);
         statuspic=findViewById(R.id.imageView2);
         cityList();
+        setWeatherImage();
         Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
         Status.setText("Status: "+ main +"\n");
         montreal.setText(cityName);
@@ -95,41 +98,6 @@ public class WeatherActivity extends AppCompatActivity {
                 open(view);
             }
         });
-
-        if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
-        statuspic.setImageResource(R.drawable.clear_sky);
-        }else if(main.equals("few clouds")){
-            statuspic.setImageResource(R.drawable.few_clouds);
-
-        }else if(main.equals("scattered clouds")){
-            statuspic.setImageResource(R.drawable.scattered_clouds);
-
-        }else if(main.equals("broken clouds")){
-            statuspic.setImageResource(R.drawable.scattered_clouds);
-
-        }else if(main.equals("shower rain")){
-            statuspic.setImageResource(R.drawable.shower_rain);
-
-        }else if(main.equals("rain")){
-            statuspic.setImageResource(R.drawable.rain);
-
-        }else if(main.equals("thunderstorm")){
-            statuspic.setImageResource(R.drawable.thunder_storm);
-
-        }else if(main.equals("snow")){
-            statuspic.setImageResource(R.drawable.snow);
-
-        }else if(main.equals("mist")){
-            statuspic.setImageResource(R.drawable.mist);
-
-        }
-
-
-
-
-
-
-
 
 
 
@@ -183,7 +151,40 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
     }
+    void setWeatherImage(){
 
+        if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
+            statuspic.setImageResource(R.drawable.clear_sky);
+        }else if(main.equals("few clouds")){
+            statuspic.setImageResource(R.drawable.few_clouds);
+
+        }else if(main.equals("scattered clouds")){
+            statuspic.setImageResource(R.drawable.scattered_clouds);
+
+        }else if(main.equals("broken clouds")){
+            statuspic.setImageResource(R.drawable.scattered_clouds);
+
+        }else if(main.equals("shower rain")){
+            statuspic.setImageResource(R.drawable.shower_rain);
+
+        }else if(main.equals("rain")){
+            statuspic.setImageResource(R.drawable.rain);
+
+        }else if(main.equals("thunderstorm")){
+            statuspic.setImageResource(R.drawable.thunder_storm);
+
+        }else if(main.equals("snow")){
+            statuspic.setImageResource(R.drawable.snow);
+
+        }else if(main.equals("mist")){
+            statuspic.setImageResource(R.drawable.mist);
+
+        }else {
+            main.equals("few clouds");
+        }
+
+
+    }
 
     static String weatherInfo() {
         String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=b6907d289e10d714a6e88b30761fae22";

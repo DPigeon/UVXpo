@@ -40,11 +40,12 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="64dp"
-        android:layout_height="61dp"
-        android:layout_marginStart="173dp"
-        android:layout_marginTop="38dp"
-        android:layout_marginEnd="174dp"
+        android:layout_width="121dp"
+        android:layout_height="79dp"
+        android:layout_marginStart="145dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="145dp"
+        android:src="@drawable/few_clouds"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5" />
@@ -92,10 +93,10 @@
         android:layout_width="82dp"
         android:layout_height="22dp"
         android:layout_marginStart="164dp"
-        android:layout_marginTop="6dp"
         android:layout_marginEnd="165dp"
         android:text="Get Weather Data"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton" />
 

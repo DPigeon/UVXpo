@@ -163,10 +163,10 @@ public class MainActivity extends AppCompatActivity {
         setupAction();
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
+        weatherbutton();
 
         newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
-         weatherbutton();
 
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
    void weatherbutton(){
-        String main = "";
+        String main = "clear sky";
        Weather weather = new Weather();
        try {
            String content = weather.execute(WeatherActivity.weatherInfo()).get();
@@ -443,6 +443,7 @@ public class MainActivity extends AppCompatActivity {
        }
        if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
            newWeatherButton.setImageResource(R.drawable.clear_sky);
+
        }else if(main.equals("few clouds")){
            newWeatherButton.setImageResource(R.drawable.few_clouds);
 
@@ -467,6 +468,8 @@ public class MainActivity extends AppCompatActivity {
        }else if(main.equals("mist")){
            newWeatherButton.setImageResource(R.drawable.mist);
 
+       }else {
+           main.equals("few clouds");
        }
 
 
