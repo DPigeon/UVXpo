@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.bluetooth.BluetoothAdapter;
@@ -54,6 +56,7 @@ import static java.lang.Integer.parseInt;
  */
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_LOCATION = 1;
     private NotificationManagerCompat notificationManagerCompat;
     protected SharedPreferencesHelper sharedPreferencesHelper;
     FirebaseFirestore fireStore;
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         setupUI();
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
@@ -91,12 +95,21 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        /* Testing the storeLocatorFragment */
+        String latitude = "45.4968913";
+        String longitude = "-73.5830253";
+        StoreLocatorFragment dialog = new StoreLocatorFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("lat", latitude);
+        bundle.putString("long", longitude);
+        dialog.setArguments(bundle);
+        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         try {
             String profileName = sharedPreferencesHelper.getProfile().getUsername();
 
@@ -357,6 +370,9 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("A little sunscreen wouldn't hurt!")
                 .build();
         notificationManagerCompat.notify(2,notifications);
+
+        // Opens a fragment that proposes you store around you with sunscreen?
+        // ADD StoreLocatorFragment HERE
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)

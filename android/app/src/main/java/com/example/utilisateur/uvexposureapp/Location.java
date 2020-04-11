@@ -10,14 +10,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.ExecutionException;
+
 public class Location extends AppCompatActivity  {
 
-    private static final int REQUEST_LOCATION=1;
+    private static final int REQUEST_LOCATION = 1;
 
     Button getLocationBtn;
     TextView showLocationTxt;
@@ -30,7 +37,7 @@ public class Location extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
 
-///add permissions //
+        ///add permissions //
 
         ActivityCompat.requestPermissions(this,new String[]
                 {Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
@@ -43,23 +50,16 @@ public class Location extends AppCompatActivity  {
             public void onClick(View v) {
                 locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-
                 //Check if GPS or on or not
                 if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-
-/// write function to enable GPS
+                    /// write function to enable GPS
                     OnGPS();
-
-
                 }
 
                 else {
                     //gps is already on
-
                     getLocation();
-
                 }
-
             }
         });
 
@@ -88,7 +88,6 @@ public class Location extends AppCompatActivity  {
 
                 showLocationTxt.setText("Your location"+"\n"+"Latitude="+latitude+"\n"+"Longitude="+longitude);
             }
-
             else if(LocationNetwork!=null){
 
                 double lat=LocationNetwork.getLatitude();
@@ -98,7 +97,6 @@ public class Location extends AppCompatActivity  {
 
                 showLocationTxt.setText("Your location"+"\n"+"Latitude="+latitude+"\n"+"Longitude="+longitude);
             }
-
             else if(LocationPassive!=null){
 
                 double lat=LocationPassive.getLatitude();
@@ -112,7 +110,6 @@ public class Location extends AppCompatActivity  {
 
                 Toast.makeText(this,"Can't get your location",Toast.LENGTH_SHORT).show();
             }
-
         }
     }
 
@@ -133,10 +130,4 @@ public class Location extends AppCompatActivity  {
         final AlertDialog alertDialog=builder.create();
         alertDialog.show();
     }
-
-
-
-
-
-
 }
