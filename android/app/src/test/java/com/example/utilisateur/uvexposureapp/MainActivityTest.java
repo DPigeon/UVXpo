@@ -13,7 +13,7 @@ public class MainActivityTest {
     @Before
     public void setup() {
         mainActivity = new MainActivity();
-        weatherButton = mainActivity.findViewById(R.id.weatherButton);
+        //weatherButton = mainActivity.findViewById(R.id.weatherButton);
     }
 
     @Test

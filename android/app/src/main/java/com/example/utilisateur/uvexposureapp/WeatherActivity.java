@@ -66,7 +66,7 @@ public class WeatherActivity extends AppCompatActivity {
                 }
                 JSONObject temp = new JSONObject(temperature);
                 temps = temp.getString("temp");
-                //setupUI(main,desc,temps);                         //setup ui
+                setupUI(main,desc,temps);                         //setup ui
 
             }
         } catch (ExecutionException e) {
@@ -87,7 +87,7 @@ public class WeatherActivity extends AppCompatActivity {
         Status = findViewById(R.id.Status);
         statuspic=findViewById(R.id.imageView2);
         cityList();
-        setWeatherImage();
+        setWeatherImage(main);
         Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
         Status.setText("Status: "+ main +"\n");
         montreal.setText(cityName);
@@ -148,35 +148,36 @@ public class WeatherActivity extends AppCompatActivity {
                 montreal.setText(cityName);
                 Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
                 Status.setText("Status: "+ main +"\n");
+                setWeatherImage(main);
             }
         });
     }
-    void setWeatherImage(){
+    void setWeatherImage(String main){
 
-        if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
+        if (desc.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
             statuspic.setImageResource(R.drawable.clear_sky);
-        }else if(main.equals("few clouds")){
+        }else if(desc.equals("clouds")||desc.equals("overcast clouds")){
+            statuspic.setImageResource(R.drawable.scattered_clouds);
+
+        }else if(desc.equals("scattered clouds")){
             statuspic.setImageResource(R.drawable.few_clouds);
 
-        }else if(main.equals("scattered clouds")){
-            statuspic.setImageResource(R.drawable.scattered_clouds);
+        }else if(desc.equals("broken clouds")||main.equals("Clouds")){
+            statuspic.setImageResource(R.drawable.few_clouds);
 
-        }else if(main.equals("broken clouds")){
-            statuspic.setImageResource(R.drawable.scattered_clouds);
-
-        }else if(main.equals("shower rain")){
+        }else if(desc.equals("shower rain")||main.equals("Rain")){
             statuspic.setImageResource(R.drawable.shower_rain);
 
-        }else if(main.equals("rain")){
+        }else if(desc.equals("rain")||main.equals("Drizzle")){
             statuspic.setImageResource(R.drawable.rain);
 
-        }else if(main.equals("thunderstorm")){
+        }else if(desc.equals("thunderstorm")||main.equals("Thunderstorm")){
             statuspic.setImageResource(R.drawable.thunder_storm);
 
-        }else if(main.equals("snow")){
+        }else if(desc.equals("snow")||main.equals("Snow")){
             statuspic.setImageResource(R.drawable.snow);
 
-        }else if(main.equals("mist")){
+        }else if(desc.equals("mist")){
             statuspic.setImageResource(R.drawable.mist);
 
         }else {
@@ -187,7 +188,9 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     static String weatherInfo() {
-        String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=9978eaf01e5cdf06792a0e803cefe0a7";
+
+
+        String URL = "http://openweathermap.org/data/2.5/weather?q="+cityName+",ca&appid=439d4b804bc8187953eb36d2a8c26a02";
         return URL;
     }
 

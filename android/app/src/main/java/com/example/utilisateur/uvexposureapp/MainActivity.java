@@ -163,11 +163,10 @@ public class MainActivity extends AppCompatActivity {
         setupAction();
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
-        weatherbutton();
 
         newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
-
+        weatherbutton();
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -414,54 +413,59 @@ public class MainActivity extends AppCompatActivity {
 
    void weatherbutton(){
         String main = "clear sky";
+    String desc = "rain";
+
        Weather weather = new Weather();
        try {
            String content = weather.execute(WeatherActivity.weatherInfo()).get();
+           //Log.i("contentData", content);
            if (content != null) {
                JSONObject jsonObject = new JSONObject(content);
-               String weatherData = jsonObject.getString("weather");
-               JSONArray array = new JSONArray(weatherData);
 
+               String weatherData = jsonObject.getString("weather");
+               //Log.i("WeatherData",weatherData);
+               JSONArray array = new JSONArray(weatherData);
                for (int i = 0; i < array.length(); i++) {
                    JSONObject weatherPt = array.getJSONObject(i);
                    main = weatherPt.getString("main");
+                   desc = weatherPt.getString("description");
+
+               }}}
+    catch (InterruptedException e) {
+                   e.printStackTrace();
+               } catch (ExecutionException e) {
+                   e.printStackTrace();
+               } catch (JSONException e) {
+                   e.printStackTrace();
                }
 
 
 
-           }
-       } catch (ExecutionException e) {
-           e.printStackTrace();
-       } catch (InterruptedException e) {
-           e.printStackTrace();
-       } catch (JSONException e) {
-           e.printStackTrace();
-       }
-       if (main.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
-           newWeatherButton.setImageResource(R.drawable.clear_sky);
 
-       }else if(main.equals("few clouds")){
+       if (desc.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
+           newWeatherButton.setImageResource(R.drawable.clear_sky);
+       }else if(desc.equals("clouds")||desc.equals("overcast clouds")){
+           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
+
+       }else if(desc.equals("scattered clouds")){
            newWeatherButton.setImageResource(R.drawable.few_clouds);
 
-       }else if(main.equals("scattered clouds")){
-           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
+       }else if(desc.equals("broken clouds")||main.equals("Clouds")){
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
 
-       }else if(main.equals("broken clouds")){
-           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
-
-       }else if(main.equals("shower rain")){
+       }else if(desc.equals("shower rain")||main.equals("Rain")){
            newWeatherButton.setImageResource(R.drawable.shower_rain);
 
-       }else if(main.equals("rain")){
+       }else if(desc.equals("rain")||main.equals("Drizzle")){
            newWeatherButton.setImageResource(R.drawable.rain);
 
-       }else if(main.equals("thunderstorm")){
+       }else if(desc.equals("thunderstorm")||main.equals("Thunderstorm")){
            newWeatherButton.setImageResource(R.drawable.thunder_storm);
 
-       }else if(main.equals("snow")){
+       }else if(desc.equals("snow")||main.equals("Snow")){
            newWeatherButton.setImageResource(R.drawable.snow);
 
-       }else if(main.equals("mist")){
+       }else if(desc.equals("mist")){
            newWeatherButton.setImageResource(R.drawable.mist);
 
        }else {
