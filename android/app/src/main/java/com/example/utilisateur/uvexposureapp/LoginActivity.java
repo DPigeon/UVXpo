@@ -86,11 +86,25 @@ public class LoginActivity extends AppCompatActivity {
         newregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RegisterUserFragment dialog = new RegisterUserFragment();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("hasInternet", haveNetworkConnection());
-                dialog.setArguments(bundle);
-                dialog.show(getSupportFragmentManager(), "RegisterUserFragment");
+                try
+                {
+                    if (haveNetworkConnection())
+                    {
+                        RegisterUserFragment dialog = new RegisterUserFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("hasInternet", haveNetworkConnection());
+                        dialog.setArguments(bundle);
+                        dialog.show(getSupportFragmentManager(), "RegisterUserFragment");
+                    }
+                    else
+                    {
+                        Toast.makeText(LoginActivity.this, "Internet required for registration.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                catch (Exception e){
+                    Log.d("Exception", e.toString());
+                }
+
             }
         });
 

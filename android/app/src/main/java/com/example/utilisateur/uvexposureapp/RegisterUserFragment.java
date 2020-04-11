@@ -1,7 +1,10 @@
 package com.example.utilisateur.uvexposureapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -20,6 +23,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.ThrowOnExtraProperties;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -92,98 +96,100 @@ public class RegisterUserFragment extends DialogFragment {
                 int ivalueForStatement = -1;
 
                 List<User> usernameCheck = dbhelper.getAllUserData();
+                try { //Try to see if internet is connected, if not then exception
 
-                if (registerusername.equals("")) /**IF USERNAME IS NULL*/
-                {
+                    if (haveNetworkConnection()) {  //registration can only happen with internet
+                        if (registerusername.equals("")) /**IF USERNAME IS NULL*/ {
 
-                    usernameinputEditText.setText(null);
-                    passwordinputEditText.setText(null);
-                    confirmpassinputEditText.setText(null);
-                    newusercheck = false;
-                    Toast.makeText(getActivity(), "Username cannot be blank.", Toast.LENGTH_SHORT).show();
-                }
-                else if (registerpassword.equals("") || registerconfirmpassword.equals("")) /**IF ANY OF THE PASSWORDS ARE NULL*/
-                {
+                            usernameinputEditText.setText(null);
+                            passwordinputEditText.setText(null);
+                            confirmpassinputEditText.setText(null);
+                            newusercheck = false;
+                            Toast.makeText(getActivity(), "Username cannot be blank.", Toast.LENGTH_SHORT).show();
+                        } else if (registerpassword.equals("") || registerconfirmpassword.equals("")) /**IF ANY OF THE PASSWORDS ARE NULL*/ {
 
-                    passwordinputEditText.setText(null);
-                    confirmpassinputEditText.setText(null);
-                    newusercheck = false;
-                    Toast.makeText(getActivity(), "Passwords cannot be blank.", Toast.LENGTH_SHORT).show();
-                }
-                else if (getpasslength < 8) /**IF PASSWORD LENGTH IS LESS THAN 8 CHARACTERS*/
-                {
-                    passwordinputEditText.setText(null);
-                    confirmpassinputEditText.setText(null);
-                    newusercheck = false;
-                    Toast.makeText(getActivity(), "Password has to be 8 or more characters.", Toast.LENGTH_SHORT).show();
-                }
-                else if (!registerpassword.equals(registerconfirmpassword))
-                {
+                            passwordinputEditText.setText(null);
+                            confirmpassinputEditText.setText(null);
+                            newusercheck = false;
+                            Toast.makeText(getActivity(), "Passwords cannot be blank.", Toast.LENGTH_SHORT).show();
+                        } else if (getpasslength < 8) /**IF PASSWORD LENGTH IS LESS THAN 8 CHARACTERS*/ {
+                            passwordinputEditText.setText(null);
+                            confirmpassinputEditText.setText(null);
+                            newusercheck = false;
+                            Toast.makeText(getActivity(), "Password has to be 8 or more characters.", Toast.LENGTH_SHORT).show();
+                        } else if (!registerpassword.equals(registerconfirmpassword)) {
 
-                    confirmpassinputEditText.setText(null);
-                    newusercheck = false;
-                    Toast.makeText(getActivity(), "Passwords don't match.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    if (!hasInternet) {
-                        for (int i = 0; i < usernameCheck.size(); i++) {
-                            if (usernameCheck.get(i).getUsername().equals(registerusername)) { /**CHECKS IF USERNAME IS TAKEN*/
-                                usernameinputEditText.setText(null);
-                                passwordinputEditText.setText(null);
-                                confirmpassinputEditText.setText(null);
-                                ivalueForStatement = i; /**IF IT IS, THEN VALUE OF THIS INT WILL CHANGE FROM -1 to i*/
-                                newusercheck = false;
-                                Toast.makeText(getActivity(), "Username is taken.", Toast.LENGTH_SHORT).show();
-                            }
+                            confirmpassinputEditText.setText(null);
+                            newusercheck = false;
+                            Toast.makeText(getActivity(), "Passwords don't match.", Toast.LENGTH_SHORT).show();
                         }
-                        if (registerconfirmpassword.equals(registerpassword) && ivalueForStatement == -1) {   /**IF THE PASSWORDS MATCH, AND INT is -1 WHICH MEANS THAT USERNAME ISNT TAKEN*/
-                            dbhelper.insertUser(new User(registerusername, registerpassword, 0, 0, true, true));
-                            //(String username, String password, int age, ArrayList<UV> uv, int skin, boolean notifications)
-                            getDialog().dismiss();
-                            newusercheck = true;
-                            Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
-                            intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
-                            intent.removeExtra("username");
-                            intent.putExtra("checknewuser", newusercheck);
-                            intent.putExtra("username", registerusername);
-                            startActivity(intent);
-                            Toast.makeText(getActivity(), "Confirmed! Setup your preferences!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                        else { //only with Online registration, includes local database addition
+                            final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
 
-                        // Checks if user is already registered
-                        // If not registered, add it to the database
-                        users.whereEqualTo("username", registerusername).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    if (task.getResult().getDocuments().isEmpty()) { // Username does not exist
-                                        User user = new User(registerusername, registerpassword, 0, 0, true, true);
-                                        users.add(user); // Add a new user value
+                            // Checks if user is already registered
+                            // If not registered, add it to the database
+                            users.whereEqualTo("username", registerusername).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if (task.getResult().getDocuments().isEmpty()) { // Username does not exist
+                                            User user = new User(registerusername, registerpassword, 0, 0, true, true);
+                                            //for online Firebase registration
 
-                                        getDialog().dismiss();
-                                        Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
-                                        intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
-                                        intent.removeExtra("username");
-                                        intent.putExtra("checknewuser", true);
-                                        intent.putExtra("username", registerusername);
-                                        startActivity(intent);
-                                        Toast.makeText(getActivity(), "Confirmed! Setup your preferences!", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    } else {
-                                        Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
+                                            users.add(user); // Add a new user value on online firebase
+
+                                            dbhelper.insertUser(new User(registerusername, registerpassword, 0, 0, true, true));
+                                            //adds account to local database
+
+
+                                            getDialog().dismiss();
+                                            Intent intent = new Intent(getActivity(), UserActivity.class); /**STARTS NEW ACTIVITY*/
+                                            intent.removeExtra("checknewuser"); /**PASSES ON USERNAME, NEWUSERCHECK */
+                                            intent.removeExtra("username");
+                                            intent.putExtra("checknewuser", true);
+                                            intent.putExtra("username", registerusername);
+                                            startActivity(intent);
+                                            Toast.makeText(getActivity(), "Confirmed! Setup your preferences!", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        } else {
+                                            Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
+                                    Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
                                 }
-                                Toast.makeText(getActivity(), "Username already exists!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                            });
+                        }
                     }
+                    else //if no internet, toast message says internet is required and fragment closes
+                    {
+                        Toast.makeText(getActivity(), "Registration interrupted by network disconnection.", Toast.LENGTH_SHORT).show();
+                        getDialog().dismiss();
+                    }
+                }
+                catch (Exception exception){ //if there is an error in the catch
+                    Log.d("Error:", exception.toString());
+
                 }
             }
 
         });
 
         return view;
+    }
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 }
