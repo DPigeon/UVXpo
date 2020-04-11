@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore fireStore;
 
     protected TextView welcomeUserTextView;
-    protected Button weatherButton, graphButton, settingsButton, faqButton;
+    protected Button  graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
     String usernameIntentExtra;
@@ -163,17 +163,11 @@ public class MainActivity extends AppCompatActivity {
         setupAction();
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
-        weatherButton = findViewById(R.id.weatherButton);
+
         newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
-        weatherButton.setText("Get Current Weather Data");
-        weatherbutton();
-        weatherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToActivity(WeatherActivity.class);
-            }
-        });
+         weatherbutton();
+
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
