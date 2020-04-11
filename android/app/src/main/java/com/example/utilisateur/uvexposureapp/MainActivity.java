@@ -174,11 +174,11 @@ public class MainActivity extends AppCompatActivity {
                 goToActivity(WeatherActivity.class);
             }
         });
-        newWeatherButton.setOnContextClickListener(new View.OnContextClickListener() {
+        newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onContextClick(View v) {
+            public void onClick(View v) {
                 goToActivity(WeatherActivity.class);
-                return false;
+
             }
         });
         graphButton.setOnClickListener(new View.OnClickListener() {
