@@ -35,8 +35,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_1;
@@ -386,5 +391,42 @@ public class MainActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
+   void weatherbutton(){
+        String main = "";
+       Weather weather = new Weather();
+       try {
+           String content = weather.execute(WeatherActivity.weatherInfo()).get();
+           if (content != null) {
+               JSONObject jsonObject = new JSONObject(content);
+               String weatherData = jsonObject.getString("weather");
+               JSONArray array = new JSONArray(weatherData);
+
+
+               String temperature = "";
+               temperature = jsonObject.getString("main");
+
+               for (int i = 0; i < array.length(); i++) {
+                   JSONObject weatherPt = array.getJSONObject(i);
+                   main = weatherPt.getString("main");
+               }
+
+
+
+           }
+       } catch (ExecutionException e) {
+           e.printStackTrace();
+       } catch (InterruptedException e) {
+           e.printStackTrace();
+       } catch (JSONException e) {
+           e.printStackTrace();
+       }
+
+
+
+
+   }
+
+
 
 }
