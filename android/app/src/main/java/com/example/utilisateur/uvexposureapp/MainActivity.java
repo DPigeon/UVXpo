@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 goToActivity(WeatherActivity.class);
 
             }
@@ -422,10 +422,6 @@ public class MainActivity extends AppCompatActivity {
                String weatherData = jsonObject.getString("weather");
                JSONArray array = new JSONArray(weatherData);
 
-
-               String temperature = "";
-               temperature = jsonObject.getString("main");
-
                for (int i = 0; i < array.length(); i++) {
                    JSONObject weatherPt = array.getJSONObject(i);
                    main = weatherPt.getString("main");
@@ -469,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
            newWeatherButton.setImageResource(R.drawable.mist);
 
        }else {
-           main.equals("few clouds");
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
        }
 
 

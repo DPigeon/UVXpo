@@ -180,14 +180,14 @@ public class WeatherActivity extends AppCompatActivity {
             statuspic.setImageResource(R.drawable.mist);
 
         }else {
-            main.equals("few clouds");
+            statuspic.setImageResource(R.drawable.few_clouds);
         }
 
 
     }
 
     static String weatherInfo() {
-        String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=b6907d289e10d714a6e88b30761fae22";
+        String URL = "https://openweathermap.org/data/2.5/weather?q="+cityName+","+"ca"+"&appid=9978eaf01e5cdf06792a0e803cefe0a7";
         return URL;
     }
 
