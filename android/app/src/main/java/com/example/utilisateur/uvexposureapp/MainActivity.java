@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         try {
             checkInternetForUpdates();
-            Toast.makeText(this, "Updating Info Offline to Online", Toast.LENGTH_SHORT).show();
         }
         catch(Exception e){
             Log.d("Error:", e.toString());
@@ -136,13 +135,29 @@ public class MainActivity extends AppCompatActivity {
 
         /* Tutorial */
         try {
-            if (newusercheck == true) {
+            DatabaseHelper dbhelper = new DatabaseHelper(this);
+            List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
+            boolean newOfflineCheck = false;
+            int ivalue = -1;
+            if (!haveNetworkConnection()) {
+                for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
+                    if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
+                        newusercheck = tutorialNewUserCheck.get(i).getNewUser();
+                        ivalue = i;
+                    }
+                }
+            }
+
+            if (newusercheck || newOfflineCheck) {
                 TutorialFragment dialog = new TutorialFragment();
                 dialog.show(getSupportFragmentManager(), "TutorialFragment");
                 newusercheck = false;
                 // Below here we update database newUser field
                 if (!haveNetworkConnection()) { // Offline changes for tutorial
-
+                    String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
+                    dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
+                            tutorialNewUserCheck.get(ivalue).getPassword(),tutorialNewUserCheck.get(ivalue).getAge(), tutorialNewUserCheck.get(ivalue).getSkin(),
+                            tutorialNewUserCheck.get(ivalue).getNotifications(), false);
                 }
                 else { // Online
                     final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
@@ -156,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
                             }
+
                         }
                     });
                 }

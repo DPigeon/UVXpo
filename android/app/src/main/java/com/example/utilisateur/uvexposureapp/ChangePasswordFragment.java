@@ -1,6 +1,9 @@
 package com.example.utilisateur.uvexposureapp;
 
+import android.content.Context;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Gravity;
@@ -89,7 +92,7 @@ public class ChangePasswordFragment extends DialogFragment {
                 final String confirmpass = confirmpassEditText.getText().toString();
                 String databasePassword = null;
 
-                if (!hasInternet) { // Offline
+                if (haveNetworkConnection()) { // Offline
                     dbhelper = new DatabaseHelper(getActivity());
                     userInfo = dbhelper.getAllUserData();
                     for (int i = 0; i < userInfo.size(); i++) {
@@ -112,55 +115,50 @@ public class ChangePasswordFragment extends DialogFragment {
                         Toast.makeText(getActivity(), "That is not your old password. Try Again.", Toast.LENGTH_SHORT).show();
 
                     }
-                    if (oldpass.equals("") || newpass.equals("") || currentpassEditText.equals(""))
-                    {
+                    if (oldpass.equals("") || newpass.equals("") || currentpassEditText.equals("")) {
                         currentpassEditText.setText(null);
                         newpassEditText.setText(null);
                         confirmpassEditText.setText(null);
                         Toast.makeText(getActivity(), "Entries can't be blank.", Toast.LENGTH_SHORT).show();
 
-                    }
-                    else if (newpass.length() < 8)
-                    {
+                    } else if (newpass.length() < 8) {
                         currentpassEditText.setText(null);
                         newpassEditText.setText(null);
                         confirmpassEditText.setText(null);
                         Toast.makeText(getActivity(), "New password must be 8 or more characters.", Toast.LENGTH_SHORT).show();
 
-                    }
-                    else if (!newpass.equals(confirmpass))
-                    {
+                    } else if (!newpass.equals(confirmpass)) {
                         currentpassEditText.setText(null);
                         newpassEditText.setText(null);
                         confirmpassEditText.setText(null);
                         Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        dbhelper.updateData(userID, userUsername, newpass, ageInteger, skin_type, userNotifications, newUser);
-                        getDialog().dismiss();
-                        Toast.makeText(getActivity(), "Password Changed!", Toast.LENGTH_SHORT).show();
-                    }
-                } else { // Online
-                    final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
-                    users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document_user : task.getResult()) {
-                                    String oldPassword = document_user.getData().get("password").toString(); // Getting old password
-                                    if (currentpassEditText.getText().toString().equals(oldPassword) && newpassEditText.getText().toString().equals(confirmpassEditText.getText().toString())) { // old passes matches and new too
-                                        users.document(document_user.getId()).update("password", confirmpassEditText.getText().toString());
-                                        getDialog().dismiss();
-                                        Toast.makeText(getActivity(), "Password Changed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Online
+                        final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                        users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                        String oldPassword = document_user.getData().get("password").toString(); // Getting old password
+                                        if (currentpassEditText.getText().toString().equals(oldPassword) && newpassEditText.getText().toString().equals(confirmpassEditText.getText().toString())) { // old passes matches and new too
+                                            users.document(document_user.getId()).update("password", confirmpassEditText.getText().toString());
+                                            dbhelper.updateData(userID, userUsername, confirmpassEditText.getText().toString(), ageInteger, skin_type, userNotifications, newUser);
+                                            getDialog().dismiss();
+                                            Toast.makeText(getActivity(), "Password Changed", Toast.LENGTH_SHORT).show();
+                                        } else
+                                            Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
                                     }
-                                    else
-                                        Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                Toast.makeText(getActivity(), "Passwords don't match. Try Again.", Toast.LENGTH_SHORT).show();
                             }
-                        }
-                    });
+                        });
+                    }
+                }
+                else{
+                    Toast.makeText(getActivity(), "Password cannot be changed while not connected to internet.", Toast.LENGTH_SHORT).show();
+                    getDialog().dismiss();
                 }
             }
         });
@@ -174,5 +172,22 @@ public class ChangePasswordFragment extends DialogFragment {
         });
 
         return view;
+    }
+
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 }

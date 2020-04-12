@@ -20,17 +20,18 @@ public class TutorialFragment extends DialogFragment {
     protected TextView instructionsTextView;
     protected Button continuestepsButton;
     protected int i;
+    Window window;
+    Point size;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tutorial, container, false);
-
+        getDialog().setCanceledOnTouchOutside(false);
         instructionsTextView = view.findViewById(R.id.informationTextView);
         continuestepsButton = view.findViewById(R.id.gotitButton);
         instructionsTextView.setText("Hello! Welcome to the app that lets you see your UV exposure!");
         i = 0;
-
 
         continuestepsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +51,7 @@ public class TutorialFragment extends DialogFragment {
                     else if (i == 2)
                     {
                         instructionsTextView.setText(("The Graph Exposure Button allows for you to see your UV " +
-                                "exposure over time. You can see any UV exposure over any specific date ").toString());
+                                "exposure over time. You can see any UV exposure over any specific date.").toString());
                         i++;
                     }
                     else if (i == 3)

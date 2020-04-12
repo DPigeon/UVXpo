@@ -83,7 +83,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
                 else { // Online, no internet
-                    
                     loginOnline(usernameEditText.getText().toString(), passwordEditText.getText().toString());
                 }
             }
@@ -143,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("username", username);
         intent.putExtra("password", password);
         intent.putExtra("checknewuser", newUserCheck);
+
         Toast.makeText(LoginActivity.this, "Logged In!", Toast.LENGTH_SHORT).show();
         startActivity(intent); /**if correct, open mainactivity*/
         finish();
@@ -161,25 +161,27 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+
+
                     if (!task.getResult().getDocuments().isEmpty() && task.getResult().getDocuments().get(0).getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password)) { // If user exists and password matches
                         Boolean checkNewUser = Boolean.valueOf(task.getResult().getDocuments().get(0).getData().get("newUser").toString());
                         proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), checkNewUser);
 
+                        boolean userInLocalDB = false;   //THIS FOR LOOP CHECKS IF USER ACCOUNT IS IN LOCAL, AND IF NOT THEN ADDS IT TO LOCAL
 
-                        boolean userInLocalDB = false;
                         for (int i = 0; i < userLocalDBCheck.size(); i++)
                         {
                             if (username.equals(userLocalDBCheck.get(i).getUsername())){
                                 userInLocalDB = true;
                             }
                         }
+
                         if (!userInLocalDB){
                             int age = Integer.parseInt(task.getResult().getDocuments().get(0).getData().get("age").toString());
                             int skin = Integer.parseInt(task.getResult().getDocuments().get(0).getData().get("skin").toString());
 
                             dbhelperCheck.insertUser(new User(username, password, age, skin, true, true));
                         }
-                        return;
                     }
                 }
                 else {
