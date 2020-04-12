@@ -374,6 +374,11 @@ public class UserActivity extends AppCompatActivity {
 
     public void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(UserActivity.this, page); // from the main activity to the profile class
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newuserregcheck);
         startActivity(intent);
         /**I JUST SET IT TO MAIN ACTIVITY FOR NOW BUT IT SHOULD BE CHANGED TO THE HOME INTERFACE*/
     }

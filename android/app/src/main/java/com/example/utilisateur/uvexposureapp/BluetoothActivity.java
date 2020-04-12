@@ -42,6 +42,10 @@ public class BluetoothActivity extends AppCompatActivity {
     ToggleButton scanButton;
     TextView pairedTextView;
 
+    String usernameIntent;
+    String passwordIntent;
+    Boolean newuserregcheck;
+
     BluetoothAdapter bluetoothAdapter;
     protected ArrayAdapter adapter;
     protected ArrayAdapter adapter2;
@@ -64,6 +68,15 @@ public class BluetoothActivity extends AppCompatActivity {
         availableDevices = new ArrayList<BluetoothDevice>();
         pairedDevices = new ArrayList<BluetoothDevice>();
 
+        try {
+            Bundle bndset = getIntent().getExtras();
+            newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
+            usernameIntent = bndset.getString("username");
+            passwordIntent = bndset.getString("password");
+        } catch (Exception exception) {
+            Log.d("Error: ", exception.toString());
+        }
+
         setupUI();
     }
 
@@ -81,7 +94,12 @@ public class BluetoothActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, UserActivity.class);
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newuserregcheck);
         startActivity(intent);
     }
 
