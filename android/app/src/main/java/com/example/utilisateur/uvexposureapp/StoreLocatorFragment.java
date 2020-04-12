@@ -1,7 +1,10 @@
 package com.example.utilisateur.uvexposureapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,12 +47,35 @@ public class StoreLocatorFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_store_locator, container, false);
 
-        Bundle coordinates = getArguments();
-        currentLatitude = coordinates.getString("lat");
-        currentLongtitude = coordinates.getString("long");
+            if (haveNetworkConnection()) {
+                try {
 
-        setupUI(view);
-        getNearestStores(currentLatitude, currentLongtitude);
+
+                    Bundle coordinates = getArguments();
+                    currentLatitude = coordinates.getString("lat");
+                    currentLongtitude = coordinates.getString("long");
+
+                    setupUI(view);
+                    getNearestStores(currentLatitude, currentLongtitude);
+                }
+                catch(Exception exception){
+                    Log.d("Error:", exception.toString());
+                    getDialog().dismiss();
+
+                }
+            }
+            else{
+                stores.add("There is no internet connection, cannot load stores.");
+                cancelButton = view.findViewById(R.id.locatorStoreCancelButton);
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        getDialog().dismiss();
+                    }
+                });
+            }
+
+
 
         return view;
     }
@@ -122,5 +148,22 @@ public class StoreLocatorFragment extends DialogFragment {
         window.setGravity(Gravity.CENTER);
         super.onResume();
 
+    }
+
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 }

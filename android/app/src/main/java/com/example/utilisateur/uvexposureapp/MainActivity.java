@@ -37,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
     String usernameIntentExtra;
     String passwordIntent;
     Boolean newusercheck;
+
+    String usernameOffline = null;
+    String passwordOffline = null;
+    int ageOffline = 0;
+    int skinOffline = 0;
+    boolean notifsOffline = true;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -89,21 +96,30 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
-
-        /* Testing the storeLocatorFragment */
-        String latitude = "45.4968913";
-        String longitude = "-73.5830253";
-        StoreLocatorFragment dialog = new StoreLocatorFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("lat", latitude);
-        bundle.putString("long", longitude);
-        dialog.setArguments(bundle);
-        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
+        if (haveNetworkConnection()) {
+            /* Testing the storeLocatorFragment */
+            String latitude = "45.4968913";
+            String longitude = "-73.5830253";
+            StoreLocatorFragment dialog = new StoreLocatorFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("lat", latitude);
+            bundle.putString("long", longitude);
+            dialog.setArguments(bundle);
+            dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        try {
+            checkInternetForUpdates();
+            Toast.makeText(this, "Updating Info Offline to Online", Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e){
+            Log.d("Error:", e.toString());
+        }
+
         try {
             String profileName = sharedPreferencesHelper.getProfile().getUsername();
 
@@ -116,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         } catch(Exception exception) {
             Log.d("Error: ", exception.toString());
         }
+
 
         /* Tutorial */
         try {
@@ -163,18 +180,21 @@ public class MainActivity extends AppCompatActivity {
         weatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkInternetForUpdates();
                 goToActivity(WeatherActivity.class);
             }
         });
         graphButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkInternetForUpdates();
                 goToActivity(GraphActivity.class);
             }
         });
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkInternetForUpdates();
                 Intent intent = new Intent(MainActivity.this, UserActivity.class);
                 intent.removeExtra("username");
                 intent.removeExtra("checknewuser");
@@ -188,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         faqButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkInternetForUpdates();
                 openFaqWebsite(view);
             }
         });
@@ -402,5 +423,45 @@ public class MainActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
+
+    public void checkInternetForUpdates(){
+        try {
+            if (haveNetworkConnection()) {
+                String profileName = sharedPreferencesHelper.getProfile().getUsername();
+                DatabaseHelper dbhelper = new DatabaseHelper(this);
+                List<User> userLocaltoOnline = dbhelper.getAllUserData();
+                final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+
+
+                for (int i = 0; i < userLocaltoOnline.size(); i++) {
+                    if (profileName.equals(userLocaltoOnline.get(i).getUsername())) {
+                        usernameOffline = userLocaltoOnline.get(i).getUsername();
+                        passwordOffline = userLocaltoOnline.get(i).getPassword();
+                        ageOffline = userLocaltoOnline.get(i).getAge();
+                        skinOffline = userLocaltoOnline.get(i).getSkin();
+                        notifsOffline = userLocaltoOnline.get(i).getNotifications();
+                    }
+                }
+
+                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, profileName).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                users.document(document_user.getId()).update("notifications", notifsOffline, "password", passwordOffline);
+                                users.document(document_user.getId()).update("age", ageOffline,  "skin", skinOffline);
+                            }
+
+                        }
+                    }
+                });
+            }
+        }
+        catch(Exception exception){
+            Log.d("Exception: ", exception.toString());
+        }
+    }
+
 
 }
