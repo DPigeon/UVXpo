@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     Boolean newusercheck;
     LocationManager locationManager;
     String latitude, longitude;
+    Boolean storeLocationShown = false; // we show only once
     protected ImageButton newWeatherButton;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
@@ -347,6 +348,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void showStoreLocator() {
+        if (!storeLocationShown) {
+            StoreLocatorFragment dialog = new StoreLocatorFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("lat", latitude);
+            bundle.putString("long", longitude);
+            dialog.setArguments(bundle);
+            dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
+            storeLocationShown = true;
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif() {
     Notification notifications = new NotificationCompat.Builder(this,CHANNELID_1)
@@ -355,15 +368,6 @@ public class MainActivity extends AppCompatActivity {
             .setContentText("Stay in shade, apply sunscreen and wear sunglasses!")
             .build();
         notificationManagerCompat.notify(1,notifications);
-    }
-
-    public void showStoreLocator() {
-        StoreLocatorFragment dialog = new StoreLocatorFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("lat", latitude);
-        bundle.putString("long", longitude);
-        dialog.setArguments(bundle);
-        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
     }
 
     public void channel2Notif() {
