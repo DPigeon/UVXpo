@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.ExecutionException;
 
 public class WeatherActivity extends AppCompatActivity {
@@ -65,6 +66,8 @@ public class WeatherActivity extends AppCompatActivity {
                 }
                 JSONObject temp = new JSONObject(temperature);
                 temps = temp.getString("temp");
+                double x = Double.parseDouble(temps)-273.15;
+                temps = String.valueOf(new DecimalFormat("#.##").format(x));
                 setupUI(main,desc,temps);                         //setup ui
 
             }
@@ -124,6 +127,8 @@ public class WeatherActivity extends AppCompatActivity {
                         }
                         JSONObject temp = new JSONObject(temperature);
                         temps = temp.getString("temp");
+                        double x = Double.parseDouble(temps)-273.15;
+                        temps = String.valueOf(new DecimalFormat("#.##").format(x));
                         setupUI(main,desc,temps);
 
                     }
@@ -179,7 +184,7 @@ public class WeatherActivity extends AppCompatActivity {
     static String weatherInfo() {
 
 
-        String URL = "http://openweathermap.org/data/2.5/weather?q="+cityName+",ca&appid=439d4b804bc8187953eb36d2a8c26a02";
+        String URL = "https://api.openweathermap.org/data/2.5/weather?q="+cityName+",ca&appid=9978eaf01e5cdf06792a0e803cefe0a7";
         return URL;
     }
 }
