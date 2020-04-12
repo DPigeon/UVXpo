@@ -122,18 +122,6 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
-
-        if (haveNetworkConnection()) {
-            /* Testing the storeLocatorFragment */
-            String latitude = "45.4968913";
-            String longitude = "-73.5830253";
-            StoreLocatorFragment dialog = new StoreLocatorFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("lat", latitude);
-            bundle.putString("long", longitude);
-            dialog.setArguments(bundle);
-            dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
-        }
     }
 
     @Override
@@ -397,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showStoreLocator() {
-        if (!storeLocationShown) {
+        if (!storeLocationShown && haveNetworkConnection()) { // Showing once and with internet
             StoreLocatorFragment dialog = new StoreLocatorFragment();
             Bundle bundle = new Bundle();
             bundle.putString("lat", latitude);
@@ -579,9 +567,6 @@ public class MainActivity extends AppCompatActivity {
        }else {
            newWeatherButton.setImageResource(R.drawable.few_clouds);
        }
-
-
-
    }
 
     private void getLocation(){
