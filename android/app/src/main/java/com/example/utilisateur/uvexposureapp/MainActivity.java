@@ -3,6 +3,7 @@ package com.example.utilisateur.uvexposureapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -18,7 +19,10 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -68,7 +72,10 @@ public class MainActivity extends AppCompatActivity {
     String usernameIntentExtra;
     String passwordIntent;
     Boolean newusercheck;
+    LocationManager locationManager;
+    String latitude, longitude;
     protected ImageButton newWeatherButton;
+
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         setupUI();
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //Check if GPS or on or not
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            /// write function to enable GPS
+            OnGPS();
+        }
+        else {
+            //gps is already on
+            getLocation();
+        }
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
         fireStore = FirebaseFirestore.getInstance();
@@ -95,16 +114,6 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
-
-        /* Testing the storeLocatorFragment */
-        String latitude = "45.4968913";
-        String longitude = "-73.5830253";
-        StoreLocatorFragment dialog = new StoreLocatorFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("lat", latitude);
-        bundle.putString("long", longitude);
-        dialog.setArguments(bundle);
-        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
     }
 
     @Override
@@ -348,6 +357,15 @@ public class MainActivity extends AppCompatActivity {
         notificationManagerCompat.notify(1,notifications);
     }
 
+    public void showStoreLocator() {
+        StoreLocatorFragment dialog = new StoreLocatorFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("lat", latitude);
+        bundle.putString("long", longitude);
+        dialog.setArguments(bundle);
+        dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
+    }
+
     public void channel2Notif() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
                 .setSmallIcon(R.drawable.ic_sentiment_satisfied_black_24dp)
@@ -364,8 +382,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         notificationManagerCompat.notify(2,notifications);
 
-        // Opens a fragment that proposes you store around you with sunscreen?
-        // ADD StoreLocatorFragment HERE
+        // Opens a fragment that proposes you store around you with sunscreen
+        showStoreLocator();
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
@@ -476,6 +494,60 @@ public class MainActivity extends AppCompatActivity {
 
    }
 
+    private void getLocation(){
 
+        //check permission again
+        if (ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
 
+        {
+            ActivityCompat.requestPermissions(this,new String[]
+                    {Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
+        }
+
+        else{
+            android.location.Location LocationGps=locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+            android.location.Location LocationNetwork=locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+            android.location.Location LocationPassive=locationManager.getLastKnownLocation(locationManager.PASSIVE_PROVIDER);
+
+            if(LocationGps!=null){
+                double lat=LocationGps.getLatitude();
+                double longi=LocationGps.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else if(LocationNetwork!=null){
+                double lat=LocationNetwork.getLatitude();
+                double longi=LocationNetwork.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else if(LocationPassive!=null){
+                double lat=LocationPassive.getLatitude();
+                double longi=LocationPassive.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else{
+
+                Toast.makeText(this,"Can't get your location",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void OnGPS(){
+
+        final AlertDialog.Builder builder= new AlertDialog.Builder(this);
+        builder.setMessage("Enable GPS").setCancelable(false).setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        final AlertDialog alertDialog=builder.create();
+        alertDialog.show();
+    }
 }

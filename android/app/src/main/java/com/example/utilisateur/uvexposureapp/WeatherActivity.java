@@ -27,7 +27,6 @@ public class WeatherActivity extends AppCompatActivity {
     protected TextView montreal;
     protected TextView Status;
     protected ListView citiesView;
-    protected Button locationButton;
     protected ImageView statuspic;
     static String cityName = "Montreal";
     String main = "";
@@ -91,16 +90,6 @@ public class WeatherActivity extends AppCompatActivity {
         Weather.setText("Description: "+desc+"\n"+"Temperature: "+temps);
         Status.setText("Status: "+ main +"\n");
         montreal.setText(cityName);
-        locationButton = findViewById(R.id.Location);
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                open(view);
-            }
-        });
-
-
-
     }
     void cityList() {
         final String[] cities = {"   Montreal", "   Vancouver", "   Toronto", "   Calgary", "   Edmonton","   Quebec"};
@@ -193,12 +182,5 @@ public class WeatherActivity extends AppCompatActivity {
         String URL = "http://openweathermap.org/data/2.5/weather?q="+cityName+",ca&appid=439d4b804bc8187953eb36d2a8c26a02";
         return URL;
     }
-
-    //////to open location activity///
-    public void  open(View view) {
-        Intent intent= new Intent(this, Location.class);
-        startActivity(intent);
-    }
-
 }
 
