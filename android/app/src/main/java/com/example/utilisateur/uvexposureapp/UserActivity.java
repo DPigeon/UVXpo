@@ -100,7 +100,7 @@ public class UserActivity extends AppCompatActivity {
         userInfoAllData = dbhelper.getData();
         userInfo = dbhelper.getAllUserData();
 
-
+        //set calendar format for date of birth entry once user inputs age
         date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -111,11 +111,11 @@ public class UserActivity extends AppCompatActivity {
                 getDOBmonth = month;
                 getDOByear = year;
                 ageChecker = getAge(getDOByear, getDOBmonth, getDOBday);
-                Toast.makeText(UserActivity.this, "Age is " + ageChecker, Toast.LENGTH_SHORT).show();
+
                 updateLabel();
             }
         };
-
+        //opens calendar format for user input
         editTextAge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +123,7 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+        //attempt to grab bundle intents sent by previous activity
         try {
             Bundle bndset = getIntent().getExtras();
             newuserregcheck = bndset.getBoolean("checknewuser"); /**INTENT RETRIEVAL*/
@@ -132,11 +133,11 @@ public class UserActivity extends AppCompatActivity {
             Log.d("Error: ", exception.toString());
         }
 
-        if (newuserregcheck == false) /**IF USER IS NOT NEW DATA WILL BE ADDED TO OBJECTS*/
+        if (!newuserregcheck) /**IF USER IS NOT NEW DATA WILL BE ADDED TO OBJECTS*/
         {
 
             //setAllValues();
-            if (!haveNetworkConnection()) { // Local, offline
+            if (!haveNetworkConnection()) { // Local, offline db fetch for user info
                 for (int i = 0; i < userInfo.size(); i++) {
                     if (userInfo.get(i).getUsername().equals(usernameIntent)) {
                         int numintcheck = userInfo.get(i).getAge();
@@ -148,7 +149,7 @@ public class UserActivity extends AppCompatActivity {
                         Toast.makeText(UserActivity.this, "Accessed User Account " + usernameIntent + " Age " + numintcheck + " Skin " +  userInfo.get(i).getSkin() +  " Notifs " + userInfo.get(i).getNotifications(), Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else { // Online
+            } else { // Online db fetch for user info
                 CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
                 users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -218,7 +219,8 @@ public class UserActivity extends AppCompatActivity {
                                         goBackToLogin();
                                 }
                             }
-                        } else { // Online
+                        }
+                        else { // Online
                             final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
                             users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntent).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
@@ -227,6 +229,21 @@ public class UserActivity extends AppCompatActivity {
                                         for (QueryDocumentSnapshot document_user : task.getResult()) {
                                             users.document(document_user.getId()).update("notifications", getNotifs());
                                             users.document(document_user.getId()).update("age", ageChecker, "skin", getSkinType());
+
+                                            List<User> userAgeChange = dbhelper.getAllUserData();
+                                            for (int i = 0; i < userAgeChange.size(); i++) {
+                                                if (userAgeChange.get(i).getUsername().equals(document_user.getData().get("username").toString())) {
+
+                                                    String userID = Integer.toString(userAgeChange.get(i).getUserId());
+                                                    String userUsername = userAgeChange.get(i).getUsername();
+                                                    String userPassword = userAgeChange.get(i).getPassword();
+                                                    int ageInteger = ageChecker;
+                                                    int skin_type = getSkinType();
+                                                    boolean userNotifications = getNotifs();
+                                                    boolean newUser = userAgeChange.get(i).getNewUser();
+                                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newUser);
+                                                }
+                                            }
                                         }
                                     } else {
                                         Toast.makeText(UserActivity.this, "Invalid Age and/or Skin Type", Toast.LENGTH_SHORT).show();
@@ -247,22 +264,6 @@ public class UserActivity extends AppCompatActivity {
                         }
                     }
                 }
-
-
-                /**THE FUNCTION BELOW IS TO CHECK FOR NOTIFICATION ON OFF CHANGES*/
-                notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked == true)
-                        {
-                            /**WE NEED TO CREATE NOTIFICATIONS MANAGER FIRST, TO ENABLE OR DISABLE IT*/
-                        }
-                        else
-                        {
-                            /**WE NEED TO CREATE NOTIFICATIONS MANAGER FIRST, TO ENABLE OR DISABLE IT*/
-                        }
-                    }
-                });
 
             }
         });
@@ -292,17 +293,31 @@ public class UserActivity extends AppCompatActivity {
             setAllObjectsTrue();
         }
         else if (menuId == R.id.setTutorialOn) {
+            int offlineTutorial = -1;
+            for (int i = 0; i < userInfo.size(); i++){
+                if (usernameIntent.equals(userInfo.get(i).getUsername())){
+                    offlineTutorial = i;
+                }
+            }
+            dbhelper.updateData(Integer.toString(userInfo.get(offlineTutorial).getUserId()), userInfo.get(offlineTutorial).getUsername(),
+                    userInfo.get(offlineTutorial).getPassword(), userInfo.get(offlineTutorial).getAge(),userInfo.get(offlineTutorial).getSkin(),
+                    userInfo.get(offlineTutorial).getNotifications(),true);
             newuserregcheck = true;
             changeActivityWithIntent();
         }
         else if (menuId == R.id.EditUserPassword) {
-            ChangePasswordFragment dialog = new ChangePasswordFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("username", usernameIntent);
-            bundle.putString("password", passwordIntent);
-            bundle.putBoolean("hasInternet", haveNetworkConnection());
-            dialog.setArguments(bundle);
-            dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+            if (haveNetworkConnection()) {
+                ChangePasswordFragment dialog = new ChangePasswordFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", usernameIntent);
+                bundle.putString("password", passwordIntent);
+                bundle.putBoolean("hasInternet", haveNetworkConnection());
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(), "ChangePasswordFragment");
+            }
+            else{
+                Toast.makeText(this, "Internet is required for password change.", Toast.LENGTH_SHORT).show();
+            }
         }
         else if (menuId == R.id.userLogOut) {
             Intent intent = new Intent(this, LoginActivity.class);

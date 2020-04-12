@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     String persistentUsername;
     String persistentPassword;
     Boolean persistentCheckNewUser;
+    DatabaseHelper dbhelperCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText.setText(null);
         fireStore = FirebaseFirestore.getInstance();
         sharedPreferencesHelper = new SharedPreferencesHelper(LoginActivity.this);
+
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Invalid Username.", Toast.LENGTH_SHORT).show();
                     }
                     else if (ivalueCheck == -1) {
-                        Toast.makeText(LoginActivity.this, "No username with that account.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "No account found, either because its not registered or not on your device.", Toast.LENGTH_SHORT).show();
                     }
                     else if (userIDcheck.get(ivalueCheck).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(ivalueCheck).getPassword().equals(passwordEditText.getText().toString()))
                     {
@@ -79,18 +81,34 @@ public class LoginActivity extends AppCompatActivity {
                     else {
                         Toast.makeText(LoginActivity.this, "Invalid Password.", Toast.LENGTH_SHORT).show();
                     }
-                } else // Online, no internet
+                }
+                else { // Online, no internet
                     loginOnline(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                }
             }
         });
         newregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RegisterUserFragment dialog = new RegisterUserFragment();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("hasInternet", haveNetworkConnection());
-                dialog.setArguments(bundle);
-                dialog.show(getSupportFragmentManager(), "RegisterUserFragment");
+                try
+                {
+                    if (haveNetworkConnection())
+                    {
+                        RegisterUserFragment dialog = new RegisterUserFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("hasInternet", haveNetworkConnection());
+                        dialog.setArguments(bundle);
+                        dialog.show(getSupportFragmentManager(), "RegisterUserFragment");
+                    }
+                    else
+                    {
+                        Toast.makeText(LoginActivity.this, "Internet required for registration.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                catch (Exception e){
+                    Log.d("Exception", e.toString());
+                }
+
             }
         });
 
@@ -124,13 +142,16 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("username", username);
         intent.putExtra("password", password);
         intent.putExtra("checknewuser", newUserCheck);
+
         Toast.makeText(LoginActivity.this, "Logged In!", Toast.LENGTH_SHORT).show();
         startActivity(intent); /**if correct, open mainactivity*/
         finish();
     }
 
-    public void loginOnline(String username, final String password) {
+    public void loginOnline(final String username, final String password) {
         CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+        dbhelperCheck = new DatabaseHelper(this);
+        final List<User> userLocalDBCheck = dbhelperCheck.getAllUserData();
         // We look if username and password matches at same time
         Query query;
         query = users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, username);
@@ -140,10 +161,27 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+
+
                     if (!task.getResult().getDocuments().isEmpty() && task.getResult().getDocuments().get(0).getData().get(DatabaseConfig.COLUMN_PASSWORD).toString().equals(password)) { // If user exists and password matches
                         Boolean checkNewUser = Boolean.valueOf(task.getResult().getDocuments().get(0).getData().get("newUser").toString());
                         proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), checkNewUser);
-                        return;
+
+                        boolean userInLocalDB = false;   //THIS FOR LOOP CHECKS IF USER ACCOUNT IS IN LOCAL, AND IF NOT THEN ADDS IT TO LOCAL
+
+                        for (int i = 0; i < userLocalDBCheck.size(); i++)
+                        {
+                            if (username.equals(userLocalDBCheck.get(i).getUsername())){
+                                userInLocalDB = true;
+                            }
+                        }
+
+                        if (!userInLocalDB){
+                            int age = Integer.parseInt(task.getResult().getDocuments().get(0).getData().get("age").toString());
+                            int skin = Integer.parseInt(task.getResult().getDocuments().get(0).getData().get("skin").toString());
+
+                            dbhelperCheck.insertUser(new User(username, password, age, skin, true, true));
+                        }
                     }
                 }
                 else {
