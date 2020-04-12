@@ -3,6 +3,7 @@ package com.example.utilisateur.uvexposureapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -18,7 +19,10 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -27,6 +31,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,9 +42,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 import static com.example.utilisateur.uvexposureapp.Notifications.CHANNELID_1;
@@ -57,12 +67,16 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore fireStore;
 
     protected TextView welcomeUserTextView;
-    protected Button weatherButton, graphButton, settingsButton, faqButton;
+    protected Button  graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
     String TAG = "MainActivity";
     String usernameIntentExtra;
     String passwordIntent;
     Boolean newusercheck;
+    LocationManager locationManager;
+    String latitude, longitude;
+    Boolean storeLocationShown = false; // we show only once
+    protected ImageButton newWeatherButton;
 
     String usernameOffline = null;
     String passwordOffline = null;
@@ -78,6 +92,18 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
         setupUI();
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //Check if GPS or on or not
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            /// write function to enable GPS
+            OnGPS();
+        }
+        else {
+            //gps is already on
+            getLocation();
+        }
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
         fireStore = FirebaseFirestore.getInstance();
@@ -96,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
         connectAndListen();
         notificationManagerCompat = NotificationManagerCompat.from(this);
+
         if (haveNetworkConnection()) {
             /* Testing the storeLocatorFragment */
             String latitude = "45.4968913";
@@ -190,14 +217,16 @@ public class MainActivity extends AppCompatActivity {
         setupAction();
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
-        weatherButton = findViewById(R.id.weatherButton);
+
+        newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
-        weatherButton.setText("Get Current Weather Data");
-        weatherButton.setOnClickListener(new View.OnClickListener() {
+        weatherbutton();
+        newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkInternetForUpdates();
                 goToActivity(WeatherActivity.class);
+
             }
         });
         graphButton.setOnClickListener(new View.OnClickListener() {
@@ -367,6 +396,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void showStoreLocator() {
+        if (!storeLocationShown) {
+            StoreLocatorFragment dialog = new StoreLocatorFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("lat", latitude);
+            bundle.putString("long", longitude);
+            dialog.setArguments(bundle);
+            dialog.show(getSupportFragmentManager(), "StoreLocatorFragment");
+            storeLocationShown = true;
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void channel1Notif() {
     Notification notifications = new NotificationCompat.Builder(this,CHANNELID_1)
@@ -393,8 +434,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         notificationManagerCompat.notify(2,notifications);
 
-        // Opens a fragment that proposes you store around you with sunscreen?
-        // ADD StoreLocatorFragment HERE
+        // Opens a fragment that proposes you store around you with sunscreen
+        showStoreLocator();
     }
     public void channel2Notifhigh() {
         Notification notifications = new NotificationCompat.Builder(this,CHANNELID_2)
@@ -439,8 +480,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
-
-
+  
     public void checkInternetForUpdates(){
         try {
             if (haveNetworkConnection()) {
@@ -479,5 +519,125 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+   void weatherbutton(){
+        String main = "clear sky";
+    String desc = "rain";
 
+       Weather weather = new Weather();
+       try {
+           String content = weather.execute(WeatherActivity.weatherInfo()).get();
+           //Log.i("contentData", content);
+           if (content != null) {
+               JSONObject jsonObject = new JSONObject(content);
+
+               String weatherData = jsonObject.getString("weather");
+               //Log.i("WeatherData",weatherData);
+               JSONArray array = new JSONArray(weatherData);
+               for (int i = 0; i < array.length(); i++) {
+                   JSONObject weatherPt = array.getJSONObject(i);
+                   main = weatherPt.getString("main");
+                   desc = weatherPt.getString("description");
+
+               }}}
+    catch (InterruptedException e) {
+                   e.printStackTrace();
+               } catch (ExecutionException e) {
+                   e.printStackTrace();
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
+
+
+
+
+       if (desc.equals("clear sky")){                                                 //Deals with the image view depending on what the status is outside
+           newWeatherButton.setImageResource(R.drawable.clear_sky);
+       }else if(desc.equals("clouds")||desc.equals("overcast clouds")){
+           newWeatherButton.setImageResource(R.drawable.scattered_clouds);
+
+       }else if(desc.equals("scattered clouds")){
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
+
+       }else if(desc.equals("broken clouds")||main.equals("Clouds")){
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
+
+       }else if(desc.equals("shower rain")||main.equals("Rain")){
+           newWeatherButton.setImageResource(R.drawable.shower_rain);
+
+       }else if(desc.equals("rain")||main.equals("Drizzle")){
+           newWeatherButton.setImageResource(R.drawable.rain);
+
+       }else if(desc.equals("thunderstorm")||main.equals("Thunderstorm")){
+           newWeatherButton.setImageResource(R.drawable.thunder_storm);
+
+       }else if(desc.equals("snow")||main.equals("Snow")){
+           newWeatherButton.setImageResource(R.drawable.snow);
+
+       }else if(desc.equals("mist")){
+           newWeatherButton.setImageResource(R.drawable.mist);
+
+       }else {
+           newWeatherButton.setImageResource(R.drawable.few_clouds);
+       }
+
+
+
+   }
+
+    private void getLocation(){
+
+        //check permission again
+        if (ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&ActivityCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED)
+
+        {
+            ActivityCompat.requestPermissions(this,new String[]
+                    {Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
+        }
+
+        else{
+            android.location.Location LocationGps=locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+            android.location.Location LocationNetwork=locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+            android.location.Location LocationPassive=locationManager.getLastKnownLocation(locationManager.PASSIVE_PROVIDER);
+
+            if(LocationGps!=null){
+                double lat=LocationGps.getLatitude();
+                double longi=LocationGps.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else if(LocationNetwork!=null){
+                double lat=LocationNetwork.getLatitude();
+                double longi=LocationNetwork.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else if(LocationPassive!=null){
+                double lat=LocationPassive.getLatitude();
+                double longi=LocationPassive.getLongitude();
+                latitude= String.valueOf(lat);
+                longitude=String.valueOf(longi);
+            }
+            else{
+
+                Toast.makeText(this,"Can't get your location",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void OnGPS(){
+
+        final AlertDialog.Builder builder= new AlertDialog.Builder(this);
+        builder.setMessage("Enable GPS").setCancelable(false).setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        final AlertDialog alertDialog=builder.create();
+        alertDialog.show();
+    }
 }
