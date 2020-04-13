@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         DatabaseHelper dbhelper = new DatabaseHelper(this);
         List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
-        String newuserOffline = "";
         int ivalue = -1;
 
 
@@ -157,25 +156,22 @@ public class MainActivity extends AppCompatActivity {
         /* Tutorial */
         try {
 
-            if (!haveNetworkConnection()) {
+            if (newusercheck && !haveNetworkConnection()) {
                 for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
                     if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
-                        newuserOffline = String.valueOf(tutorialNewUserCheck.get(i).getNewUser());
-                        Toast.makeText(this, String.valueOf(tutorialNewUserCheck.get(i).getNewUser()), Toast.LENGTH_SHORT).show();
                         ivalue = i;
                     }
                 }
-                if (newuserOffline.equals("true")) {
                     TutorialFragment dialog = new TutorialFragment();
                     dialog.show(getSupportFragmentManager(), "TutorialFragment");
-
+                    newusercheck = false;
                     String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
                     dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
                             tutorialNewUserCheck.get(ivalue).getPassword(), tutorialNewUserCheck.get(ivalue).getAge(),
-                            tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), false);
-                }
+                            tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), newusercheck);
+
             }
-            if (newusercheck && haveNetworkConnection()){
+            else if (newusercheck && haveNetworkConnection()){
                 TutorialFragment dialog = new TutorialFragment();
                 dialog.show(getSupportFragmentManager(), "TutorialFragment");
                 newusercheck = false;

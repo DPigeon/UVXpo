@@ -159,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     int skincolorShow = cursor.getInt(cursor.getColumnIndex(DatabaseConfig.COLUMN_SKIN_TYPE));
                     String notifShow = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_NOTIF));
                     String newuser = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_NEW_USER));
-                    boolean newuserShow = false;
+                    boolean newuserShow = Boolean.parseBoolean(newuser);
                     boolean notifShowSwitch = true;
 
                     if (newuser.equals("true"))
@@ -201,7 +201,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         String notifs = Boolean.toString(notifications);
-        String newuserString = Boolean.toString(new_user);
+        String newuserString = String.valueOf(new_user);
         Integer idCheck = Integer.getInteger(id);
 
         values.put(DatabaseConfig.COLUMN_USERNAME, username);

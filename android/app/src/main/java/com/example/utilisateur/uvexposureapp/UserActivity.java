@@ -233,7 +233,6 @@ public class UserActivity extends AppCompatActivity {
                                             List<User> userAgeChange = dbhelper.getAllUserData();
                                             for (int i = 0; i < userAgeChange.size(); i++) {
                                                 if (userAgeChange.get(i).getUsername().equals(document_user.getData().get("username").toString())) {
-
                                                     String userID = Integer.toString(userAgeChange.get(i).getUserId());
                                                     String userUsername = userAgeChange.get(i).getUsername();
                                                     String userPassword = userAgeChange.get(i).getPassword();
@@ -241,7 +240,7 @@ public class UserActivity extends AppCompatActivity {
                                                     int skin_type = getSkinType();
                                                     boolean userNotifications = getNotifs();
                                                     boolean newUser = userAgeChange.get(i).getNewUser();
-                                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newUser);
+                                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newuserregcheck);
                                                 }
                                             }
                                         }
@@ -294,15 +293,6 @@ public class UserActivity extends AppCompatActivity {
             setAllObjectsTrue();
         }
         else if (menuId == R.id.setTutorialOn) {
-            int offlineTutorial = -1;
-            for (int i = 0; i < userInfo.size(); i++){
-                if (usernameIntent.equals(userInfo.get(i).getUsername())){
-                    offlineTutorial = i;
-                }
-            }
-            dbhelper.updateData(Integer.toString(userInfo.get(offlineTutorial).getUserId()), userInfo.get(offlineTutorial).getUsername(),
-                    userInfo.get(offlineTutorial).getPassword(), userInfo.get(offlineTutorial).getAge(),userInfo.get(offlineTutorial).getSkin(),
-                    userInfo.get(offlineTutorial).getNotifications(),true);
             newuserregcheck = true;
             changeActivityWithIntent();
         }
