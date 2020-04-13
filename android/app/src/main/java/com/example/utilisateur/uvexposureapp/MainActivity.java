@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     protected SharedPreferencesHelper sharedPreferencesHelper;
     FirebaseFirestore fireStore;
 
+    TextView test;
+
     protected TextView welcomeUserTextView;
     protected Button  graphButton, settingsButton, faqButton;
     String FaqURL = "https://www.ccohs.ca/oshanswers/phys_agents/ultravioletradiation.html?fbclid=IwAR05zwUhYrQqcc0bNr-nSeWcbN7J1LUsjgW3K7Bs5oT49s_O9XrgfFpZybY";
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        test = findViewById(R.id.textView);
         setupUI();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -376,51 +379,51 @@ public class MainActivity extends AppCompatActivity {
         uvIndicator.setImageResource(R.drawable.uv_none);
 
         // From http://educ8s.tv/arduino-uv-meter-project/ with converting of 3.3V output
-        if (voltage < 33) {
+        if (voltage < 5) {
             uvIndex = 0;
             uvIndicator.setImageResource(R.drawable.uv_none);
         }
-        else if (voltage > 33 && voltage <= 150){
+        else if (voltage > 5 && voltage <= 33){
             uvIndex = 1;
             uvIndicator.setImageResource(R.drawable.uv_low);
         }
-        else if (voltage > 150 && voltage <= 210) {
+        else if (voltage > 33 && voltage <= 150) {
             uvIndex = 2;
             uvIndicator.setImageResource(R.drawable.uv_medium);
         }
-        else if (voltage > 210 && voltage <= 269) {
+        else if (voltage > 150 && voltage <= 210) {
             uvIndex = 3;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 269 && voltage <= 332) {
+        else if (voltage > 210 && voltage <= 269) {
             uvIndex = 4;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 332 && voltage <= 400) {
+        else if (voltage > 269 && voltage <= 332) {
             uvIndex = 5;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 400 && voltage <= 459) {
+        else if (voltage > 332 && voltage <= 400) {
             uvIndex = 6;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 459 && voltage <= 525) {
+        else if (voltage > 400 && voltage <= 459) {
             uvIndex = 7;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 525 && voltage <= 581) {
+        else if (voltage > 459 && voltage <= 525) {
             uvIndex = 8;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 581 && voltage <= 644) {
+        else if (voltage > 525 && voltage <= 681) {
             uvIndex = 9;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 644 && voltage <= 712) {
+        else if (voltage > 581 && voltage <= 644) {
             uvIndex = 10;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        else if (voltage > 712) {
+        else if (voltage > 644) {
             uvIndex = 11;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
@@ -436,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (uvIndex > 11) {
             channel2Notifextremelyhigh();
         }
+        //test.setText("Voltage: " + String.valueOf(voltage) + "\n" + "UV Index: " + String.valueOf(uvIndex));
     }
 
     public void showStoreLocator() {
