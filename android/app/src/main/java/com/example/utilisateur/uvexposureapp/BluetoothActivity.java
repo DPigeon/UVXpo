@@ -65,6 +65,7 @@ public class BluetoothActivity extends AppCompatActivity {
         pairedDevices = new ArrayList<BluetoothDevice>();
 
         setupUI();
+        getSupportActionBar().setTitle(" ");
     }
 
     @Override

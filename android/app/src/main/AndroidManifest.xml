@@ -22,7 +22,8 @@
             android:value="AIzaSyCIM243Sx8Gp-7dDvkeyiaYAKreWGv87E8"/>
         <activity
             android:name=".UserActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity"
+            android:enabled="true"></activity>
         <activity
             android:name=".MainActivity"
             android:parentActivityName=".LoginActivity"

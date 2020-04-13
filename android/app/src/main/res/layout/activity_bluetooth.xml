@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BluetoothActivity">
+    tools:context=".BluetoothActivity"
+    android:background="@color/lightBlue">
 
     <Button
         android:id="@+id/toggleButton"
         style="@style/Widget.AppCompat.Button"
+        android:background="@drawable/rounded_button_blue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="148dp"
-        android:background="#3F51B5"
         android:text="Turn On"
         android:textColor="#F5F6F8"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Bluetooth Settings"
-        android:textColor="#3F51B5"
+        android:textColor="#FFFFFF"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,10 +46,10 @@
 
     <ToggleButton
         android:id="@+id/scanButton"
+        android:background="@drawable/rounded_button_blue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="216dp"
-        android:background="#3F51B5"
         android:text="Scanning..."
         android:textColor="#F6F7F8"
         android:textOff="Scan"
