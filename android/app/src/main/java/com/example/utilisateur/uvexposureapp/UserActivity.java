@@ -233,7 +233,6 @@ public class UserActivity extends AppCompatActivity {
                                             List<User> userAgeChange = dbhelper.getAllUserData();
                                             for (int i = 0; i < userAgeChange.size(); i++) {
                                                 if (userAgeChange.get(i).getUsername().equals(document_user.getData().get("username").toString())) {
-
                                                     String userID = Integer.toString(userAgeChange.get(i).getUserId());
                                                     String userUsername = userAgeChange.get(i).getUsername();
                                                     String userPassword = userAgeChange.get(i).getPassword();
@@ -241,7 +240,7 @@ public class UserActivity extends AppCompatActivity {
                                                     int skin_type = getSkinType();
                                                     boolean userNotifications = getNotifs();
                                                     boolean newUser = userAgeChange.get(i).getNewUser();
-                                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newUser);
+                                                    dbhelper.updateData(userID, userUsername, userPassword, ageInteger, skin_type, userNotifications, newuserregcheck);
                                                 }
                                             }
                                         }
@@ -290,18 +289,10 @@ public class UserActivity extends AppCompatActivity {
         int menuId = item.getItemId();
         if (menuId == R.id.EditUserProfileItem) { // If we click on the ... button
             Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
+            editTextAge.setText(null);
             setAllObjectsTrue();
         }
         else if (menuId == R.id.setTutorialOn) {
-            int offlineTutorial = -1;
-            for (int i = 0; i < userInfo.size(); i++){
-                if (usernameIntent.equals(userInfo.get(i).getUsername())){
-                    offlineTutorial = i;
-                }
-            }
-            dbhelper.updateData(Integer.toString(userInfo.get(offlineTutorial).getUserId()), userInfo.get(offlineTutorial).getUsername(),
-                    userInfo.get(offlineTutorial).getPassword(), userInfo.get(offlineTutorial).getAge(),userInfo.get(offlineTutorial).getSkin(),
-                    userInfo.get(offlineTutorial).getNotifications(),true);
             newuserregcheck = true;
             changeActivityWithIntent();
         }
@@ -374,6 +365,11 @@ public class UserActivity extends AppCompatActivity {
 
     public void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(UserActivity.this, page); // from the main activity to the profile class
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newuserregcheck);
         startActivity(intent);
         /**I JUST SET IT TO MAIN ACTIVITY FOR NOW BUT IT SHOULD BE CHANGED TO THE HOME INTERFACE*/
     }

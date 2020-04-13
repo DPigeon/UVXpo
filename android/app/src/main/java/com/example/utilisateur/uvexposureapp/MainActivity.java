@@ -127,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        DatabaseHelper dbhelper = new DatabaseHelper(this);
+        List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
+        int ivalue = -1;
+
+
         try {
             checkInternetForUpdates();
         }
@@ -150,46 +155,41 @@ public class MainActivity extends AppCompatActivity {
 
         /* Tutorial */
         try {
-            DatabaseHelper dbhelper = new DatabaseHelper(this);
-            List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
-            boolean newOfflineCheck = false;
-            int ivalue = -1;
-            if (!haveNetworkConnection()) {
+
+            if (newusercheck && !haveNetworkConnection()) {
                 for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
                     if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
-                        newusercheck = tutorialNewUserCheck.get(i).getNewUser();
                         ivalue = i;
                     }
                 }
-            }
+                    TutorialFragment dialog = new TutorialFragment();
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    newusercheck = false;
+                    String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
+                    dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
+                            tutorialNewUserCheck.get(ivalue).getPassword(), tutorialNewUserCheck.get(ivalue).getAge(),
+                            tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), newusercheck);
 
-            if (newusercheck || newOfflineCheck) {
+            }
+            else if (newusercheck && haveNetworkConnection()){
                 TutorialFragment dialog = new TutorialFragment();
                 dialog.show(getSupportFragmentManager(), "TutorialFragment");
                 newusercheck = false;
-                // Below here we update database newUser field
-                if (!haveNetworkConnection()) { // Offline changes for tutorial
-                    String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
-                    dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
-                            tutorialNewUserCheck.get(ivalue).getPassword(),tutorialNewUserCheck.get(ivalue).getAge(), tutorialNewUserCheck.get(ivalue).getSkin(),
-                            tutorialNewUserCheck.get(ivalue).getNotifications(), false);
-                }
-                else { // Online
-                    final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
-                    users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntentExtra).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document_user : task.getResult()) {
-                                    users.document(document_user.getId()).update("newUser", newusercheck);
-                                }
-                            } else {
-                                Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
-                            }
 
+                final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntentExtra).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                users.document(document_user.getId()).update("newUser", newusercheck);
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
                         }
-                    });
-                }
+
+                    }
+                });
             }
         } catch (Exception exception) {
             Log.d("New User Check", exception.toString());

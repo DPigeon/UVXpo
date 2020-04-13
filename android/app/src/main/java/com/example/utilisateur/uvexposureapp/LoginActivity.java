@@ -76,7 +76,8 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     else if (userIDcheck.get(ivalueCheck).getUsername().equals(usernameEditText.getText().toString()) && userIDcheck.get(ivalueCheck).getPassword().equals(passwordEditText.getText().toString()))
                     {
-                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), userIDcheck.get(ivalueCheck).getNewUser());
+                        Boolean newuser = Boolean.valueOf(userIDcheck.get(ivalueCheck).getNewUser());
+                        proceedLogin(usernameEditText.getText().toString(), passwordEditText.getText().toString(), newuser);
                     }
                     else {
                         Toast.makeText(LoginActivity.this, "Invalid Password.", Toast.LENGTH_SHORT).show();
