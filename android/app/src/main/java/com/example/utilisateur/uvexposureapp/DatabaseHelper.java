@@ -161,6 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     String newuser = cursor.getString(cursor.getColumnIndex(DatabaseConfig.COLUMN_NEW_USER));
                     boolean newuserShow = false;
                     boolean notifShowSwitch = true;
+
                     if (newuser.equals("true"))
                     {
                         newuserShow = true;

@@ -290,6 +290,7 @@ public class UserActivity extends AppCompatActivity {
         int menuId = item.getItemId();
         if (menuId == R.id.EditUserProfileItem) { // If we click on the ... button
             Toast.makeText(this, "Edit Mode Enabled", Toast.LENGTH_SHORT).show();
+            editTextAge.setText(null);
             setAllObjectsTrue();
         }
         else if (menuId == R.id.setTutorialOn) {
