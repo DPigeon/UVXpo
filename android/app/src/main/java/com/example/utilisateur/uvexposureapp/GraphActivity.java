@@ -366,6 +366,8 @@ public class GraphActivity extends AppCompatActivity {
         double y = Double.parseDouble(data);
         double weight = 0.20;
         double filterEWMA = (1-weight)*previousY + weight*y;
+        DataPoint point = new DataPoint(currentTime, filterEWMA);
+        liveValues[counter] = point;
         series.appendData(new DataPoint(currentTime, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
         addDataToDatabase(currentTime, filterEWMA, LocalDate.now());
         counter = counter + 1; // Increment by 1
