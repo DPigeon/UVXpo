@@ -363,12 +363,15 @@ public class GraphActivity extends AppCompatActivity {
     protected void buildLiveExposureGraph(String data) {
         Date today = new Date();
         double currentTime = today.getTime();
+        Log.d("hi:", data);
         double x = counter; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
         double weight = 0.20;
         double filterEWMA = (1-weight)*previousY + weight*y;
+
         DataPoint point = new DataPoint(currentTime, filterEWMA);
         liveValues[counter] = point;
+
         series.appendData(new DataPoint(currentTime, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
         addDataToDatabase(currentTime, filterEWMA, LocalDate.now());
         counter = counter + 1; // Increment by 1
