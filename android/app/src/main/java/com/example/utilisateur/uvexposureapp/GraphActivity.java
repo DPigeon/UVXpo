@@ -38,6 +38,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -249,7 +250,7 @@ public class GraphActivity extends AppCompatActivity {
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         graph.getGridLabelRenderer().setNumHorizontalLabels(3);
         graph.getGridLabelRenderer().setNumVerticalLabels(5);
-        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time"); // 5t is 5 times the actual time to reject fluctuations
@@ -359,15 +360,14 @@ public class GraphActivity extends AppCompatActivity {
     double previousY = 0;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
-        // Calendar calendar = Calendar.getInstance();
-        // Date date = Calendar.getTime();
-        // calendar.add(Calendar.DATE, 1);
+        Date today = new Date();
+        double currentTime = today.getTime();
         double x = counter; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
         double weight = 0.20;
         double filterEWMA = (1-weight)*previousY + weight*y;
-        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
-        addDataToDatabase(x, filterEWMA, LocalDate.now());
+        series.appendData(new DataPoint(currentTime, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
+        addDataToDatabase(currentTime, filterEWMA, LocalDate.now());
         counter = counter + 1; // Increment by 1
         previousY = y;
     }
