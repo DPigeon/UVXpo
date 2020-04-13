@@ -245,7 +245,7 @@ public class GraphActivity extends AppCompatActivity {
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time"); // 5t is 5 times the actual time to reject fluctuations
-        gridLabel.setVerticalAxisTitle("Intensity (mW/cm^2)");
+        gridLabel.setVerticalAxisTitle("UV Exposure");
     }
 
     public void fetchUVDataByDate(final String date) {
@@ -307,7 +307,9 @@ public class GraphActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
                         double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
                         double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
-                        DataPoint point = new DataPoint(x, y);
+                        double weight = 0.50;
+                        double filterEWMA = (1-weight)*previousY + weight*y;
+                        DataPoint point = new DataPoint(x, filterEWMA);
                         newPoints[newCounter] = point;
                         series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
                         newCounter = newCounter + 1;
