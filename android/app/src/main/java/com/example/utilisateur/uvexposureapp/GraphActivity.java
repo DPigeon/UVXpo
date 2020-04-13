@@ -28,14 +28,18 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -64,6 +68,7 @@ public class GraphActivity extends AppCompatActivity {
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
     Menu menu;
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +247,9 @@ public class GraphActivity extends AppCompatActivity {
         series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        graph.getGridLabelRenderer().setNumVerticalLabels(5);
+        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
         gridLabel.setHorizontalAxisTitle("Time"); // 5t is 5 times the actual time to reject fluctuations
@@ -307,9 +315,7 @@ public class GraphActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document_uv_data : task.getResult()) { // Fetch every point and create new series
                         double x = Double.parseDouble(document_uv_data.getData().get("uvTime").toString());
                         double y = Double.parseDouble(document_uv_data.getData().get("uv").toString());
-                        double weight = 0.50;
-                        double filterEWMA = (1-weight)*previousY + weight*y;
-                        DataPoint point = new DataPoint(x, filterEWMA);
+                        DataPoint point = new DataPoint(x, y);
                         newPoints[newCounter] = point;
                         series.appendData(new DataPoint(point.getX(), point.getY()), false, maxLivePoints);
                         newCounter = newCounter + 1;
@@ -353,20 +359,13 @@ public class GraphActivity extends AppCompatActivity {
     double previousY = 0;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
-        double x = counter / 10; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
+        // Calendar calendar = Calendar.getInstance();
+        // Date date = Calendar.getTime();
+        // calendar.add(Calendar.DATE, 1);
+        double x = counter; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
-        //double filteredY = 0;
-        //filteredY = lowPass(y, filteredY); // filtering
-        //Log.d("y:", String.valueOf(y));
         double weight = 0.20;
         double filterEWMA = (1-weight)*previousY + weight*y;
-
-        //filteredY = averageValue(previousY, y);
-        //Log.d("yFilter:", String.valueOf(filteredY));
-
-        DataPoint point = new DataPoint(x, filterEWMA);
-        liveValues[counter] = point;
-
         series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
         addDataToDatabase(x, filterEWMA, LocalDate.now());
         counter = counter + 1; // Increment by 1
@@ -411,7 +410,7 @@ public class GraphActivity extends AppCompatActivity {
         else if (voltage > 712)
             uvIndex = "11";
 
-        uvIndexTextView.setText("UV Index: " + uvIndex);
+        uvIndexTextView.setText("UV Index (0-11): " + uvIndex);
     }
 
     //The Arduino Map function but for doubles for UV intensity
