@@ -427,17 +427,18 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 11;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-
-        if  (uvIndex >=1 && uvIndex <= 2){
-            channel2Notifmedium();
-        } else if (uvIndex > 2 &&uvIndex <= 5) {
-            channel2Notifhigh();
-        } else if (uvIndex > 5&& uvIndex <=7) {
-            channel2Notifhigh();
-        } else if (uvIndex > 7&&uvIndex <= 10) {
-            channel2Notifveryhigh();
-        } else if (uvIndex > 11) {
-            channel2Notifextremelyhigh();
+        if (UserActivity.flag == true) {
+            if (uvIndex >= 1 && uvIndex <= 2) {
+                channel2Notifmedium();
+            } else if (uvIndex > 2 && uvIndex <= 5) {
+                channel2Notifhigh();
+            } else if (uvIndex > 5 && uvIndex <= 7) {
+                channel2Notifhigh();
+            } else if (uvIndex > 7 && uvIndex <= 10) {
+                channel2Notifveryhigh();
+            } else if (uvIndex > 11) {
+                channel2Notifextremelyhigh();
+            }
         }
         //test.setText("Voltage: " + String.valueOf(voltage) + "\n" + "UV Index: " + String.valueOf(uvIndex));
     }
