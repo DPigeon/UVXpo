@@ -2,13 +2,18 @@ package com.example.utilisateur.uvexposureapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActionBar;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -174,6 +179,7 @@ public class UserActivity extends AppCompatActivity {
             }
             setAllObjectsFalse();
 
+            getSupportActionBar().setTitle("App Settings");
         }
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -501,5 +507,6 @@ public class UserActivity extends AppCompatActivity {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
 
 }

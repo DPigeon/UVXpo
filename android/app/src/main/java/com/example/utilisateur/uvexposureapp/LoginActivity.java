@@ -132,8 +132,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     protected void setupAction() { // No action bar for the main activity
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
+        //ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayHomeAsUpEnabled(false);
     }
 
     public void proceedLogin(String username, String password, Boolean newUserCheck) {

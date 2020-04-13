@@ -78,6 +78,7 @@ public class BluetoothActivity extends AppCompatActivity {
         }
 
         setupUI();
+        getSupportActionBar().setTitle(" ");
     }
 
     @Override
