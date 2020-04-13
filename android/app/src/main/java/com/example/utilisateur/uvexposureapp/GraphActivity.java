@@ -351,20 +351,22 @@ public class GraphActivity extends AppCompatActivity {
     double previousY = 0;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
-        double x = counter / 2; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
+        double x = counter / 10; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
-        double filteredY = 0;
+        //double filteredY = 0;
         //filteredY = lowPass(y, filteredY); // filtering
         //Log.d("y:", String.valueOf(y));
+        double weight = 0.20;
+        double filterEWMA = (1-weight)*previousY + weight*y;
 
-        filteredY = averageValue(previousY, y);
-        Log.d("yFilter:", String.valueOf(filteredY));
+        //filteredY = averageValue(previousY, y);
+        //Log.d("yFilter:", String.valueOf(filteredY));
 
-        DataPoint point = new DataPoint(x, filteredY);
+        DataPoint point = new DataPoint(x, filterEWMA);
         liveValues[counter] = point;
 
-        series.appendData(new DataPoint(liveValues[counter].getX() / 5, liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
-        addDataToDatabase(x / 5, filteredY, LocalDate.now());
+        series.appendData(new DataPoint(liveValues[counter].getX(), liveValues[counter].getY()), false, maxLivePoints); // Send new data to the graph with 5 times less in time to get real time
+        addDataToDatabase(x, filterEWMA, LocalDate.now());
         counter = counter + 1; // Increment by 1
         previousY = y;
     }
