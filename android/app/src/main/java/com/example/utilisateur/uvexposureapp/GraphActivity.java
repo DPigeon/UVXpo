@@ -374,7 +374,7 @@ public class GraphActivity extends AppCompatActivity {
         counter = counter + 1; // Increment by 1
         previousY = y;
     }
-
+    
     protected String convertVoltageToIntensity(double data) {
         double voltage = (data * 3.3) / 1023; // Convert analog values to voltage out of 3.3V (should be done on arduino side later)
         double intensity = mapIntensity(voltage, 0, 2.8, 0.0, 15.0); // Mapping from 0V at 0 mW/cm^2 and from 2.8V max to 15 mW/cm^2
