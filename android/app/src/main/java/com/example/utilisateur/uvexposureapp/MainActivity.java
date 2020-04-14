@@ -136,7 +136,28 @@ public class MainActivity extends AppCompatActivity {
     float x1, y1, x2, y2;
     @Override
     public boolean onTouchEvent(MotionEvent touchEvent) {
-        if (!newusercheck) {
+        try {
+            if (!newusercheck) {
+                switch (touchEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x1 = touchEvent.getX();
+                        y1 = touchEvent.getY();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        x2 = touchEvent.getX();
+                        y2 = touchEvent.getY();
+                        if (y1 >= y2) {
+                            checkInternetForUpdates();
+                            Intent i = new Intent(MainActivity.this, GraphActivity.class);
+                            startActivity(i);
+                            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                        }
+                        break;
+                }
+            }
+        }
+        catch(Exception e){
+            Log.d("Error: ", e.toString());
             switch (touchEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     x1 = touchEvent.getX();
@@ -146,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                     x2 = touchEvent.getX();
                     y2 = touchEvent.getY();
                     if (y1 >= y2) {
+                        checkInternetForUpdates();
                         Intent i = new Intent(MainActivity.this, GraphActivity.class);
                         startActivity(i);
                         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
@@ -159,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
 
         try {
             checkInternetForUpdates();
@@ -210,13 +231,24 @@ public class MainActivity extends AppCompatActivity {
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                checkInternetForUpdates();
-                if (newusercheck) {
-                    tutorialChecker();
+                try{
+                    if (newusercheck) {
+                        try {
+                            tutorialChecker();
+                        }
+                        catch(Exception e){
+                            Log.d("Error: ", e.toString());
+                        }
+                    }
+                    else{
+                        checkInternetForUpdates();
+                        goToActivity(WeatherActivity.class);
+                    }
                 }
-                else{
-                goToActivity(WeatherActivity.class);
+                catch(Exception e){
+                    Log.d("Error: ", e.toString());
+                    checkInternetForUpdates();
+                    goToActivity(WeatherActivity.class);
                 }
 
             }
@@ -224,11 +256,21 @@ public class MainActivity extends AppCompatActivity {
         graphButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkInternetForUpdates();
-                if (newusercheck) {
-                    tutorialChecker();
+                try {
+                    if (newusercheck) {
+                        try {
+                            tutorialChecker();
+                        } catch (Exception e) {
+                            Log.d("Error: ", e.toString());
+                        }
+                    } else {
+                        checkInternetForUpdates();
+                        goToActivity(GraphActivity.class);
+                    }
                 }
-                else {
+                catch(Exception e){
+                    Log.d("Error: ", e.toString());
+                    checkInternetForUpdates();
                     goToActivity(GraphActivity.class);
                 }
             }
@@ -236,11 +278,27 @@ public class MainActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkInternetForUpdates();
-                if (newusercheck) {
-                    tutorialChecker();
+                try {
+                    if (newusercheck) {
+                        try {
+                            tutorialChecker();
+                        } catch (Exception e) {
+                            Log.d("Error: ", e.toString());
+                        }
+                    } else {
+                        checkInternetForUpdates();
+                        Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                        intent.removeExtra("username");
+                        intent.removeExtra("checknewuser");
+                        intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+                        intent.putExtra("password", passwordIntent);
+                        intent.putExtra("checknewuser", newusercheck);
+                        startActivity(intent);
+                    }
                 }
-                else {
+                catch(Exception e){
+                    Log.d("Error: ", e.toString());
+                    checkInternetForUpdates();
                     Intent intent = new Intent(MainActivity.this, UserActivity.class);
                     intent.removeExtra("username");
                     intent.removeExtra("checknewuser");
@@ -255,11 +313,21 @@ public class MainActivity extends AppCompatActivity {
         faqButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkInternetForUpdates();
-                if (newusercheck) {
-                    tutorialChecker();
+                try {
+                    if (newusercheck) {
+                        try {
+                            tutorialChecker();
+                        } catch (Exception e) {
+                            Log.d("Error: ", e.toString());
+                        }
+                    } else {
+                        checkInternetForUpdates();
+                        openFaqWebsite(view);
+                    }
                 }
-                else {
+                catch(Exception e){
+                    Log.d("Error: ", e.toString());
+                    checkInternetForUpdates();
                     openFaqWebsite(view);
                 }
             }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.utilisateur.uvexposureapp">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -23,31 +24,54 @@
         <activity
             android:name=".UserActivity"
             android:parentActivityName=".MainActivity"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:enabled="true"></activity>
         <activity
             android:name=".MainActivity"
             android:parentActivityName=".LoginActivity"
             android:theme="@style/DefaultScreen"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             ></activity>
         <activity
             android:name=".WeatherActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            ></activity>
+
         <activity
             android:name=".GraphActivity"
             android:parentActivityName=".MainActivity"></activity>
         <activity
             android:name=".BluetoothActivity"
-            android:parentActivityName=".UserActivity" />
+            android:parentActivityName=".UserActivity"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
 
         <activity android:name=".Location"
             android:parentActivityName=".WeatherActivity"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             />
         <activity android:name=".LoginActivity"
             android:parentActivityName=".LoginActivity"
             android:theme="@style/DefaultScreen"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             />
         <activity android:name=".splashScreen"
-            android:theme="@style/SplashScreen">
+            android:theme="@style/SplashScreen"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".splashScreen" />
