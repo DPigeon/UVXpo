@@ -52,8 +52,7 @@
             android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.GraphActivity"
-            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity"
-            android:screenOrientation="landscape" />
+            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.BluetoothActivity"
             android:parentActivityName="com.example.utilisateur.uvexposureapp.UserActivity" />

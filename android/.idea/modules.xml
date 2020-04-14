@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/UV ExposureApp.iml" filepath="$PROJECT_DIR$/UV ExposureApp.iml" group="UV ExposureApp" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="UV ExposureApp/app" />
+      <module fileurl="file://$USER_HOME$/AndroidStudioProjects/flutter_module1/flutter_module1.iml" filepath="$USER_HOME$/AndroidStudioProjects/flutter_module1/flutter_module1.iml" />
     </modules>
   </component>
 </project>
