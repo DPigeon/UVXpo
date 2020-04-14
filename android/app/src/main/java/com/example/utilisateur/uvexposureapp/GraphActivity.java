@@ -249,7 +249,7 @@ public class GraphActivity extends AppCompatActivity {
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         //graph.getGridLabelRenderer().setNumHorizontalLabels(3);
-        graph.getGridLabelRenderer().setNumVerticalLabels(5);
+        //graph.getGridLabelRenderer().setNumVerticalLabels(5);
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
             @Override
             public String formatLabel(double value, boolean isValueX){
