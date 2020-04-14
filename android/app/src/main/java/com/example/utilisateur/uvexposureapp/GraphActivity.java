@@ -69,7 +69,7 @@ public class GraphActivity extends AppCompatActivity {
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
     Menu menu;
-    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat("y HH:mm:ss a");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
