@@ -248,8 +248,8 @@ public class GraphActivity extends AppCompatActivity {
         series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
-        //graph.getGridLabelRenderer().setNumHorizontalLabels(3);
-        //graph.getGridLabelRenderer().setNumVerticalLabels(5);
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        graph.getGridLabelRenderer().setNumVerticalLabels(5);
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
             @Override
             public String formatLabel(double value, boolean isValueX){
@@ -263,6 +263,7 @@ public class GraphActivity extends AppCompatActivity {
         }}
     });
         graph.getGridLabelRenderer().setHumanRounding(false);
+
 
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
@@ -374,7 +375,6 @@ public class GraphActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
         double currentTime = new Date().getTime();
-        Log.d("hi:", data);
         double x = counter; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
         double weight = 0.20;
