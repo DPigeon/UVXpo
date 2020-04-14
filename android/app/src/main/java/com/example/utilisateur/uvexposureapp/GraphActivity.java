@@ -250,7 +250,19 @@ public class GraphActivity extends AppCompatActivity {
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         graph.getGridLabelRenderer().setNumHorizontalLabels(3);
         graph.getGridLabelRenderer().setNumVerticalLabels(5);
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
+            @Override
+            public String formatLabel(double value, boolean isValueX){
+            if(isValueX)
+            {
+                return sdf.format(new Date((long) value));
+            }
+            else
+                {
+                    return super.formatLabel(value, isValueX);
+        }}
+    });
+        graph.getGridLabelRenderer().setHumanRounding(false);
 
         // Axis
         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
@@ -361,8 +373,7 @@ public class GraphActivity extends AppCompatActivity {
     double previousY = 0;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void buildLiveExposureGraph(String data) {
-        Date today = new Date();
-        double currentTime = today.getTime();
+        double currentTime = new Date().getTime();
         Log.d("hi:", data);
         double x = counter; // Should be divided by 10 for real second values but we get lots of fluctuation (5 times faster)
         double y = Double.parseDouble(data);
@@ -429,5 +440,6 @@ public class GraphActivity extends AppCompatActivity {
         Intent intent = new Intent(GraphActivity.this, page); // from the main activity to the profile class
         startActivity(intent);
     }
+
 
 }
