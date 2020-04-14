@@ -33,6 +33,9 @@ public class WeatherActivity extends AppCompatActivity {
     String main = "";
     String desc = "";
     String temps = "";
+    String usernameIntent;
+    String passwordIntent;
+    Boolean newusercheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,11 @@ public class WeatherActivity extends AppCompatActivity {
 
         Weather weather = new Weather();                //call weather activity thats responsible to deal witht he weather API
         try {
+            Bundle userIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+
+            usernameIntent = userIntent.getString("username");
+            passwordIntent = userIntent.getString("password");
+            newusercheck = userIntent.getBoolean("checknewuser");
             String content = weather.execute(weatherInfo()).get();          //http call
             //Log.i("contentData", content);
             if (content != null) {
@@ -80,6 +88,23 @@ public class WeatherActivity extends AppCompatActivity {
         }
         setupUI(main,desc,temps);                         //setup ui
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newusercheck);
+        startActivity(intent);
     }
 
     void setupUI(String main,String desc,String temps) {

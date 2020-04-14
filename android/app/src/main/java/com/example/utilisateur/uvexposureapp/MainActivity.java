@@ -284,6 +284,11 @@ public class MainActivity extends AppCompatActivity {
 
     void goToActivity(Class page) { // Function that goes from the main activity to another one
         Intent intent = new Intent(MainActivity.this, page); // from the main activity to the profile class
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newusercheck);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
@@ -427,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
             uvIndex = 11;
             uvIndicator.setImageResource(R.drawable.uv_high);
         }
-        if (UserActivity.flag == true) {
+        //if (UserActivity.flag == true) {
             if (uvIndex >= 1 && uvIndex <= 2) {
                 channel2Notifmedium();
             } else if (uvIndex > 2 && uvIndex <= 5) {
@@ -439,7 +444,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (uvIndex > 11) {
                 channel2Notifextremelyhigh();
             }
-        }
+        // }
         //test.setText("Voltage: " + String.valueOf(voltage) + "\n" + "UV Index: " + String.valueOf(uvIndex));
     }
 

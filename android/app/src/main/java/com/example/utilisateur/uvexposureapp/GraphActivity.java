@@ -66,6 +66,9 @@ public class GraphActivity extends AppCompatActivity {
     LineGraphSeries<DataPoint> series;
     FirebaseFirestore fireStore;
     static final double ALPHA = 0.50; // If ALPHA = 0 or 1, no filter applies
+    String usernameIntent;
+    String passwordIntent;
+    Boolean newusercheck;
 
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
@@ -88,6 +91,34 @@ public class GraphActivity extends AppCompatActivity {
         sharedPreferencesHelper = new SharedPreferencesHelper(GraphActivity.this);
         fireStore = FirebaseFirestore.getInstance();
         setDate();
+
+        try {
+            Bundle userIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
+
+            usernameIntent = userIntent.getString("username");
+            passwordIntent = userIntent.getString("password");
+            newusercheck = userIntent.getBoolean("checknewuser");
+        } catch (Exception exception) {
+
+        }
+
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.removeExtra("username");
+        intent.removeExtra("checknewuser");
+        intent.putExtra("username", usernameIntent);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+        intent.putExtra("password", passwordIntent);
+        intent.putExtra("checknewuser", newusercheck);
+        startActivity(intent);
     }
 
     float x1, y1, x2, y2;
