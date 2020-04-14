@@ -22,74 +22,58 @@ public class TutorialFragment extends DialogFragment {
     protected int i;
     Window window;
     Point size;
-    int tutorialCheck;
-    int btnCheck;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tutorial, container, false);
-
-        Bundle bundle = getArguments();
-        tutorialCheck = bundle.getInt("introButtons");
-
-
         getDialog().setCanceledOnTouchOutside(false);
         instructionsTextView = view.findViewById(R.id.informationTextView);
         continuestepsButton = view.findViewById(R.id.gotitButton);
-        if (tutorialCheck == 0)
-        {
-            instructionsTextView.setText(("Hello! Welcome to the app that lets you see your UV exposure! Please click on the " +
-                    "settings button (grey gears logo) to continue the tutorial.").toString());
-            i++;
-        }
-        else if (tutorialCheck == 1)
-        {
-            instructionsTextView.setText(("The Settings Button lets you see your user preferences, and edit your " +
-                    "age, skin tone, and whether or not you want notifications. Click on the FAQ button (purple chat logo) to continue " +
-                    "the tutorial.").toString());
-            i++;
-        }
-        else if (tutorialCheck == 2)
-        {
-            instructionsTextView.setText(("The FAQ Button allows you to access different questions that" +
-                    " may come to your mind when it comes to UV exposure and how it affects you. Click on the Graph Exposure" +
-                    " button (orange button) to continue the tutorial.").toString());
-            i++;
-        }
-        else if (tutorialCheck == 3)
-        {
-            instructionsTextView.setText(("The Graph Exposure Button allows for you to see your UV " +
-                    "exposure over time. You can see any UV exposure over any specific date. Click on the Weather button" +
-                    " (grey button) to continue the tutorial.").toString());
-            i++;
-        }
-        else if (tutorialCheck == 4)
-        {
-            instructionsTextView.setText(("The Get Current Weather Data Button allows for you to see the " +
-                    "weather conditions in your area, and allows for you to change your location.").toString());
-
-            tutorialCheck = 5;
-        }
-
-
+        instructionsTextView.setText("Hello! Welcome to the app that lets you see your UV exposure!");
+        i = 0;
 
         continuestepsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                    if (i == 0)
+                    {
+                        instructionsTextView.setText(("The Settings Button lets you see your user preferences, and edit your " +
+                                "age, skin tone, and whether or not you want notifications.").toString());
+                        i++;
+                    }
+                    else if (i == 1)
+                    {
+                        instructionsTextView.setText(("The FAQ Button allows you to access different questions that" +
+                                " may come to your mind when it comes to UV exposure and how it affects you.").toString());
+                        i++;
+                    }
+                    else if (i == 2)
+                    {
+                        instructionsTextView.setText(("The Graph Exposure Button allows for you to see your UV " +
+                                "exposure over time. You can see any UV exposure over any specific date.").toString());
+                        i++;
+                    }
+                    else if (i == 3)
+                    {
+                        instructionsTextView.setText(("The Get Current Weather Data Button allows for you to see the " +
+                                "weather conditions in your area, and allows for you to change your location.").toString());
 
-                if (tutorialCheck == 5)
-                {
-                    instructionsTextView.setText(("Hope you enjoy the app, and it's our pleasure to help you stay " +
-                            "healthy and happy!").toString());
+                        i++;
+                    }
+                    else if (i == 4)
+                    {
+                        instructionsTextView.setText(("Hope you enjoy the app, and it's our pleasure to help you stay " +
+                                "healthy and happy!").toString());
 
-                    tutorialCheck = 0;
-                }
-                else{
-                    getDialog().dismiss();
-                }
+                        i++;
+                    }
+                    else if (i == 5)
+                    {
+                        getDialog().dismiss();
+                    }
+
             }
-
         });
 
 
@@ -109,7 +93,7 @@ public class TutorialFragment extends DialogFragment {
         display.getSize(size);
 
         //resize
-        window.setLayout((int) (size.x *0.98), (int) (size.y *0.60));
+        window.setLayout((int) (size.x *0.98), (int) (size.y *0.9));
         window.setGravity(Gravity.CENTER);
         super.onResume();
 

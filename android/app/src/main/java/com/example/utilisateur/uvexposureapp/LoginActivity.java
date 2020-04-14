@@ -129,7 +129,6 @@ public class LoginActivity extends AppCompatActivity {
         } catch (Exception exception) {
             Log.d("Login", exception.toString());
         }
-
     }
 
     protected void setupAction() { // No action bar for the main activity
@@ -189,6 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                     Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
                 }
+                Toast.makeText(LoginActivity.this, "Invalid Username and/or Password", Toast.LENGTH_SHORT).show();
             }
         });
     }
