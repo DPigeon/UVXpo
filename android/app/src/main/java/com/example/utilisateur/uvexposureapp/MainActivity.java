@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
     int ageOffline = 0;
     int skinOffline = 0;
     boolean notifsOffline = true;
+    List<User> tutorialNewUserCheck;
+    int ivalue;
 
     @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -147,7 +149,12 @@ public class MainActivity extends AppCompatActivity {
                         x2 = touchEvent.getX();
                         y2 = touchEvent.getY();
                         if (y1 >= y2) {
-                            checkInternetForUpdates();
+                            try{
+                                checkInternetForUpdates();
+                            }
+                            catch(Exception e){
+                                Log.d("Error: ", e.toString() );
+                            }
                             Intent i = new Intent(MainActivity.this, GraphActivity.class);
                             startActivity(i);
                             overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
@@ -167,7 +174,12 @@ public class MainActivity extends AppCompatActivity {
                     x2 = touchEvent.getX();
                     y2 = touchEvent.getY();
                     if (y1 >= y2) {
-                        checkInternetForUpdates();
+                        try{
+                            checkInternetForUpdates();
+                        }
+                        catch(Exception ex){
+                            Log.d("Error: ", ex.toString() );
+                        }
                         Intent i = new Intent(MainActivity.this, GraphActivity.class);
                         startActivity(i);
                         overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
@@ -224,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
         setupAction();
         welcomeUserTextView = findViewById(R.id.welcomeUserTextView);
         graphButton = findViewById(R.id.graphButton);
-
         newWeatherButton = findViewById(R.id.imageButton);
         settingsButton = findViewById(R.id.settingsButton);
         weatherbutton();
@@ -241,13 +252,23 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     else{
-                        checkInternetForUpdates();
+                        try{
+                            checkInternetForUpdates();
+                        }
+                        catch(Exception e){
+                            Log.d("Error: ", e.toString() );
+                        }
                         goToActivity(WeatherActivity.class);
                     }
                 }
                 catch(Exception e){
                     Log.d("Error: ", e.toString());
-                    checkInternetForUpdates();
+                    try{
+                        checkInternetForUpdates();
+                    }
+                    catch(Exception ex){
+                        Log.d("Error: ", ex.toString() );
+                    }
                     goToActivity(WeatherActivity.class);
                 }
 
@@ -264,13 +285,23 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Error: ", e.toString());
                         }
                     } else {
-                        checkInternetForUpdates();
+                        try{
+                            checkInternetForUpdates();
+                        }
+                        catch(Exception e){
+                            Log.d("Error: ", e.toString() );
+                        }
                         goToActivity(GraphActivity.class);
                     }
                 }
                 catch(Exception e){
                     Log.d("Error: ", e.toString());
-                    checkInternetForUpdates();
+                    try{
+                        checkInternetForUpdates();
+                    }
+                    catch(Exception ex){
+                        Log.d("Error: ", ex.toString() );
+                    }
                     goToActivity(GraphActivity.class);
                 }
             }
@@ -286,7 +317,12 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Error: ", e.toString());
                         }
                     } else {
-                        checkInternetForUpdates();
+                        try{
+                            checkInternetForUpdates();
+                        }
+                        catch(Exception e){
+                            Log.d("Error: ", e.toString() );
+                        }
                         Intent intent = new Intent(MainActivity.this, UserActivity.class);
                         intent.removeExtra("username");
                         intent.removeExtra("checknewuser");
@@ -298,7 +334,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 catch(Exception e){
                     Log.d("Error: ", e.toString());
-                    checkInternetForUpdates();
+                    try{
+                        checkInternetForUpdates();
+                    }
+                    catch(Exception ex){
+                        Log.d("Error: ", ex.toString() );
+                    }
                     Intent intent = new Intent(MainActivity.this, UserActivity.class);
                     intent.removeExtra("username");
                     intent.removeExtra("checknewuser");
@@ -321,13 +362,23 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Error: ", e.toString());
                         }
                     } else {
-                        checkInternetForUpdates();
+                        try{
+                            checkInternetForUpdates();
+                        }
+                        catch(Exception e){
+                            Log.d("Error: ", e.toString() );
+                        }
                         openFaqWebsite(view);
                     }
                 }
                 catch(Exception e){
                     Log.d("Error: ", e.toString());
-                    checkInternetForUpdates();
+                    try{
+                        checkInternetForUpdates();
+                    }
+                    catch(Exception ex){
+                        Log.d("Error: ", ex.toString() );
+                    }
                     openFaqWebsite(view);
                 }
             }
@@ -626,6 +677,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void tutorialChecker(){
         try {
+            tutorialNewUserCheck = dbhelper.getAllUserData();
+            ivalue = -1;
             if (newusercheck) {
                 settingsButton.setVisibility(View.INVISIBLE);
                 faqButton.setVisibility(View.INVISIBLE);
@@ -701,6 +754,13 @@ public class MainActivity extends AppCompatActivity {
                     graphButton.setVisibility(View.VISIBLE);
                     introButtons = 0;
                     newusercheck = false;
+
+                    for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
+                        if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
+                            ivalue = i;
+                            break;
+                        }
+                    }
                     if (haveNetworkConnection()) {
 
                         final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
@@ -710,6 +770,14 @@ public class MainActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document_user : task.getResult()) {
                                         users.document(document_user.getId()).update("newUser", newusercheck);
+                                        String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
+                                        String username = tutorialNewUserCheck.get(ivalue).getUsername();
+                                        String password =  tutorialNewUserCheck.get(ivalue).getPassword();
+                                        int age = tutorialNewUserCheck.get(ivalue).getAge();
+                                        int skin = tutorialNewUserCheck.get(ivalue).getSkin();
+                                        boolean notifs = tutorialNewUserCheck.get(ivalue).getNotifications();
+
+                                        dbhelper.updateData(id, username, password, age, skin, notifs, newusercheck);
                                     }
                                 } else {
                                     Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
@@ -719,17 +787,15 @@ public class MainActivity extends AppCompatActivity {
                         });
                     } else {
 
-                        List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
-                        int ivalue = -1;
-                        for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
-                            if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
-                                ivalue = i;
-                            }
-                        }
+
                         String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
-                        dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
-                                tutorialNewUserCheck.get(ivalue).getPassword(), tutorialNewUserCheck.get(ivalue).getAge(),
-                                tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), newusercheck);
+                        String username = tutorialNewUserCheck.get(ivalue).getUsername();
+                        String password =  tutorialNewUserCheck.get(ivalue).getPassword();
+                        int age = tutorialNewUserCheck.get(ivalue).getAge();
+                        int skin = tutorialNewUserCheck.get(ivalue).getSkin();
+                        boolean notifs = tutorialNewUserCheck.get(ivalue).getNotifications();
+
+                        dbhelper.updateData(id, username, password, age, skin, notifs, newusercheck);
                     }
                 }
             }
