@@ -201,7 +201,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         String notifs = Boolean.toString(notifications);
-        String newuserString = String.valueOf(new_user);
+        String newuserString = Boolean.toString(new_user);
         Integer idCheck = Integer.getInteger(id);
 
         values.put(DatabaseConfig.COLUMN_USERNAME, username);

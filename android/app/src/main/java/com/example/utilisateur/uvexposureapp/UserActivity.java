@@ -8,7 +8,6 @@ import android.app.ActionBar;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Canvas;
@@ -69,7 +68,7 @@ public class UserActivity extends AppCompatActivity {
     int getDOBmonth;
     int getDOByear;
     int ageChecker;
-    static boolean flag;
+
 
     Boolean newuserregcheck = false;
     String usernameIntent;
@@ -182,25 +181,7 @@ public class UserActivity extends AppCompatActivity {
 
             getSupportActionBar().setTitle("App Settings");
         }
-        notifSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notifSwitch.isChecked()) {
-                    SharedPreferences.Editor editor = getSharedPreferences("save",MODE_PRIVATE).edit();
-                    editor.putBoolean("stat",true);
-                    editor.apply();
-                    notifSwitch.setChecked(true);
-                    flag = true;
-                } else {
-                    flag = false;
-                    SharedPreferences .Editor editor = getSharedPreferences("save",MODE_PRIVATE).edit();
-                    editor.putBoolean("stat",false);
-                    editor.apply();
-                    notifSwitch.setChecked(false);
-                }
-            }
 
-        });
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
