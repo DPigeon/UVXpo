@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     String latitude, longitude;
     Boolean storeLocationShown = false; // we show only once
     protected ImageButton newWeatherButton;
+    int introButtons;
+    DatabaseHelper dbhelper;
 
     String usernameOffline = null;
     String passwordOffline = null;
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferencesHelper = new SharedPreferencesHelper(MainActivity.this);
         fireStore = FirebaseFirestore.getInstance();
+        dbhelper = new DatabaseHelper(this);
         try {
             Bundle userIntent = getIntent().getExtras(); /**GETS USER INTENTS SO DATA COULD BE RETRIEVED*/
 
@@ -133,20 +136,22 @@ public class MainActivity extends AppCompatActivity {
     float x1, y1, x2, y2;
     @Override
     public boolean onTouchEvent(MotionEvent touchEvent) {
-        switch(touchEvent.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                x1 = touchEvent.getX();
-                y1 = touchEvent.getY();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = touchEvent.getX();
-                y2 = touchEvent.getY();
-                if(y1 >= y2){
-                Intent i = new Intent(MainActivity.this, GraphActivity.class);
-                startActivity(i);
-                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+        if (!newusercheck) {
+            switch (touchEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    x1 = touchEvent.getX();
+                    y1 = touchEvent.getY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    x2 = touchEvent.getX();
+                    y2 = touchEvent.getY();
+                    if (y1 >= y2) {
+                        Intent i = new Intent(MainActivity.this, GraphActivity.class);
+                        startActivity(i);
+                        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                    }
+                    break;
             }
-            break;
         }
         return false;
     }
@@ -154,9 +159,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        DatabaseHelper dbhelper = new DatabaseHelper(this);
-        List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
-        int ivalue = -1;
 
 
         try {
@@ -182,41 +184,9 @@ public class MainActivity extends AppCompatActivity {
 
         /* Tutorial */
         try {
-
-            if (newusercheck && !haveNetworkConnection()) {
-                for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
-                    if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
-                        ivalue = i;
-                    }
-                }
-                    TutorialFragment dialog = new TutorialFragment();
-                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
-                    newusercheck = false;
-                    String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
-                    dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
-                            tutorialNewUserCheck.get(ivalue).getPassword(), tutorialNewUserCheck.get(ivalue).getAge(),
-                            tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), newusercheck);
-
-            }
-            else if (newusercheck && haveNetworkConnection()){
-                TutorialFragment dialog = new TutorialFragment();
-                dialog.show(getSupportFragmentManager(), "TutorialFragment");
-                newusercheck = false;
-
-                final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
-                users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntentExtra).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document_user : task.getResult()) {
-                                users.document(document_user.getId()).update("newUser", newusercheck);
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
+            if (newusercheck){
+                introButtons = 0;
+                tutorialChecker();
             }
         } catch (Exception exception) {
             Log.d("New User Check", exception.toString());
@@ -240,8 +210,14 @@ public class MainActivity extends AppCompatActivity {
         newWeatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 checkInternetForUpdates();
+                if (newusercheck) {
+                    tutorialChecker();
+                }
+                else{
                 goToActivity(WeatherActivity.class);
+                }
 
             }
         });
@@ -249,20 +225,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkInternetForUpdates();
-                goToActivity(GraphActivity.class);
+                if (newusercheck) {
+                    tutorialChecker();
+                }
+                else {
+                    goToActivity(GraphActivity.class);
+                }
             }
         });
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkInternetForUpdates();
-                Intent intent = new Intent(MainActivity.this, UserActivity.class);
-                intent.removeExtra("username");
-                intent.removeExtra("checknewuser");
-                intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
-                intent.putExtra("password", passwordIntent);
-                intent.putExtra("checknewuser", newusercheck);
-                startActivity(intent);
+                if (newusercheck) {
+                    tutorialChecker();
+                }
+                else {
+                    Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                    intent.removeExtra("username");
+                    intent.removeExtra("checknewuser");
+                    intent.putExtra("username", usernameIntentExtra);/**ADDING INTENT SO USER DATA CAN BE RETRIEVED*/
+                    intent.putExtra("password", passwordIntent);
+                    intent.putExtra("checknewuser", newusercheck);
+                    startActivity(intent);
+                }
             }
         });
         faqButton = findViewById(R.id.faqButton);
@@ -270,7 +256,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkInternetForUpdates();
-                openFaqWebsite(view);
+                if (newusercheck) {
+                    tutorialChecker();
+                }
+                else {
+                    openFaqWebsite(view);
+                }
             }
         });
 
@@ -562,6 +553,121 @@ public class MainActivity extends AppCompatActivity {
         }
         catch(Exception exception){
             Log.d("Exception: ", exception.toString());
+        }
+    }
+
+    public void tutorialChecker(){
+        try {
+            if (newusercheck) {
+                settingsButton.setVisibility(View.INVISIBLE);
+                faqButton.setVisibility(View.INVISIBLE);
+                newWeatherButton.setVisibility(View.INVISIBLE);
+                graphButton.setVisibility(View.INVISIBLE);
+
+                if (introButtons == 0) {
+                    TutorialFragment dialog = new TutorialFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.remove("introButtons");
+                    bundle.remove("btnNumber");
+                    bundle.putInt("introButtons", introButtons);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    introButtons = 1;
+                    settingsButton.setVisibility(View.VISIBLE);
+                    settingsButton.setClickable(true);
+                } else if (introButtons == 1) {
+                    TutorialFragment dialog = new TutorialFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.remove("introButtons");
+                    bundle.remove("btnNumber");
+                    bundle.putInt("introButtons", 1);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    settingsButton.setVisibility(View.INVISIBLE);
+                    settingsButton.setClickable(false);
+
+                    faqButton.setVisibility(View.VISIBLE);
+                    faqButton.setClickable(true);
+                    introButtons = 2;
+                } else if (introButtons == 2) {
+                    TutorialFragment dialog = new TutorialFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.remove("introButtons");
+                    bundle.remove("btnNumber");
+                    bundle.putInt("introButtons", 2);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    faqButton.setVisibility(View.INVISIBLE);
+                    faqButton.setClickable(false);
+                    graphButton.setVisibility(View.VISIBLE);
+                    graphButton.setClickable(true);
+                    introButtons = 3;
+                } else if (introButtons == 3) {
+                    TutorialFragment dialog = new TutorialFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.remove("introButtons");
+                    bundle.remove("btnNumber");
+                    bundle.putInt("introButtons", 3);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    graphButton.setClickable(false);
+                    graphButton.setVisibility(View.INVISIBLE);
+                    newWeatherButton.setVisibility(View.VISIBLE);
+                    newWeatherButton.setClickable(true);
+                    introButtons = 4;
+                } else if (introButtons == 4) {
+                    TutorialFragment dialog = new TutorialFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.remove("introButtons");
+                    bundle.remove("btnNumber");
+                    bundle.putInt("introButtons", 4);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), "TutorialFragment");
+                    settingsButton.setClickable(true);
+                    faqButton.setClickable(true);
+                    newWeatherButton.setClickable(true);
+                    graphButton.setClickable(true);
+                    settingsButton.setVisibility(View.VISIBLE);
+                    faqButton.setVisibility(View.VISIBLE);
+                    newWeatherButton.setVisibility(View.VISIBLE);
+                    graphButton.setVisibility(View.VISIBLE);
+                    introButtons = 0;
+                    newusercheck = false;
+                    if (haveNetworkConnection()) {
+
+                        final CollectionReference users = fireStore.collection(DatabaseConfig.USER_TABLE_NAME);
+                        users.whereEqualTo(DatabaseConfig.COLUMN_USERNAME, usernameIntentExtra).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document_user : task.getResult()) {
+                                        users.document(document_user.getId()).update("newUser", newusercheck);
+                                    }
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Error storing newUser value!", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+                    } else {
+
+                        List<User> tutorialNewUserCheck = dbhelper.getAllUserData();
+                        int ivalue = -1;
+                        for (int i = 0; i < tutorialNewUserCheck.size(); i++) {
+                            if (usernameIntentExtra.equals(tutorialNewUserCheck.get(i).getUsername())) {
+                                ivalue = i;
+                            }
+                        }
+                        String id = Integer.toString(tutorialNewUserCheck.get(ivalue).getUserId());
+                        dbhelper.updateData(id, tutorialNewUserCheck.get(ivalue).getUsername(),
+                                tutorialNewUserCheck.get(ivalue).getPassword(), tutorialNewUserCheck.get(ivalue).getAge(),
+                                tutorialNewUserCheck.get(ivalue).getSkin(), tutorialNewUserCheck.get(ivalue).getNotifications(), newusercheck);
+                    }
+                }
+            }
+        }
+        catch(Exception e){
+            Log.d("Error: ", e.toString());
         }
     }
 
