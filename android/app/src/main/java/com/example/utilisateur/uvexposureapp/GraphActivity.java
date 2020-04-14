@@ -69,7 +69,7 @@ public class GraphActivity extends AppCompatActivity {
     String lastDate = ""; // To keep track of the last date entered
     Boolean toggleLivePastData = false; // If false: live data, if true: past data
     Menu menu;
-    SimpleDateFormat sdf = new SimpleDateFormat("y HH:mm:ss a");
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm a");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,7 +248,7 @@ public class GraphActivity extends AppCompatActivity {
         series.setThickness(5);
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        //graph.getGridLabelRenderer().setNumHorizontalLabels(3);
         graph.getGridLabelRenderer().setNumVerticalLabels(5);
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
             @Override
