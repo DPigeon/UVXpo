@@ -40,28 +40,40 @@
 
         <activity
             android:name="com.example.utilisateur.uvexposureapp.UserActivity"
+            android:configChanges="orientation"
             android:enabled="true"
-            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity" />
+            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         <activity
             android:name="com.example.utilisateur.uvexposureapp.MainActivity"
+            android:configChanges="orientation"
             android:parentActivityName="com.example.utilisateur.uvexposureapp.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/DefaultScreen" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.WeatherActivity"
-            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity" />
+            android:configChanges="orientation"
+            android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         <activity
             android:name="com.example.utilisateur.uvexposureapp.GraphActivity"
             android:parentActivityName="com.example.utilisateur.uvexposureapp.MainActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.BluetoothActivity"
-            android:parentActivityName="com.example.utilisateur.uvexposureapp.UserActivity" />
+            android:configChanges="orientation"
+            android:parentActivityName="com.example.utilisateur.uvexposureapp.UserActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.Location"
             android:parentActivityName="com.example.utilisateur.uvexposureapp.WeatherActivity" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.LoginActivity"
+            android:configChanges="orientation"
             android:parentActivityName="com.example.utilisateur.uvexposureapp.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/DefaultScreen" />
         <activity
             android:name="com.example.utilisateur.uvexposureapp.splashScreen"

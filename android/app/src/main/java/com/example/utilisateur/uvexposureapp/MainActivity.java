@@ -354,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) { // Listen to data here from the characteristic
                         String data = new String(characteristic.getValue()); // Converting from byte[] to string
+                        Log.d("hi:", data);
                         double val = Double.parseDouble(data);
                         notificationFunction(val);
                         /* Here we broadcast data to other activities using a specific action */
