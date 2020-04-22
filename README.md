@@ -1,7 +1,7 @@
 # UV Exposure App
 Our Mini Capstone Project is a mobile application that is used to track your UV exposure throughout the day.
 
-<img width="150" src="https://user-images.githubusercontent.com/37888675/79155470-260ed600-7d9f-11ea-829b-8700532dbc93.jpg">
+<img width="250" src="https://github.com/DPigeon/UVXpo/blob/master/Small-Demo.gif?raw=true">
 
 ### Features
 - Sends notifications when UV exposure is high
